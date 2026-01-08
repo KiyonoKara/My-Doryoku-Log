@@ -16,7 +16,7 @@
 
 @font-face {
     font-family: "DM Sans";
-    src: url('/fonts/dm-sans-variable.ttf') format("truetype");
+    src: url("/fonts/dm-sans-variable.ttf") format("truetype");
     font-weight: 0 1000;
     font-display: swap;
 }
