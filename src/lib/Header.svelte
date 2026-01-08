@@ -17,13 +17,12 @@
       text-align: center;
       padding: 6px;
       text-decoration: none;
-      font-size: 24px;
+      font-size: 28px;
       line-height: 25px;
       border-radius: 4px;
   }
 
 	.header h1.logo {
-      font-size: 28px;
       font-weight: bold;
       display: flex;
       align-items: center;
