@@ -11,7 +11,7 @@
 
 		setTimeout(() => {
 			pressed = false;
-		}, 400);
+		}, 300);
 	}
 </script>
 
@@ -45,7 +45,8 @@
  }
 
  .submit-button.pressed {
-		 background-color: #bed4e9;
+		 /*background-color: #122335;*/
+		 background-color: #a2c0df;
 		 color: #1c2127;
  }
 
