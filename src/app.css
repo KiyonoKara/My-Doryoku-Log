@@ -1,49 +1,58 @@
 :root {
-    --bg-primary: #1c2127;
-    --bg-secondary: #0b385f;
-    --bg-surface: #3373b0;
-    --text-primary: #e7f1fb;
-    --text-secondary: #bed4e9;
-    --accent: #3373b0;
-    --accent-hover: #0b385f;
-    --border: #3373b0;
-    --border-hover: #bed4e9;
+	--bg-primary: #1c2127;
+	--bg-secondary: #0b385f;
+	--bg-surface: #3373b0;
+	--text-primary: #e7f1fb;
+	--text-secondary: #bed4e9;
+	--accent: #3373b0;
+	--accent-hover: #0b385f;
+	--border: #3373b0;
+	--border-hover: #bed4e9;
 }
 
 * {
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 @font-face {
-    font-family: "DM Sans";
-    src: url("/fonts/dm-sans-variable.ttf") format("truetype");
-    font-weight: 0 1000;
-    font-display: swap;
+	font-family: 'DM Sans';
+	src: url('./fonts/dm-sans-variable.ttf') format('truetype');
+	font-weight: 0 1000;
+	font-display: swap;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    font-family: "DM Sans", system-ui, -apple-system, sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    line-height: 1.6;
+	margin: 0;
+	padding: 0;
+	font-family:
+		'DM Sans',
+		system-ui,
+		-apple-system,
+		sans-serif;
+	background: var(--bg-primary);
+	color: var(--text-primary);
+	line-height: 1.6;
 }
 
-h1, h2, h3 {
-    color: var(--text-primary);
+h1,
+h2,
+h3 {
+	color: var(--text-primary);
 }
 
 a {
-    color: var(--accent);
-    text-decoration: none;
+	color: var(--accent);
+	text-decoration: none;
 }
 
 a:hover {
-    color: var(--accent-hover);
+	color: var(--accent-hover);
 }
 
-button, input, select, textarea {
-    font-family: inherit;
-    font-size: inherit;
+button,
+input,
+select,
+textarea {
+	font-family: inherit;
+	font-size: inherit;
 }
