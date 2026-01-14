@@ -1,1 +1,5 @@
-<h1>Finance</h1>
+<script lang="ts">
+	import BackButton from '$lib/BackButton.svelte';
+</script>
+
+<BackButton label="Home" href="/" />
