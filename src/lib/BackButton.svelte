@@ -15,8 +15,7 @@
 	type="button"
 	class="back-button"
 	on:click={handleClick}
-	aria-label={ariaLabel}
->
+	aria-label={ariaLabel}>
   <span class="back-button__icon">
     <img src="/src/lib/assets/left-arrow.svg" alt="" aria-hidden="true" />
   </span>
@@ -28,10 +27,11 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-
         padding: 0.5rem 0.9rem;
         border-radius: 100px;
         border: 1px solid var(--border);
+        margin-top: 1.5rem;
+        margin-left: 1.5rem;
         background: linear-gradient(
                 135deg,
                 var(--bg-secondary),
