@@ -1,8 +1,10 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text, real } from 'drizzle-orm/sqlite-core';
 
-export const user = sqliteTable('user', {
-	id: text('id')
-		.primaryKey()
-		.$defaultFn(() => crypto.randomUUID()),
-	age: integer('age')
+export const transactions = sqliteTable('transactions', {
+	id: integer('id').primaryKey(),
+	date: text('date').notNull(),
+	amount: real('amount').notNull(),
+	category: text('category').notNull(),
+	type: text('type', { enum: ['income', 'expense'] as const }).notNull(),
+	description: text('description')
 });
