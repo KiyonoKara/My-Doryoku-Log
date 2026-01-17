@@ -8,3 +8,12 @@ export const transactions = sqliteTable('transactions', {
 	type: text('type', { enum: ['income', 'expense'] as const }).notNull(),
 	description: text('description')
 });
+
+export type Transaction = {
+	id: number;
+	date: string;
+	amount: number;
+	category: string;
+	type: 'income' | 'expense';
+	description: string | null;
+};
