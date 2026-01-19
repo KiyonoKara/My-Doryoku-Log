@@ -4,6 +4,7 @@ import { db } from '$lib/server/db';
 import { transactions, type Transaction } from '$lib/server/db/schema';
 import { desc, eq } from 'drizzle-orm';
 
+// load page with this
 export const load: PageServerLoad = async () => {
 	const rows: Transaction[] = await db
 		.select()
@@ -17,6 +18,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
+	// for submitting transactions
 	submit: async ({ request }) => {
 		const formData = await request.formData();
 
@@ -35,11 +37,13 @@ export const actions: Actions = {
 			return fail(400, { success: false, message: 'Invalid form data' });
 		}
 
+		// needs to be a real number
 		const parsedAmount = Number(amount);
 		if (!Number.isFinite(parsedAmount)) {
 			return fail(400, { success: false, message: 'Amount must be a number' });
 		}
 
+		// there should only be two types
 		if (type !== 'income' && type !== 'expense') {
 			return fail(400, { success: false, message: 'Invalid type' });
 		}
@@ -56,6 +60,7 @@ export const actions: Actions = {
 			success: true
 		};
 	},
+	// for deleting transactions
 	delete: async ({ request }) => {
 		const formData = await request.formData();
 		const id = Number(formData.get('id'));
