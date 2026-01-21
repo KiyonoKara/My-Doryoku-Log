@@ -111,6 +111,10 @@
 	let showError = $state(false);
 
 	$effect(() => {
+		if (!form) {
+			return;
+		}
+
 		if (form?.success && form?.message) {
 			showSuccess = true;
 			setTimeout(() => {
