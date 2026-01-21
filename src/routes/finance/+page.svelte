@@ -1,4 +1,3 @@
-<!-- src/routes/finance/+page.svelte -->
 <script lang="ts">
 	import { type Transaction } from '$lib/server/db/schema';
 	import SubmitButton from '$lib/SubmitButton.svelte';
@@ -112,13 +111,13 @@
 	let showError = $state(false);
 
 	$effect(() => {
-		if (form?.success) {
+		if (form?.success && form?.message) {
 			showSuccess = true;
 			setTimeout(() => {
 				showSuccess = false;
 			}, 5000);
 		}
-		if (form?.message) {
+		else {
 			showError = true;
 			setTimeout(() => {
 				showError = false;
@@ -132,7 +131,7 @@
 		<h2 class="panel-title">Log transaction</h2>
 
 		{#if showSuccess}
-			<p class="flash flash--success">Entry saved.</p>
+			<p class="flash flash--success">{form?.message}</p>
 		{/if}
 		{#if showError}
 			<p class="flash flash--error">{form?.message}</p>
