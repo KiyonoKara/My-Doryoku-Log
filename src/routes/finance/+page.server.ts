@@ -40,12 +40,18 @@ export const actions: Actions = {
 		// needs to be a real number
 		const parsedAmount = Number(amount);
 		if (!Number.isFinite(parsedAmount)) {
-			return fail(400, { success: false, message: 'Amount must be a number' });
+			return fail(400, {
+				success: false,
+				message: 'Amount must be a number'
+			});
 		}
 
 		// there should only be two types
 		if (type !== 'income' && type !== 'expense') {
-			return fail(400, { success: false, message: 'Invalid type' });
+			return fail(400, {
+				success: false,
+				message: 'Invalid type'
+			});
 		}
 
 		await db.insert(transactions).values({
@@ -57,7 +63,9 @@ export const actions: Actions = {
 		});
 
 		return {
-			success: true
+			success: true,
+			action: 'submit',
+			message: 'Entry saved.'
 		};
 	},
 	// for deleting transactions
@@ -66,14 +74,18 @@ export const actions: Actions = {
 		const id = Number(formData.get('id'));
 
 		if (!Number.isFinite(id)) {
-			return fail(400, { success: false, message: 'Invalid ID' });
+			return fail(400, {
+				success: false,
+				message: 'Invalid ID'
+			});
 		}
 
-		try {
-			await db.delete(transactions).where(eq(transactions.id, id));
-			return { success: true, deleted: true };
-		} catch {
-			return fail(500, { success: false, message: `Failed to delete` });
-		}
+		await db.delete(transactions).where(eq(transactions.id, id));
+
+		return {
+			success: true,
+			deleted: true,
+			message: 'Entry deleted.'
+		};
 	}
 };
