@@ -2,6 +2,7 @@
 	import { type Transaction } from '$lib/server/db/schema';
 	import SubmitButton from '$lib/SubmitButton.svelte';
 
+	// set types
 	const EXPENSE_CATEGORIES = [
 		'Groceries',
 		'Dining',
@@ -71,7 +72,9 @@
 
 	function formatDateLabel(d: string) {
 		const [yyyy, mm, dd] = d.split('-').map(Number);
-		if (!yyyy || !mm || !dd) return d;
+		if (!yyyy || !mm || !dd) {
+			return d;
+		}
 		const month = MONTH_NAMES[mm - 1] ?? '';
 		return `${month} ${dd}, ${yyyy}`;
 	}
@@ -79,7 +82,9 @@
 	// filter by keywords
 	let filtered = $derived(
 		transactions.filter((tx) => {
-			if (!search) return true;
+			if (!search) {
+				return true;
+			}
 			const q = search.toLowerCase();
 			return (
 				tx.category.toLowerCase().includes(q) || (tx.description ?? '').toLowerCase().includes(q)
@@ -111,13 +116,16 @@
 	let showError = $state(false);
 
 	$effect(() => {
+		if (!form) {
+			return;
+		}
+
 		if (form?.success && form?.message) {
 			showSuccess = true;
 			setTimeout(() => {
 				showSuccess = false;
 			}, 5000);
-		}
-		else {
+		} else {
 			showError = true;
 			setTimeout(() => {
 				showError = false;
@@ -200,10 +208,10 @@
 				</select>
 			</div>
 
-			<!-- Description -->
+			<!-- description, optional field -->
 			<div class="field-row">
 				<label for="description" class="field-label">Details</label>
-				<textarea id="description" name="description" rows="2" placeholder="Optional description..."
+				<textarea id="description" name="description" rows="2" placeholder="Description..."
 				></textarea>
 			</div>
 
@@ -223,7 +231,7 @@
 
 		<div class="history-scroll">
 			{#if groupedDates.length === 0}
-				<p class="empty-state">No entries yet. Add your first one on the left.</p>
+				<p class="empty-state">No entries yet.</p>
 			{:else}
 				{#each groupedDates as d (d.toString())}
 					<section class="date-group">
