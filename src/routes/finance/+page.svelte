@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { type Transaction } from '$lib/server/db/schema';
 	import SubmitButton from '$lib/SubmitButton.svelte';
+	import CsvExportButton from '$lib/CsvExportButton.svelte';
+	import { capitalizeFirstLetter } from '$lib/utils/util';
 
 	// set types
 	const EXPENSE_CATEGORIES = [
@@ -110,6 +112,38 @@
 			event.preventDefault();
 		}
 	}
+
+	// convert existing transactions to csv data
+	function buildTransactionsCsv(rows: Transaction[]): string {
+		if (!rows.length) {
+			return '';
+		}
+
+		const headers = ['ID', 'Date', 'Amount', 'Category', 'Type', 'Description'];
+
+		const escape = (value: unknown) => {
+			const str = String(value ?? '');
+			// if value has comma, quote or newline, wrap in quotes and escape them
+			return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+		};
+
+		const dataRows = rows.map((tx) => [
+			tx.id,
+			tx.date,
+			tx.amount,
+			tx.category,
+			capitalizeFirstLetter(tx.type),
+			tx.description ?? ''
+		]);
+
+		return [
+			// headers
+			headers.map(escape).join(','),
+			// data
+			...dataRows.map((r) => r.map(escape).join(','))
+		].join('\n');
+	}
+	let transactionsCsv = $derived(buildTransactionsCsv(filtered));
 
 	// auto dismiss
 	let showSuccess = $state(false);
@@ -275,13 +309,19 @@
 				{/each}
 			{/if}
 		</div>
+		<CsvExportButton
+			label="Export CSV"
+			description="Download all transactions as CSV"
+			csvContent={transactionsCsv}
+			iconPath="/src/lib/assets/file-report.svg"
+			filename={`transactions-${new Date().toISOString().slice(0, 10)}.csv`}
+		/>
 	</div>
 </section>
 
 <!--suppress CssUnusedSymbol
 (for the tx-income and tx-expense type css since it relies on a string concat)
 -->
-
 <style>
 	.finance-layout {
 		max-width: 1100px;
