@@ -65,7 +65,7 @@ export const actions: Actions = {
 		return {
 			success: true,
 			action: 'submit',
-			message: 'Entry saved.'
+			message: 'Entry saved'
 		};
 	},
 	// for deleting transactions
@@ -85,7 +85,7 @@ export const actions: Actions = {
 		return {
 			success: true,
 			deleted: true,
-			message: 'Entry deleted.'
+			message: 'Entry deleted'
 		};
 	}
 };

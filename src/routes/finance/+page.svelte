@@ -4,8 +4,9 @@
 	import CsvExportButton from '$lib/CsvExportButton.svelte';
 	import CategoryBarChart from '$lib/CategoryBarChart.svelte';
 	import { capitalizeFirstLetter } from '$lib/utils/util';
-	import './type_toggle.css';
 	import { type TxType, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '$lib/types/finance';
+	import './type_toggle.css';
+	import '../../flash_notif.css'
 
 	let { data, form } = $props();
 	let transactions = $derived<Transaction[]>(data.transactions ?? []);
@@ -170,15 +171,23 @@
 </script>
 
 <section class="finance-layout">
-	<div class="panel panel--form">
-		<h2 class="panel-title">Log transaction</h2>
-
+	<div class="flash-container" aria-live="polite" aria-atomic="true">
 		{#if showSuccess}
 			<p class="flash flash--success">{form?.message}</p>
-		{/if}
-		{#if showError}
+		{:else if showError}
 			<p class="flash flash--error">{form?.message}</p>
 		{/if}
+	</div>
+
+	<div class="panel panel--form">
+		<h2 class="panel-title">Log transaction</h2>
+		<!-- on the form UI -->
+		<!--{#if showSuccess}-->
+		<!--	<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
+		<!--{/if}-->
+		<!--{#if showError}-->
+		<!--	<p class="flash flash&#45;&#45;error">{form?.message}</p>-->
+		<!--{/if}-->
 
 		<form method="POST" action="?/submit" class="entry-form">
 			<div class="field-row">
@@ -491,38 +500,6 @@
 		display: flex;
 		justify-content: flex-end;
 		margin-top: 0.4rem;
-	}
-
-	.flash {
-		padding: 0.5rem 0.75rem;
-		border-radius: 0.5rem;
-		font-size: 0.85rem;
-		font-weight: 500;
-		margin-bottom: 0.5rem;
-		animation: slideIn 0.3s ease;
-	}
-
-	.flash--success {
-		background: rgba(59, 176, 126, 0.25);
-		color: #a5ffcf;
-		border: 1px solid rgba(59, 176, 126, 0.5);
-	}
-
-	.flash--error {
-		background: rgba(214, 88, 95, 0.25);
-		color: #ffb3c1;
-		border: 1px solid rgba(214, 88, 95, 0.5);
-	}
-
-	@keyframes slideIn {
-		from {
-			opacity: 0;
-			transform: translateY(-8px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
 	}
 
 	.history-header {
