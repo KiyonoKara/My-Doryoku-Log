@@ -2,28 +2,10 @@
 	import { type Transaction } from '$lib/server/db/schema';
 	import SubmitButton from '$lib/SubmitButton.svelte';
 	import CsvExportButton from '$lib/CsvExportButton.svelte';
+	import CategoryBarChart from '$lib/CategoryBarChart.svelte';
 	import { capitalizeFirstLetter } from '$lib/utils/util';
-
-	// set types
-	const EXPENSE_CATEGORIES = [
-		'Groceries',
-		'Dining',
-		'Entertainment',
-		'Travel',
-		'Merchandise',
-		'Other',
-		'Other Services'
-	] as const;
-
-	const INCOME_CATEGORIES = [
-		'Salary',
-		'Allowance',
-		'Stocks',
-		'Interest & Dividends',
-		'Reimbursements'
-	] as const;
-
-	type TxType = 'income' | 'expense';
+	import './type_toggle.css';
+	import { type TxType, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '$lib/types/finance';
 
 	let { data, form } = $props();
 	let transactions = $derived<Transaction[]>(data.transactions ?? []);
@@ -32,6 +14,7 @@
 	let date = $state('');
 	let search = $state('');
 	let category = $state('');
+	let chartType = $state<TxType>('expense');
 
 	// run once then set to today's date
 	$effect(() => {
@@ -144,6 +127,20 @@
 		].join('\n');
 	}
 	let transactionsCsv = $derived(buildTransactionsCsv(filtered));
+
+	// get category totals for each type
+	function getCategoryTotals(transactions: Transaction[]) {
+		const income: Record<string, number> = {};
+		const expense: Record<string, number> = {};
+
+		for (const tx of transactions as Transaction[]) {
+			const bucket = tx.type === 'income' ? income : expense;
+			bucket[tx.category] = (bucket[tx.category] ?? 0) + tx.amount;
+		}
+
+		return { income, expense };
+	}
+	let categoryTotals = $derived(getCategoryTotals(filtered));
 
 	// auto dismiss
 	let showSuccess = $state(false);
@@ -263,6 +260,7 @@
 			</div>
 		</div>
 
+		<!-- history section -->
 		<div class="history-scroll">
 			{#if groupedDates.length === 0}
 				<p class="empty-state">No entries yet.</p>
@@ -315,6 +313,14 @@
 			csvContent={transactionsCsv}
 			iconPath="/src/lib/assets/file-report.svg"
 			filename={`transactions-${new Date().toISOString().slice(0, 10)}.csv`}
+		/>
+	</div>
+
+	<div class="history-chart-row">
+		<CategoryBarChart
+			type={chartType}
+			incomeTotals={categoryTotals.income}
+			expenseTotals={categoryTotals.expense}
 		/>
 	</div>
 </section>
@@ -414,41 +420,6 @@
 			0 0 0 2px rgba(51, 115, 176, 0.3),
 			inset 0 0 0 1px rgba(190, 212, 233, 0.5);
 		transition: all 0.2s ease;
-	}
-
-	.type-toggle {
-		display: inline-flex;
-		padding: 0.16rem;
-		border-radius: 999px;
-		border: 1px solid rgba(190, 212, 233, 0.35);
-		background: rgba(12, 28, 47, 0.9);
-		gap: 0.15rem;
-	}
-
-	.type-toggle button {
-		border: none;
-		background: transparent;
-		color: var(--text-secondary);
-		cursor: pointer;
-		padding: 0.25rem 0.9rem;
-		border-radius: 999px;
-		font-size: 0.85rem;
-		transition:
-			background 0.16s ease,
-			color 0.16s ease,
-			transform 0.12s ease;
-	}
-
-	.type-toggle button.active {
-		background: linear-gradient(135deg, var(--bg-secondary), var(--accent));
-		color: var(--text-primary);
-		box-shadow:
-			0 6px 14px rgba(0, 0, 0, 0.35),
-			0 0 0 1px rgba(0, 0, 0, 0.45);
-	}
-
-	.type-toggle button:hover {
-		color: var(--text-primary);
 	}
 
 	.today-input-btn {
