@@ -151,7 +151,11 @@
 			return;
 		}
 
-		if (form?.success && form?.message) {
+		// reset before checking and setting again
+		showSuccess = false;
+		showError = false;
+
+		if (form.success && form.message) {
 			showSuccess = true;
 			setTimeout(() => {
 				showSuccess = false;
