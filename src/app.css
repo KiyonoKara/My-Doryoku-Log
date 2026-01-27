@@ -8,6 +8,7 @@
 	--accent-hover: #0b385f;
 	--border: #3373b0;
 	--border-hover: #bed4e9;
+    --header-height: 108px;
 }
 
 * {
