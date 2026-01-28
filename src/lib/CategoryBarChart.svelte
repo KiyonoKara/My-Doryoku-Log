@@ -166,6 +166,7 @@
 	.category-chart__empty {
 		margin: 0.4rem 0 0;
 		font-size: 0.85rem;
+		padding: 1rem;
 		color: var(--text-secondary);
 	}
 
