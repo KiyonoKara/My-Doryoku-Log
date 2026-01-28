@@ -81,7 +81,7 @@
 
 	{#if entries.length === 0}
 		<p class="category-chart__empty">
-			No {type} data yet for the current view.
+			No {type} data yet.
 		</p>
 	{:else}
 		<svg viewBox={`0 0 ${width} ${height}`} class="category-chart__svg">
