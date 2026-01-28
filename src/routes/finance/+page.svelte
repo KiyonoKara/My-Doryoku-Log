@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { type Transaction } from '$lib/server/db/schema';
 	import SubmitButton from '$lib/SubmitButton.svelte';
 	import CsvExportButton from '$lib/CsvExportButton.svelte';
@@ -189,7 +190,7 @@
 		<!--	<p class="flash flash&#45;&#45;error">{form?.message}</p>-->
 		<!--{/if}-->
 
-		<form method="POST" action="?/submit" class="entry-form">
+		<form method="POST" action="?/submit" class="entry-form" use:enhance>
 			<div class="field-row">
 				<div class="field-label">Type</div>
 				<div class="type-toggle">
@@ -297,7 +298,7 @@
 											{/if}
 										</div>
 										<div class="tx-actions">
-											<form method="POST" action="?/delete">
+											<form method="POST" action="?/delete" use:enhance>
 												<input type="hidden" name="id" value={tx.id} />
 												<button type="submit" class="delete-btn" onclick={confirmDelete}>
 													Delete
