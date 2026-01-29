@@ -20,6 +20,13 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
 	// for submitting transactions
 	submit: async ({ request }) => {
+		if (request.method !== 'POST') {
+			return fail(405, {
+				success: false,
+				message: 'Method not allowed'
+			});
+		}
+
 		const formData = await request.formData();
 
 		const date = formData.get('date');
@@ -70,6 +77,13 @@ export const actions: Actions = {
 	},
 	// for deleting transactions
 	delete: async ({ request }) => {
+		if (request.method !== 'POST') {
+			return fail(405, {
+				success: false,
+				message: 'Method not allowed'
+			});
+		}
+
 		const formData = await request.formData();
 		const id = Number(formData.get('id'));
 
