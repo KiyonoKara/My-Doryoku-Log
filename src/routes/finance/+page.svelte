@@ -7,7 +7,7 @@
 	import { capitalizeFirstLetter } from '$lib/utils/util';
 	import { type TxType, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '$lib/types/finance';
 	import './type_toggle.css';
-	import '../../flash_notif.css'
+	import '../../flash_notif.css';
 
 	let { data, form } = $props();
 	let transactions = $derived<Transaction[]>(data.transactions ?? []);
@@ -82,6 +82,7 @@
 	// group by date
 	let groupedByDate = $derived(
 		filtered.reduce<Record<string, Transaction[]>>((acc, tx) => {
+			// if no date then it's empty
 			acc[tx.date] ??= [];
 			acc[tx.date].push(tx);
 			return acc;
@@ -89,7 +90,9 @@
 	);
 
 	let groupedDates = $derived(
-		Object.keys(groupedByDate).sort((a, b) => (a < b ? 1 : a > b ? -1 : 0))
+		Object.keys(groupedByDate)
+			// sort dates newest to oldest
+			.sort((a, b) => (a < b ? 1 : a > b ? -1 : 0))
 	);
 
 	function confirmDelete(event: Event) {
@@ -275,7 +278,6 @@
 		</div>
 
 		<!-- history section -->
-		<!-- TODO: show newest items from top to bottom -->
 		<div class="history-scroll">
 			{#if groupedDates.length === 0}
 				<p class="empty-state">No entries yet.</p>

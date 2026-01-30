@@ -9,7 +9,7 @@ export const load: PageServerLoad = async () => {
 	const rows: Transaction[] = await db
 		.select()
 		.from(transactions)
-		.orderBy(desc(transactions.date))
+		.orderBy(desc(transactions.date), desc(transactions.id))
 		.limit(50);
 
 	return {
