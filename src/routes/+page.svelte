@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SectionButton from '$lib/SectionButton.svelte';
+	import SectionButton from '$lib/buttons/SectionButton.svelte';
 </script>
 
 <section class="dashboard">

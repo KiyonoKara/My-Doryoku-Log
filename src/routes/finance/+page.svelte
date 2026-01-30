@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { type Transaction } from '$lib/server/db/schema';
-	import SubmitButton from '$lib/SubmitButton.svelte';
-	import CsvExportButton from '$lib/CsvExportButton.svelte';
-	import CategoryBarChart from '$lib/CategoryBarChart.svelte';
+	import SubmitButton from '$lib/buttons/SubmitButton.svelte';
+	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
+	import CategoryBarChart from '$lib/other/CategoryBarChart.svelte';
 	import { capitalizeFirstLetter } from '$lib/utils/util';
 	import { type TxType, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '$lib/types/finance';
 	import './type_toggle.css';
@@ -275,6 +275,7 @@
 		</div>
 
 		<!-- history section -->
+		<!-- TODO: show newest items from top to bottom -->
 		<div class="history-scroll">
 			{#if groupedDates.length === 0}
 				<p class="empty-state">No entries yet.</p>

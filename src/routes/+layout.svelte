@@ -1,8 +1,8 @@
 <script lang="ts">
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
-	import Header from '$lib/Header.svelte';
-	import BackButton from '$lib/BackButton.svelte';
+	import Header from '$lib/layout/Header.svelte';
+	import BackButton from '$lib/buttons/BackButton.svelte';
 	import { page } from '$app/state';
 
 	let { children } = $props();

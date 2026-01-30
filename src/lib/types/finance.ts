@@ -8,7 +8,7 @@ export const EXPENSE_CATEGORIES = [
 	'Merchandise',
 	'Other',
 	'Other Services'
-] as const;
+];
 
 export const INCOME_CATEGORIES = [
 	'Salary',
@@ -16,4 +16,4 @@ export const INCOME_CATEGORIES = [
 	'Stocks',
 	'Interest & Dividends',
 	'Reimbursements'
-] as const;
+];
