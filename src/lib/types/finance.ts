@@ -7,7 +7,8 @@ export const EXPENSE_CATEGORIES = [
 	'Travel',
 	'Merchandise',
 	'Other',
-	'Other Services'
+	'Other Services',
+	'Rent'
 ];
 
 export const INCOME_CATEGORIES = [
@@ -15,5 +16,7 @@ export const INCOME_CATEGORIES = [
 	'Allowance',
 	'Stocks',
 	'Interest & Dividends',
-	'Reimbursements'
+	'Reimbursements',
+	'Gifts',
+	'Sales'
 ];
