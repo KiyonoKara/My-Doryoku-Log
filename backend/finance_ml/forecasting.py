@@ -1,8 +1,8 @@
 from collections import Counter
 from datetime import datetime
 
-from db import get_transactions, convert_transactions_to_dict
-from random_forest import (
+from .db import get_transactions, convert_transactions_to_dict
+from .random_forest import (
     build_datasets,
     RandomForestClassifier,
     RandomForestRegressor,
