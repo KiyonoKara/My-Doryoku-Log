@@ -163,8 +163,13 @@ def train_test_split(X, y, test_ratio=0.2, random_state=0):
     return X_train, X_test, y_train, y_test
 
 def accuracy(y_true, y_pred):
-    correct = sum(1 for a, b in zip(y_true, y_pred) if a == b)
-    return correct / len(y_true) if y_true else 0.0
+    if not y_true:
+        return 0.0
+    correct_count = 0
+    for a, b in zip(y_true, y_pred):
+        if a == b:
+            correct_count += 1
+    return correct_count / len(y_true)
 
 # specifically for the transaction data
 def build_datasets(rows: list[dict]) -> tuple:
@@ -222,3 +227,66 @@ def build_datasets(rows: list[dict]) -> tuple:
             X_inc_clf, y_inc_clf, X_inc_reg, y_inc_reg)
 
 
+class RandomForestClassifier:
+    def __init__(self, n_trees=15, max_depth=10, min_size=2, sample_size=1):
+        self.n_trees = n_trees
+        self.max_depth = max_depth
+        self.min_size = min_size
+        self.sample_size = sample_size
+        self.trees = []
+        self.n_features = None
+
+    def fit(self, X, y):
+        dataset = []
+        for x, y_i in zip(X, y):
+            dataset.append(list(x) + [y_i])
+        self.n_features = int(sqrt(len(X[0])))
+        self.trees = []
+        for _ in range(self.n_trees):
+            sample = subsample(dataset, self.sample_size)
+            tree = build_tree(sample, self.max_depth, self.min_size, self.n_features)
+            self.trees.append(tree)
+
+    def predict_one(self, x):
+        return bagging_predict(self.trees, x)
+
+    def predict(self, X):
+        preds = []
+        for x in X:
+            preds.append(self.predict_one(x))
+        return preds
+
+class RandomForestRegressor:
+    def __init__(self, n_trees=15, max_depth=10, min_size=2, sample_size=1.0):
+        self.n_trees = n_trees
+        self.max_depth = max_depth
+        self.min_size = min_size
+        self.sample_size = sample_size
+        self.trees = []
+        self.n_features = None
+
+    def fit(self, X, y):
+        dataset = []
+        for x, y_i in zip(X, y):
+            dataset.append(list(x) + [float(y_i)])
+        self.n_features = int(sqrt(len(X[0])))
+        self.trees = []
+        for _ in range(self.n_trees):
+            sample = subsample(dataset, self.sample_size)
+            tree = build_tree(sample, self.max_depth, self.min_size, self.n_features)
+            self.trees.append(tree)
+
+    def predict_one(self, x):
+        preds = []
+        for t in self.trees:
+            preds.append(tree_predict(t, list(x)))
+        return sum(preds) / len(preds)
+
+    def predict(self, X):
+        preds = []
+        for x in X:
+            tree_preds = []
+            for t in  self.trees:
+                tree_preds.append(tree_predict(t, list(x)))
+            preds.append(sum(tree_preds) / len(tree_preds))
+        return preds
