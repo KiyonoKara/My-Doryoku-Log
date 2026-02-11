@@ -22,7 +22,7 @@ def get_transactions() -> list[tuple]:
 
 def convert_transactions_to_dict(transactions) -> list[dict]:
     """
-    Transactions from the SQLite transactions table
+    Transactions from the SQLite transactions table converted to list of dicts
     :param transactions:
     :return: List of dictionaries
     """
