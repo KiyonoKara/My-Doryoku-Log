@@ -1,4 +1,6 @@
 <script lang="ts">
+	import fileReport from '$lib/assets/file-report.svg'
+	import stopwatch from '$lib/assets/stopwatch.svg'
 	import SectionButton from '$lib/buttons/SectionButton.svelte';
 </script>
 
@@ -6,14 +8,14 @@
 	<SectionButton
 		label="Finance logging"
 		description="Log transactions and see reports"
-		iconPath="/src/lib/assets/file-report.svg"
+		iconPath={fileReport}
 		href="/finance"
 	/>
 
 	<SectionButton
 		label="Time tracking"
 		description="Track how long tasks take"
-		iconPath="/src/lib/assets/stopwatch.svg"
+		iconPath={stopwatch}
 		href="/time"
 	/>
 </section>

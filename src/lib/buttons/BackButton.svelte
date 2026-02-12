@@ -1,4 +1,5 @@
 <script lang="ts">
+	import leftArrow from '$lib/assets/left-arrow.svg'
 	import { goto } from '$app/navigation';
 
 	export let label: string = '';
@@ -13,7 +14,7 @@
 
 <button type="button" class="back-button" on:click={handleClick} aria-label={ariaLabel}>
 	<span class="back-button__icon">
-		<img src="/src/lib/assets/left-arrow.svg" alt="" aria-hidden="true" />
+		<img src={leftArrow} alt="" aria-hidden="true" />
 	</span>
 	<span class="back-button__text">{label}</span>
 </button>

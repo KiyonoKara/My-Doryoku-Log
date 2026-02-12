@@ -1,11 +1,12 @@
 <script>
+	import notebook from '$lib/assets/notebook.svg';
 	export let label;
 </script>
 
 <div class="header">
 	<h1 class="logo">{label}</h1>
 	<div class="header-logo" aria-hidden="true">
-		<img src="/src/lib/assets/notebook.svg" alt="" />
+		<img src={notebook} alt="" />
 	</div>
 </div>
 
