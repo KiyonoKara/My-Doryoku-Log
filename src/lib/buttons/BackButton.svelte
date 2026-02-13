@@ -1,5 +1,5 @@
 <script lang="ts">
-	import leftArrow from '$lib/assets/left-arrow.svg'
+	import leftArrow from '$lib/assets/left-arrow.svg';
 	import { goto } from '$app/navigation';
 
 	export let label: string = '';

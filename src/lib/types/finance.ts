@@ -33,5 +33,5 @@ export interface FinMLPredictionResponse {
 	preds: {
 		expense?: FinMLPrediction;
 		income?: FinMLPrediction;
-	}
+	};
 }

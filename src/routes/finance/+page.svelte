@@ -346,7 +346,6 @@
 	<div class="ml-forecast">
 		<ForecastSection />
 	</div>
-
 </section>
 
 <!--suppress CssUnusedSymbol
@@ -684,20 +683,20 @@
 		}
 	}
 
-  .ml-forecast {
-      border-radius: 1em;
-      border: 1px solid var(--border);
-      background: radial-gradient(
-              circle at top left,
-              rgba(51, 115, 176, 0.35),
-              rgba(7, 20, 37, 0.98)
-      );
-      padding: 1.5em;
-      box-shadow:
-              0 10px 20px rgba(0, 0, 0, 0.4),
-              0 0 0 1px rgba(0, 0, 0, 0.55);
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-  }
+	.ml-forecast {
+		border-radius: 1em;
+		border: 1px solid var(--border);
+		background: radial-gradient(
+			circle at top left,
+			rgba(51, 115, 176, 0.35),
+			rgba(7, 20, 37, 0.98)
+		);
+		padding: 1.5em;
+		box-shadow:
+			0 10px 20px rgba(0, 0, 0, 0.4),
+			0 0 0 1px rgba(0, 0, 0, 0.55);
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
 </style>

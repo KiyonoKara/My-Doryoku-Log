@@ -1,6 +1,6 @@
 <script lang="ts">
-	import fileReport from '$lib/assets/file-report.svg'
-	import stopwatch from '$lib/assets/stopwatch.svg'
+	import fileReport from '$lib/assets/file-report.svg';
+	import stopwatch from '$lib/assets/stopwatch.svg';
 	import SectionButton from '$lib/buttons/SectionButton.svelte';
 </script>
 
