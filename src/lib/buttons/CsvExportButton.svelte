@@ -55,18 +55,15 @@
 		max-width: 480px;
 		margin: 0 auto;
 		padding: 1.25rem 1.5rem;
-
 		background: linear-gradient(135deg, var(--bg-secondary), var(--bg-surface));
 		border-radius: 0.9rem;
 		border: 1px solid var(--border);
 		color: var(--text-primary);
 		text-decoration: none;
 		cursor: pointer;
-
 		box-shadow:
 			0 10px 20px rgba(0, 0, 0, 0.35),
 			0 0 0 1px rgba(0, 0, 0, 0.4);
-
 		transition:
 			transform 0.2s ease,
 			box-shadow 0.2s ease,

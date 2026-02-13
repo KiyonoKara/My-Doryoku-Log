@@ -4,10 +4,12 @@
 	import SubmitButton from '$lib/buttons/SubmitButton.svelte';
 	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
 	import CategoryBarChart from '$lib/other/CategoryBarChart.svelte';
+	import ForecastSection from '$lib/other/ForecastSection.svelte';
 	import { capitalizeFirstLetter } from '$lib/utils/util';
 	import { type TxType, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '$lib/types/finance';
 	import './type_toggle.css';
 	import '../../flash_notif.css';
+	import fileReport from '$lib/assets/file-report.svg';
 
 	let { data, form } = $props();
 	let transactions = $derived<Transaction[]>(data.transactions ?? []);
@@ -328,7 +330,7 @@
 			label="Export CSV"
 			description="Download all transactions as CSV"
 			csvContent={transactionsCsv}
-			iconPath="/src/lib/assets/file-report.svg"
+			iconPath={fileReport}
 			filename={`transactions-${new Date().toISOString().slice(0, 10)}.csv`}
 		/>
 	</div>
@@ -340,6 +342,11 @@
 			expenseTotals={categoryTotals.expense}
 		/>
 	</div>
+
+	<div class="ml-forecast">
+		<ForecastSection />
+	</div>
+
 </section>
 
 <!--suppress CssUnusedSymbol
@@ -376,11 +383,12 @@
 
 	.panel--form {
 		min-height: 0;
+		max-height: 550px;
 	}
 
 	.panel--history {
 		min-height: 360px;
-		max-height: 520px;
+		max-height: 550px;
 	}
 
 	.entry-form {
@@ -675,4 +683,21 @@
 			flex-direction: column;
 		}
 	}
+
+  .ml-forecast {
+      border-radius: 1em;
+      border: 1px solid var(--border);
+      background: radial-gradient(
+              circle at top left,
+              rgba(51, 115, 176, 0.35),
+              rgba(7, 20, 37, 0.98)
+      );
+      padding: 1.5em;
+      box-shadow:
+              0 10px 20px rgba(0, 0, 0, 0.4),
+              0 0 0 1px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+  }
 </style>
