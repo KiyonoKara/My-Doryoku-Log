@@ -344,7 +344,9 @@
 	</div>
 
 	<div class="ml-forecast">
-		<ForecastSection />
+		<ForecastSection
+			{transactions}
+		/>
 	</div>
 </section>
 
