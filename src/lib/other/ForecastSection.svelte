@@ -1,18 +1,30 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { TxType, FinMLPredictionResponse } from '$lib/types/finance';
+	import { type Transaction } from '$lib/server/db/schema';
 	const FORECAST_API_URL = 'http://127.0.0.1:5000/api/finance/forecast';
 
-	let type: TxType = 'expense';
+	let { transactions } = $props<{ transactions?: Transaction[]; }>();
 
-	let showPredictions = false;
-
-	let predictions: FinMLPredictionResponse = {
+	let type: TxType = $state('expense');
+	let showPredictions = $state(false);
+	let isLoading = $state(false);
+	let predictions: FinMLPredictionResponse = $state({
+		success: false,
 		n_transactions: 0,
+		n_exp_transactions: 0,
+		n_inc_transactions: 0,
 		preds: {},
-		success: false
-	};
-	let isLoading = false;
+	});
+
+	// local counts
+	let expenseCount = $derived(transactions.filter((t: Transaction) => t.type === 'expense').length);
+	let incomeCount = $derived(transactions.filter((t: Transaction) => t.type === 'income').length);
+	let lastExpenseCount = $state<number>(0);
+	let lastIncomeCount = $state<number>(0);
+	let needsExpenseRefresh = $derived(expenseCount !== lastExpenseCount);
+	let needsIncomeRefresh = $derived(incomeCount !== lastIncomeCount);
+	let needsRefresh = $derived(needsExpenseRefresh || needsIncomeRefresh);
 
 	// get predictions
 	async function fetchPredictions() {
@@ -21,10 +33,13 @@
 			const res = await fetch(FORECAST_API_URL);
 			predictions = (await res.json()) as FinMLPredictionResponse;
 		} catch (e) {
-			console.error('Predictions failed:', e);
+			// preds failed
+			console.error("Predictions failed:", e);
 			predictions = {
 				success: false,
 				n_transactions: 0,
+				n_exp_transactions: 0,
+				n_inc_transactions: 0,
 				preds: {}
 			};
 		} finally {
@@ -32,8 +47,22 @@
 		}
 	}
 
+	async function refreshPredictions() {
+		if (isLoading) {
+			return;
+		}
+
+		lastExpenseCount = expenseCount;
+		lastIncomeCount = incomeCount;
+		await fetchPredictions();
+	}
+
 	// auto-fetch on mount
-	onMount(fetchPredictions);
+	onMount(() => {
+		lastExpenseCount = expenseCount;
+		lastIncomeCount = incomeCount;
+		fetchPredictions();
+	});
 </script>
 
 <div class="ml-forecast">
@@ -68,30 +97,42 @@
 	>
 		{showPredictions ? 'Hide' : 'Show'}
 	</button>
+	<button
+		class="ml-forecast__toggle"
+		class:dimmed={!needsRefresh || isLoading}
+		onclick={refreshPredictions}
+		disabled={!needsRefresh || isLoading}
+		title={needsRefresh ? 'New data available' : 'Up to date'}
+	>
+		{#if isLoading}
+			<span class="spinner"></span> Refreshing...
+		{:else}
+			Refresh
+		{/if}
+	</button>
 
-	{#if showPredictions}
-		<!-- if less than 10 transactions, don't show predictions -->
+
+	{#if showPredictions && predictions}
 		{#if !predictions.success}
 			<div class="ml-forecast__status ml-forecast__status--not-ready">
-				Enter {10 - (predictions.n_transactions || 0)} more transactions for predictions
+				Something went wrong...
 			</div>
 
-			<!-- if there are 10 more, show it -->
 		{:else if predictions.success}
 			{#if isLoading}
 				<div class="ml-forecast__loading">
 					<div class="spinner"></div>
 					Loading predictions...
 				</div>
-			{:else if predictions}
-				{#if predictions.preds?.expense || predictions.preds?.income}
-					<div class="ml-forecast__grid">
-						{#if type === 'expense'}
-							<!-- expense card -->
+			{:else}
+				{#if type === 'expense'}
+					{#if expenseCount >= 10}
+						<!-- show predicted expense if there are at least 10 expense transactions -->
+						<div class="ml-forecast__grid">
 							<div class="ml-forecast__card ml-forecast__card--expense">
 								<div class="ml-forecast__main">
 									<div class="ml-forecast__category">
-										{predictions.preds.expense?.['coarse_category'] || '—'}
+										{predictions.preds.expense?.coarse_category || '—'}
 									</div>
 									<div class="ml-forecast__amount">
 										-${predictions.preds.expense?.amount?.toFixed(2) || '0.00'}
@@ -99,12 +140,22 @@
 								</div>
 								<div class="ml-forecast__label">Next expense</div>
 							</div>
-						{:else}
-							<!-- income card -->
+						</div>
+					{:else}
+						<!-- show status if insufficient -->
+						<div class="ml-forecast__status ml-forecast__status--not-ready">
+							Enter {10 - expenseCount} more expenses for predictions
+						</div>
+					{/if}
+
+				{:else}
+					{#if incomeCount >= 10}
+						<!-- show predicted income if there are at least 10 income transactions -->
+						<div class="ml-forecast__grid">
 							<div class="ml-forecast__card ml-forecast__card--income">
 								<div class="ml-forecast__main">
 									<div class="ml-forecast__category">
-										{predictions.preds.income?.['coarse_category'] || '—'}
+										{predictions.preds.income?.coarse_category || '—'}
 									</div>
 									<div class="ml-forecast__amount">
 										+${predictions.preds.income?.amount?.toFixed(2) || '0.00'}
@@ -112,8 +163,13 @@
 								</div>
 								<div class="ml-forecast__label">Next income</div>
 							</div>
-						{/if}
-					</div>
+						</div>
+					{:else}
+						<!-- show status if insufficient -->
+						<div class="ml-forecast__status ml-forecast__status--not-ready">
+							Enter {10 - incomeCount} more income transactions for predictions
+						</div>
+					{/if}
 				{/if}
 			{/if}
 		{/if}
@@ -160,6 +216,11 @@
 		background: var(--accent-hover);
 		color: var(--text-primary);
 	}
+
+  .ml-forecast__toggle.dimmed {
+      opacity: 0.5;
+      cursor: not-allowed;
+  }
 
 	.ml-forecast__toggle.expanded {
 		background: var(--accent);
