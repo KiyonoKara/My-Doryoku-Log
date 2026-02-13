@@ -20,3 +20,18 @@ export const INCOME_CATEGORIES = [
 	'Gifts',
 	'Sales'
 ];
+
+interface FinMLPrediction {
+	type: string;
+	coarse_category: string;
+	amount: number;
+}
+
+export interface FinMLPredictionResponse {
+	success: boolean;
+	n_transactions: number;
+	preds: {
+		expense?: FinMLPrediction;
+		income?: FinMLPrediction;
+	}
+}
