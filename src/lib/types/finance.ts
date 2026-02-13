@@ -21,7 +21,7 @@ export const INCOME_CATEGORIES = [
 	'Sales'
 ];
 
-interface FinMLPrediction {
+export interface FinMLPrediction {
 	type: string;
 	coarse_category: string;
 	amount: number;
@@ -30,6 +30,8 @@ interface FinMLPrediction {
 export interface FinMLPredictionResponse {
 	success: boolean;
 	n_transactions: number;
+	n_exp_transactions: number;
+	n_inc_transactions: number;
 	preds: {
 		expense?: FinMLPrediction;
 		income?: FinMLPrediction;

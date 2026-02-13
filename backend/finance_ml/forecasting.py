@@ -28,6 +28,16 @@ def load_rows() -> list[dict]:
     rows_tuples = get_transactions()
     return convert_transactions_to_dict(rows_tuples)
 
+def row_by_type_tuple(rows: list[dict]) -> tuple[list[dict], list[dict]]:
+    separated_rows = {
+        "expense": [],
+        "income": []
+    }
+    for r in rows:
+        separated_rows[r['type']].append(r)
+    return separated_rows["expense"], separated_rows["income"]
+
+
 # train separate models for expense and income classification and regression
 def train_models(rows: list[dict]) -> dict:
     (X_exp_clf, y_exp_clf, X_exp_reg, y_exp_reg,
@@ -188,11 +198,17 @@ def forecast_next_for_type(trtype: str, models: dict, rows: list[dict]) -> dict:
 def forecast_next() -> dict:
     # load db, train models, get forecasts
     rows = load_rows()
+    expense_rows, income_rows = row_by_type_tuple(rows)
     if len(rows) < MIN_REQ_TRANSACTIONS:
         return {
-            "ready": False,
-            "reason": "Not enough transactions",
+            "success": False,
             "n_transactions": len(rows),
+            "n_exp_transactions": len(expense_rows),
+            "n_inc_transactions": len(income_rows),
+            "preds": {
+                "expense": {},
+                "income": {},
+            }
         }
 
     models = train_models(rows)
@@ -202,6 +218,8 @@ def forecast_next() -> dict:
     return {
         "success": True,
         "n_transactions": len(rows),
+        "n_exp_transactions": len(expense_rows),
+        "n_inc_transactions": len(income_rows),
         "preds": {
             "expense": exp_forecast,
             "income": inc_forecast
