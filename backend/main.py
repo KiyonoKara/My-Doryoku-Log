@@ -3,7 +3,10 @@ import os
 from api import app
 
 if __name__ == "__main__":
+    port = 5000
     if os.getenv("APP_ENV") == "production":
-        serve(app, host="127.0.0.1", port=5000, threads=4)
+        print(f"Running production server of {app.name} on port", port)
+        serve(app, host="127.0.0.1", port=port, threads=4)
     else:
-        app.run(debug=True, port=5000, host="127.0.0.1")
+        print(f"Running dev server of {app.name} on port", port)
+        app.run(debug=True, port=port, host="127.0.0.1")
