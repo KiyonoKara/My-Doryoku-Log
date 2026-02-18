@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { TxType, FinMLPredictionResponse } from '$lib/types/finance';
 	import { type Transaction } from '$lib/server/db/schema';
+	import { capitalizeFirstLetter} from '$lib/utils/util';
 
 	const FORECAST_EXP_API_URL = 'http://127.0.0.1:5000/api/finance/forecast-expense';
 	const FORECAST_INC_API_URL = 'http://127.0.0.1:5000/api/finance/forecast-income';
@@ -29,15 +30,24 @@
 	let needsIncomeRefresh = $derived(incomeCount !== lastIncomeCount);
 	let needsRefresh = $derived(needsExpenseRefresh || needsIncomeRefresh);
 
+	async function fetchPrediction(url: string,
+																 predType: string,
+																 setPrediction: (value: FinMLPredictionResponse) => void) {
+		try {
+			const res = await fetch(url);
+			const data = (await res.json()) as FinMLPredictionResponse;
+			setPrediction(data);
+		} catch (e) {
+			console.error(`${capitalizeFirstLetter(predType)} prediction failed:`, e);
+		}
+	}
+
 	// get predictions
 	async function fetchPredictions() {
 		isLoading = true;
 		try {
-			const expRes = await fetch(FORECAST_EXP_API_URL);
-			expPrediction = (await expRes.json()) as FinMLPredictionResponse;
-			const incRes = await fetch(FORECAST_INC_API_URL);
-			incPrediction = (await incRes.json()) as FinMLPredictionResponse;
-			console.log(incPrediction);
+			await fetchPrediction(FORECAST_EXP_API_URL, 'expense', (value) => (expPrediction = value));
+			await fetchPrediction(FORECAST_INC_API_URL, 'income', (value) => (incPrediction = value));
 		} catch (e) {
 			// preds failed
 			console.error('Predictions failed:', e);
@@ -51,9 +61,21 @@
 			return;
 		}
 
-		lastExpenseCount = expenseCount;
-		lastIncomeCount = incomeCount;
-		await fetchPredictions();
+		try {
+			if (needsExpenseRefresh && needsIncomeRefresh) {
+				await fetchPredictions();
+			} else if (needsExpenseRefresh) {
+				await fetchPrediction(FORECAST_EXP_API_URL, 'expense', (value) => (expPrediction = value));
+			} else if (needsIncomeRefresh) {
+				await fetchPrediction(FORECAST_INC_API_URL, 'income', (value) => (incPrediction = value));
+			} else {
+				return;
+			}
+			lastExpenseCount = expenseCount;
+			lastIncomeCount = incomeCount;
+		} finally {
+			isLoading = false;
+		}
 	}
 
 	// auto-fetch on mount
