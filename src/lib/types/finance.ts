@@ -30,10 +30,5 @@ export interface FinMLPrediction {
 export interface FinMLPredictionResponse {
 	success: boolean;
 	n_transactions: number;
-	n_exp_transactions: number;
-	n_inc_transactions: number;
-	preds: {
-		expense?: FinMLPrediction;
-		income?: FinMLPrediction;
-	};
+	pred?: FinMLPrediction
 }

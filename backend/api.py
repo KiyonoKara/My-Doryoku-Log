@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from finance_ml.forecasting import forecast_next
+from finance_ml.forecasting import forecast_next_expense, forecast_next_income
 
 app = Flask(__name__)
 CORS(app, resources={
@@ -15,13 +15,12 @@ CORS(app, resources={
 })
 
 
-@app.route("/api/finance/forecast", methods=["GET"])
-def forecast():
-    res = forecast_next()
+@app.route("/api/finance/forecast-expense", methods=["GET"])
+def forecast_expense():
+    res = forecast_next_expense()
     return jsonify(res)
 
-# if __name__ == "__main__":
-#     if os.environ.get("APP_ENV") == "production":
-#         serve(app, host=" 127.0.0.1", port=5000)
-#     else:
-#         app.run(debug=True, port=5000)
+@app.route("/api/finance/forecast-income", methods=["GET"])
+def forecast_income():
+    res = forecast_next_income()
+    return jsonify(res)

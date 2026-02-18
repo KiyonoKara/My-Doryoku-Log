@@ -38,36 +38,36 @@ def row_by_type_tuple(rows: list[dict]) -> tuple[list[dict], list[dict]]:
     return separated_rows["expense"], separated_rows["income"]
 
 
-# train separate models for expense and income classification and regression
-def train_models(rows: list[dict]) -> dict:
+# train separate model for expense classification and regression
+def train_expense_models(rows: list[dict]) -> dict:
     (X_exp_clf, y_exp_clf, X_exp_reg, y_exp_reg,
-     X_inc_clf, y_inc_clf, X_inc_reg, y_inc_reg) = build_datasets(rows)
-
-    configs = [
-        ("exp_clf", RandomForestClassifier, X_exp_clf, y_exp_clf),
-        ("exp_reg", RandomForestRegressor, X_exp_reg, y_exp_reg),
-        ("inc_clf", RandomForestClassifier, X_inc_clf, y_inc_clf),
-        ("inc_reg", RandomForestRegressor, X_inc_reg, y_inc_reg),
-    ]
+    _, _, _, _) = build_datasets(rows)
 
     models: dict = {
-        "exp_clf": None,
-        "exp_reg": None,
-        "inc_clf": None,
-        "inc_reg": None,
+        "exp_clf": train_rf_finance_model(RandomForestClassifier, X_exp_clf, y_exp_clf),
+        "exp_reg": train_rf_finance_model(RandomForestRegressor, X_exp_reg, y_exp_reg),
     }
-
-    # train all models
-    for name, rf_model, X, y in configs:
-        if len(X) >= MIN_REQ_TRANSACTIONS:
-            model = rf_model()
-            model.fit(X, y)
-            models[name] = model
-
     return models
 
+# train separate model for income classification and regression
+def train_income_models(rows: list[dict]) -> dict:
+    (_, _, _, _,
+     X_inc_clf, y_inc_clf, X_inc_reg, y_inc_reg) = build_datasets(rows)
 
-def _default_future_features_for_type(trtype: str, rows: list[dict]) -> dict:
+    models: dict = {
+        "inc_clf": train_rf_finance_model(RandomForestClassifier, X_inc_clf, y_inc_clf),
+        "inc_reg": train_rf_finance_model(RandomForestRegressor, X_inc_reg, y_inc_reg),
+    }
+    return models
+
+def train_rf_finance_model(model, X, y):
+    if len(X) >= MIN_REQ_TRANSACTIONS:
+        m = model()
+        m.fit(X, y)
+        return m
+    return None
+
+def _default_future_features_for_type(tr_type: str, rows: list[dict]) -> dict:
     # feature vector for the next transaction of a given type
     # uses current date and typical amount for that type.
     today = datetime.today()
@@ -79,7 +79,7 @@ def _default_future_features_for_type(trtype: str, rows: list[dict]) -> dict:
     is_month_end = int(dom >= 28)
 
     # calculate median amount per type from history
-    amounts = [float(r["amount"]) for r in rows if r["type"] == trtype]
+    amounts = [float(r["amount"]) for r in rows if r["type"] == tr_type]
     if amounts:
         sorted_amounts = sorted(amounts)
         mid = len(sorted_amounts) // 2
@@ -101,10 +101,10 @@ def _default_future_features_for_type(trtype: str, rows: list[dict]) -> dict:
     }
 
 
-def forecast_next_for_type(trtype: str, models: dict, rows: list[dict]) -> dict:
-    trtype = trtype.lower()
+def forecast_next_for_type(tr_type: str, models: dict, rows: list[dict]) -> dict:
+    tr_type = tr_type.lower()
     # forecast next coarse category and amount for a given type of expense or income
-    feats = _default_future_features_for_type(trtype, rows)
+    feats = _default_future_features_for_type(tr_type, rows)
     dow = feats["dow"]
     month = feats["month"]
     amount = feats["amount"]
@@ -113,7 +113,7 @@ def forecast_next_for_type(trtype: str, models: dict, rows: list[dict]) -> dict:
     is_month_end = feats["is_month_end"]
 
     # expense
-    if trtype == "expense":
+    if tr_type == "expense":
         clf: RandomForestClassifier = models.get("exp_clf")
         reg: RandomForestRegressor = models.get("exp_reg")
         if clf is None or reg is None:
@@ -194,34 +194,32 @@ def forecast_next_for_type(trtype: str, models: dict, rows: list[dict]) -> dict:
             "amount": amount_pred,
         }
 
+def forecast_next(rows: list[dict], sep_rows: list[dict], models: dict, tr_type: str) -> dict:
+    res = {
+        "success": False,
+        "n_transactions": len(sep_rows),
+        "pred": {}
+    }
 
-def forecast_next() -> dict:
+    if len(rows) < MIN_REQ_TRANSACTIONS:
+        return res
+
+    forecast = forecast_next_for_type(tr_type, models, rows)
+    res["success"] = True
+    res["pred"] = forecast
+
+    return res
+
+def forecast_next_expense() -> dict:
     # load db, train models, get forecasts
     rows = load_rows()
-    expense_rows, income_rows = row_by_type_tuple(rows)
-    if len(rows) < MIN_REQ_TRANSACTIONS:
-        return {
-            "success": False,
-            "n_transactions": len(rows),
-            "n_exp_transactions": len(expense_rows),
-            "n_inc_transactions": len(income_rows),
-            "preds": {
-                "expense": {},
-                "income": {},
-            }
-        }
+    expense_rows, _ = row_by_type_tuple(rows)
+    models = train_expense_models(rows)
+    return forecast_next(rows, expense_rows, models, "expense")
 
-    models = train_models(rows)
-    exp_forecast = forecast_next_for_type("expense", models, rows)
-    inc_forecast = forecast_next_for_type("income", models, rows)
-
-    return {
-        "success": True,
-        "n_transactions": len(rows),
-        "n_exp_transactions": len(expense_rows),
-        "n_inc_transactions": len(income_rows),
-        "preds": {
-            "expense": exp_forecast,
-            "income": inc_forecast
-        }
-    }
+def forecast_next_income() -> dict:
+    # load db, train models, get forecasts
+    rows = load_rows()
+    _, income_rows = row_by_type_tuple(rows)
+    models = train_income_models(rows)
+    return forecast_next(rows, income_rows, models, "income")

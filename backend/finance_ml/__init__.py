@@ -1,1 +1,1 @@
-from .forecasting import forecast_next
+from .forecasting import forecast_next_expense, forecast_next_income
