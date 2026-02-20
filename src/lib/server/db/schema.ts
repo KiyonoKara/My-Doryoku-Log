@@ -21,6 +21,7 @@ export type Transaction = {
 export const time_entries = sqliteTable('time_entries', {
 	id: integer('id').primaryKey(),
 	task: text('task').notNull(),
+	category: text('category').notNull().default('Other'),
 	start_date: text('start_date').notNull(),
 	end_date: text('end_date'),
 	duration_ms: integer('duration_ms').notNull().default(0)
@@ -29,6 +30,7 @@ export const time_entries = sqliteTable('time_entries', {
 export type TimeEntry = {
 	id: number;
 	task: string;
+	category: string;
 	start_date: string;
 	end_date: string | null;
 	duration_ms: number;
