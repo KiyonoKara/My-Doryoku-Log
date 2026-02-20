@@ -17,3 +17,19 @@ export type Transaction = {
 	type: 'income' | 'expense';
 	description: string | null;
 };
+
+export const time_entries = sqliteTable('time_entries', {
+	id: integer('id').primaryKey(),
+	task: text('task').notNull(),
+	start_date: text('start_date').notNull(),
+	end_date: text('end_date'),
+	duration_ms: integer('duration_ms').notNull().default(0)
+});
+
+export type TimeEntry = {
+	id: number;
+	task: string;
+	start_date: string;
+	end_date: string | null;
+	duration_ms: number;
+};
