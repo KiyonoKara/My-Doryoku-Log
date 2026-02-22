@@ -95,7 +95,10 @@ export const actions: Actions = {
 			.set({ end_date, duration_ms })
 			.where(eq(time_entries.id, id));
 
-		return { success: true, message: 'Timer stopped' };
+		return {
+			success: true,
+			message: 'Timer stopped and entry saved'
+		};
 	},
 
 	delete: async ({ request }) => {
@@ -110,8 +113,25 @@ export const actions: Actions = {
 			return fail(400, { success: false, message: 'Invalid ID' });
 		}
 
+		const current = await db
+			.select({ end_date: time_entries.end_date })
+			.from(time_entries)
+			.where(eq(time_entries.id, id))
+			.limit(1);
+
+		const row = current[0];
+		if (!row) {
+			return fail(404, { success: false, message: 'Entry not found' });
+		}
+
+		if (row.end_date == null) {
+			return fail(409, { success: false, message: 'Stop the timer before deleting' });
+		}
+
 		await db.delete(time_entries).where(eq(time_entries.id, id));
 
-		return { success: true, message: 'Entry deleted' };
+		return {
+			success: true,
+			message: 'Entry deleted' };
 	}
 };
