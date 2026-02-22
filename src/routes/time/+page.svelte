@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { enhance, applyAction } from '$app/forms';
 	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
 	import type { TimeEntry } from '$lib/server/db/schema';
 	import fileReport from '$lib/assets/file-report.svg';
@@ -137,6 +137,7 @@
 			stopBusy = false;
 
 			if (result.type !== 'success') {
+				await applyAction(result);
 				return;
 			}
 
@@ -145,6 +146,8 @@
 			runningStartMs = null;
 			taskName = '';
 
+			// write result data so the form prop triggers
+			await applyAction(result);
 			// refresh entries without reloading like the previous function
 			await invalidateAll();
 		};
