@@ -7,6 +7,7 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { TIME_CATEGORIES, type TimeCategory, isStartData } from '$lib/types/time';
 	import { formatDuration, toYmd, formatDateLabel, formatTime, formatDate } from '$lib/utils/util';
+	import FlashNotification from '$lib/other/FlashNotification.svelte';
 
 	let { data, form } = $props();
 	let entries = $derived<TimeEntry[]>(data.entries ?? []);
@@ -93,6 +94,7 @@
 
 	let entriesCsv = $derived(buildEntriesCsv(filtered));
 
+	// show notification or not
 	let showSuccess = $state(false);
 	let showError = $state(false);
 
@@ -108,7 +110,9 @@
 		return async ({ result }) => {
 			startBusy = false;
 
-			if (result.type !== 'success') return;
+			if (result.type !== 'success') {
+				return;
+			}
 
 			const data = result.data;
 			if (!isStartData(data)) {
@@ -136,7 +140,9 @@
 		return async ({ result }) => {
 			stopBusy = false;
 
-			if (result.type !== 'success') return;
+			if (result.type !== 'success') {
+				return;
+			}
 
 			isRunning = false;
 			runningId = null;
@@ -216,13 +222,14 @@
 
 <section class="time-layout">
   <!-- flash notifications from user actions -->
-	<div class="flash-container" aria-live="polite" aria-atomic="true">
-		{#if showSuccess}
-			<p class="flash flash--success">{form?.message}</p>
-		{:else if showError}
-			<p class="flash flash--error">{form?.message}</p>
-		{/if}
-	</div>
+	<FlashNotification flashType={showSuccess ? 'success' : 'error'} message={form?.message ?? null} durationMs={5000} />
+<!--	<div class="flash-container" aria-live="polite" aria-atomic="true">-->
+<!--		{#if showSuccess}-->
+<!--			<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
+<!--		{:else if showError}-->
+<!--			<p class="flash flash&#45;&#45;error">{form?.message}</p>-->
+<!--		{/if}-->
+<!--	</div>-->
 
 	<div class="panel panel--form">
 		<h2 class="panel-title">Timer</h2>
