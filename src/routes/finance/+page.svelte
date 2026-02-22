@@ -10,6 +10,7 @@
 	import { MONTH_NAMES } from '$lib/types/time';
 	import './type_toggle.css';
 	import fileReport from '$lib/assets/file-report.svg';
+	import FlashNotification from '$lib/other/FlashNotification.svelte';
 
 	let { data, form } = $props();
 	let transactions = $derived<Transaction[]>(data.transactions ?? []);
@@ -162,13 +163,14 @@
 </script>
 
 <section class="finance-layout">
-	<div class="flash-container" aria-live="polite" aria-atomic="true">
-		{#if showSuccess}
-			<p class="flash flash--success">{form?.message}</p>
-		{:else if showError}
-			<p class="flash flash--error">{form?.message}</p>
-		{/if}
-	</div>
+	<FlashNotification flashType={showSuccess ? 'success' : showError ? 'error' : 'neutral'} message={form?.message ?? null} durationMs={5000} />
+<!--	<div class="flash-container" aria-live="polite" aria-atomic="true">-->
+<!--		{#if showSuccess}-->
+<!--			<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
+<!--		{:else if showError}-->
+<!--			<p class="flash flash&#45;&#45;error">{form?.message}</p>-->
+<!--		{/if}-->
+<!--	</div>-->
 
 	<div class="panel panel--form">
 		<h2 class="panel-title">Log transaction</h2>
