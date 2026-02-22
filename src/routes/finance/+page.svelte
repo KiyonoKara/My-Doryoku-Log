@@ -7,6 +7,7 @@
 	import ForecastSection from '$lib/other/ForecastSection.svelte';
 	import { capitalizeFirstLetter } from '$lib/utils/util';
 	import { type TxType, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '$lib/types/finance';
+	import { MONTH_NAMES } from '$lib/types/time';
 	import './type_toggle.css';
 	import '../../flash_notif.css';
 	import fileReport from '$lib/assets/file-report.svg';
@@ -43,21 +44,6 @@
 		type = newType;
 		category = '';
 	}
-
-	const MONTH_NAMES = [
-		'January',
-		'February',
-		'March',
-		'April',
-		'May',
-		'June',
-		'July',
-		'August',
-		'September',
-		'October',
-		'November',
-		'December'
-	];
 
 	function formatDateLabel(d: string) {
 		const [yyyy, mm, dd] = d.split('-').map(Number);

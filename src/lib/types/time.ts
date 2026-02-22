@@ -11,6 +11,21 @@ export const TIME_CATEGORIES = [
 	'Other'
 ] as const;
 
+export const MONTH_NAMES = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December'
+];
+
 export type TimeCategory = (typeof TIME_CATEGORIES)[number];
 
 export type StartSuccessData = {
