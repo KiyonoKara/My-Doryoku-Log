@@ -134,36 +134,13 @@
 		return { income, expense };
 	}
 	let categoryTotals = $derived(getCategoryTotals(filtered));
-
-	// auto dismiss
-	let showSuccess = $state(false);
-	let showError = $state(false);
-
-	$effect(() => {
-		if (!form) {
-			return;
-		}
-
-		// reset before checking and setting again
-		showSuccess = false;
-		showError = false;
-
-		if (form.success && form.message) {
-			showSuccess = true;
-			setTimeout(() => {
-				showSuccess = false;
-			}, 5000);
-		} else {
-			showError = true;
-			setTimeout(() => {
-				showError = false;
-			}, 5000);
-		}
-	});
 </script>
 
 <section class="finance-layout">
-	<FlashNotification flashType={showSuccess ? 'success' : showError ? 'error' : 'neutral'} message={form?.message ?? null} durationMs={5000} />
+	<FlashNotification
+		flashType={form?.success ? 'success' : 'error'}
+		message={form?.message ?? null}
+		durationMs={5000} />
 <!--	<div class="flash-container" aria-live="polite" aria-atomic="true">-->
 <!--		{#if showSuccess}-->
 <!--			<p class="flash flash&#45;&#45;success">{form?.message}</p>-->

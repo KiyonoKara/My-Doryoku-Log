@@ -94,10 +94,6 @@
 
 	let entriesCsv = $derived(buildEntriesCsv(filtered));
 
-	// show notification or not
-	let showSuccess = $state(false);
-	let showError = $state(false);
-
 	function confirmDelete(event: Event) {
 		if (!confirm('Delete this entry?')) {
 			event.preventDefault();
@@ -197,32 +193,14 @@
 			interval = null;
 		};
 	});
-
-	// for flash notifications
-	$effect(() => {
-		if (!form) {
-			return;
-		}
-		showSuccess = false;
-		showError = false;
-
-		if (form.success && form.message) {
-			showSuccess = true;
-			setTimeout(() => {
-				showSuccess = false;
-			}, 5000);
-		} else {
-			showError = true;
-			setTimeout(() => {
-				showError = false
-			}, 5000);
-		}
-	});
 </script>
 
 <section class="time-layout">
   <!-- flash notifications from user actions -->
-	<FlashNotification flashType={showSuccess ? 'success' : showError ? 'error' : 'neutral'} message={form?.message ?? null} durationMs={5000} />
+	<FlashNotification
+		flashType={form?.success ? 'success' : 'error'}
+		message={form?.message ?? null}
+		durationMs={5000} />
 <!--	<div class="flash-container" aria-live="polite" aria-atomic="true">-->
 <!--		{#if showSuccess}-->
 <!--			<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
