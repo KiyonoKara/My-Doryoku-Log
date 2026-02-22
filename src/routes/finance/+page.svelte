@@ -9,7 +9,6 @@
 	import { type TxType, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '$lib/types/finance';
 	import { MONTH_NAMES } from '$lib/types/time';
 	import './type_toggle.css';
-	import '../../flash_notif.css';
 	import fileReport from '$lib/assets/file-report.svg';
 
 	let { data, form } = $props();

@@ -3,7 +3,6 @@
 	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
 	import type { TimeEntry } from '$lib/server/db/schema';
 	import fileReport from '$lib/assets/file-report.svg';
-	import '../../flash_notif.css';
 	import { invalidateAll } from '$app/navigation';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { TIME_CATEGORIES, type TimeCategory, isStartData } from '$lib/types/time';
