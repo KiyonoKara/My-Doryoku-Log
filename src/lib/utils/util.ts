@@ -1,4 +1,4 @@
-import { MONTH_NAMES} from '$lib/types/time';
+import { MONTH_NAMES } from '$lib/types/time';
 
 /**
  * Capitalizes first letter
@@ -15,7 +15,9 @@ export function formatDuration(ms: number): string {
 	const mins = Math.floor(secs / 60);
 	const hours = Math.floor(mins / 60);
 
-	return `${hours.toString().padStart(2, '0')}:${(mins % 60).toString().padStart(2, '0')}:${(secs % 60)
+	return `${hours.toString().padStart(2, '0')}:${(mins % 60).toString().padStart(2, '0')}:${(
+		secs % 60
+	)
 		.toString()
 		.padStart(2, '0')}`;
 }

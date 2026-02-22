@@ -31,7 +31,8 @@ export const actions: Actions = {
 		}
 
 		const start_date = new Date().toISOString();
-		const c = typeof category === 'string' && category.trim().length > 0 ? category.trim() : 'Other';
+		const c =
+			typeof category === 'string' && category.trim().length > 0 ? category.trim() : 'Other';
 
 		await db.insert(time_entries).values({
 			task: task.trim(),
@@ -60,7 +61,6 @@ export const actions: Actions = {
 		};
 	},
 
-
 	stop: async ({ request }) => {
 		if (request.method !== 'POST') {
 			return fail(405, { success: false, message: 'Method not allowed' });
@@ -73,11 +73,7 @@ export const actions: Actions = {
 			return fail(400, { success: false, message: 'Invalid ID' });
 		}
 
-		const existing = await db
-			.select()
-			.from(time_entries)
-			.where(eq(time_entries.id, id))
-			.limit(1);
+		const existing = await db.select().from(time_entries).where(eq(time_entries.id, id)).limit(1);
 
 		const entry = existing[0];
 		if (!entry) {
@@ -88,12 +84,10 @@ export const actions: Actions = {
 		const startMs = Date.parse(entry.start_date);
 		const endMs = Date.parse(end_date);
 
-		const duration_ms = Number.isFinite(startMs) && Number.isFinite(endMs) ? Math.max(0, endMs - startMs) : 0;
+		const duration_ms =
+			Number.isFinite(startMs) && Number.isFinite(endMs) ? Math.max(0, endMs - startMs) : 0;
 
-		await db
-			.update(time_entries)
-			.set({ end_date, duration_ms })
-			.where(eq(time_entries.id, id));
+		await db.update(time_entries).set({ end_date, duration_ms }).where(eq(time_entries.id, id));
 
 		return {
 			success: true,
@@ -132,6 +126,7 @@ export const actions: Actions = {
 
 		return {
 			success: true,
-			message: 'Entry deleted' };
+			message: 'Entry deleted'
+		};
 	}
 };

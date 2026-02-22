@@ -140,14 +140,15 @@
 	<FlashNotification
 		flashType={form?.success ? 'success' : 'error'}
 		message={form?.message ?? null}
-		durationMs={5000} />
-<!--	<div class="flash-container" aria-live="polite" aria-atomic="true">-->
-<!--		{#if showSuccess}-->
-<!--			<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
-<!--		{:else if showError}-->
-<!--			<p class="flash flash&#45;&#45;error">{form?.message}</p>-->
-<!--		{/if}-->
-<!--	</div>-->
+		durationMs={5000}
+	/>
+	<!--	<div class="flash-container" aria-live="polite" aria-atomic="true">-->
+	<!--		{#if showSuccess}-->
+	<!--			<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
+	<!--		{:else if showError}-->
+	<!--			<p class="flash flash&#45;&#45;error">{form?.message}</p>-->
+	<!--		{/if}-->
+	<!--	</div>-->
 
 	<div class="panel panel--form">
 		<h2 class="panel-title">Log transaction</h2>

@@ -32,9 +32,9 @@
 	let dbRunningEntry = $derived(entries.find((e) => e.end_date == null) ?? null);
 
 	let effectiveRunningStartMs = $derived(
-		(runningStartMs && Number.isFinite(runningStartMs))
+		runningStartMs && Number.isFinite(runningStartMs)
 			? runningStartMs
-			: (dbRunningEntry && Number.isFinite(Date.parse(dbRunningEntry.start_date)))
+			: dbRunningEntry && Number.isFinite(Date.parse(dbRunningEntry.start_date))
 				? Date.parse(dbRunningEntry.start_date)
 				: null
 	);
@@ -66,7 +66,9 @@
 		}, {})
 	);
 
-	let groupedDates = $derived(Object.keys(groupedByDate).sort((a, b) => (a < b ? 1 : a > b ? -1 : 0)));
+	let groupedDates = $derived(
+		Object.keys(groupedByDate).sort((a, b) => (a < b ? 1 : a > b ? -1 : 0))
+	);
 
 	function buildEntriesCsv(rows: TimeEntry[]): string {
 		if (!rows.length) {
@@ -86,10 +88,14 @@
 			e.start_date,
 			e.end_date ?? '',
 			// for CSV, if still running, compute live duration
-			e.end_date ? formatDuration(e.duration_ms ?? 0) : formatDuration(Math.max(0, nowMs - Date.parse(e.start_date)))
+			e.end_date
+				? formatDuration(e.duration_ms ?? 0)
+				: formatDuration(Math.max(0, nowMs - Date.parse(e.start_date)))
 		]);
 
-		return [headers.map(escape).join(','), ...dataRows.map((r) => r.map(escape).join(','))].join('\n');
+		return [headers.map(escape).join(','), ...dataRows.map((r) => r.map(escape).join(','))].join(
+			'\n'
+		);
 	}
 
 	let entriesCsv = $derived(buildEntriesCsv(filtered));
@@ -112,7 +118,10 @@
 
 			const data = result.data;
 			if (!isStartData(data)) {
-				console.error('Start missing id/start_date. Fix +page.server.ts start to return them.', data);
+				console.error(
+					'Start missing id/start_date. Fix +page.server.ts start to return them.',
+					data
+				);
 				return;
 			}
 
@@ -199,18 +208,19 @@
 </script>
 
 <section class="time-layout">
-  <!-- flash notifications from user actions -->
+	<!-- flash notifications from user actions -->
 	<FlashNotification
 		flashType={form?.success ? 'success' : 'error'}
 		message={form?.message ?? null}
-		durationMs={5000} />
-<!--	<div class="flash-container" aria-live="polite" aria-atomic="true">-->
-<!--		{#if showSuccess}-->
-<!--			<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
-<!--		{:else if showError}-->
-<!--			<p class="flash flash&#45;&#45;error">{form?.message}</p>-->
-<!--		{/if}-->
-<!--	</div>-->
+		durationMs={5000}
+	/>
+	<!--	<div class="flash-container" aria-live="polite" aria-atomic="true">-->
+	<!--		{#if showSuccess}-->
+	<!--			<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
+	<!--		{:else if showError}-->
+	<!--			<p class="flash flash&#45;&#45;error">{form?.message}</p>-->
+	<!--		{/if}-->
+	<!--	</div>-->
 
 	<div class="panel panel--form">
 		<h2 class="panel-title">Timer</h2>
@@ -267,17 +277,11 @@
 			</div>
 			<div class="elapsed-block" aria-live="polite">
 				<div class="field-label" id="elapsed-label">Elapsed</div>
-				<div
-					class="elapsed-box"
-					role="status"
-					aria-live="polite"
-					aria-labelledby="elapsed-label"
-				>
+				<div class="elapsed-box" role="status" aria-live="polite" aria-labelledby="elapsed-label">
 					{formatDuration(elapsedMs)}
 				</div>
 			</div>
 		</div>
-
 	</div>
 
 	<div class="panel panel--history">
@@ -308,30 +312,36 @@
 				{#each groupedDates as d (d.toString())}
 					<section class="date-group">
 						<header class="date-group-header">
-							<span class="date-group-date-label">{d === 'Unknown date' ? 'Unknown date' : formatDateLabel(d)}</span>
+							<span class="date-group-date-label"
+								>{d === 'Unknown date' ? 'Unknown date' : formatDateLabel(d)}</span
+							>
 						</header>
 
 						<ul class="time-list">
 							{#each groupedByDate[d] as entry (entry.id)}
 								{@const isRowRunning = entry.end_date == null}
 								{@const startParsed = Date.parse(entry.start_date)}
-								{@const rowLiveMs = isRowRunning && Number.isFinite(startParsed) ? Math.max(0, nowMs - startParsed) : (entry.duration_ms ?? 0)}
+								{@const rowLiveMs =
+									isRowRunning && Number.isFinite(startParsed)
+										? Math.max(0, nowMs - startParsed)
+										: (entry.duration_ms ?? 0)}
 
 								<li class="time-item">
 									<div class="time-row">
 										<div class="time-main">
 											<span class="time-task">{entry.task}</span>
 											<span class="time-sub">
-                        <span class="time-chip">{entry.category ?? 'Uncategorized'}</span>
-                        <span class="time-dates">
-                          {formatDate(entry.start_date)} {formatTime(entry.start_date)}
+												<span class="time-chip">{entry.category ?? 'Uncategorized'}</span>
+												<span class="time-dates">
+													{formatDate(entry.start_date)}
+													{formatTime(entry.start_date)}
 													{#if entry.end_date}
-                            to {formatTime(entry.end_date)}
+														to {formatTime(entry.end_date)}
 													{:else}
-                            (running)
-                          {/if}
-                        </span>
-                      </span>
+														(running)
+													{/if}
+												</span>
+											</span>
 										</div>
 
 										<div class="time-actions">
@@ -341,7 +351,8 @@
 													type="submit"
 													class="delete-btn"
 													disabled={isRowRunning || !!dbRunningEntry}
-													onclick={confirmDelete}>
+													onclick={confirmDelete}
+												>
 													Delete
 												</button>
 											</form>
@@ -372,381 +383,381 @@
 </section>
 
 <style>
-    .time-layout {
-        max-width: 1100px;
-        margin: 1.5rem auto;
-        padding: 0 1.5rem 2rem;
-        display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
-        gap: 1.5rem;
-    }
+	.time-layout {
+		max-width: 1100px;
+		margin: 1.5rem auto;
+		padding: 0 1.5rem 2rem;
+		display: grid;
+		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+		gap: 1.5rem;
+	}
 
-    .panel {
-        border-radius: 1rem;
-        border: 1px solid var(--border);
-        background: linear-gradient(145deg, var(--bg-secondary), var(--bg-surface));
-        box-shadow:
-                0 12px 24px rgba(0, 0, 0, 0.35),
-                0 0 0 1px rgba(0, 0, 0, 0.45);
-        padding: 1.25rem 1.5rem 1.4rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-    }
+	.panel {
+		border-radius: 1rem;
+		border: 1px solid var(--border);
+		background: linear-gradient(145deg, var(--bg-secondary), var(--bg-surface));
+		box-shadow:
+			0 12px 24px rgba(0, 0, 0, 0.35),
+			0 0 0 1px rgba(0, 0, 0, 0.45);
+		padding: 1.25rem 1.5rem 1.4rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.8rem;
+	}
 
-    .panel-title {
-        margin: 0 0 0.3rem 0;
-        font-size: 1.1rem;
-        font-weight: 600;
-    }
+	.panel-title {
+		margin: 0 0 0.3rem 0;
+		font-size: 1.1rem;
+		font-weight: 600;
+	}
 
-    .panel--form {
-        min-height: 550px;
-        max-height: 550px;
-    }
+	.panel--form {
+		min-height: 550px;
+		max-height: 550px;
+	}
 
-    .panel--history {
-        min-height: 550px;
-        max-height: 550px;
-    }
+	.panel--history {
+		min-height: 550px;
+		max-height: 550px;
+	}
 
-    .field-row {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
+	.field-row {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
 
-    .field-row--inline {
-        flex-direction: row;
-        gap: 0.8rem;
-        align-items: flex-end;
-    }
+	.field-row--inline {
+		flex-direction: row;
+		gap: 0.8rem;
+		align-items: flex-end;
+	}
 
-    .field-group {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
+	.field-group {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
 
-    .field-label {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-    }
+	.field-label {
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+	}
 
-    input,
-    select {
-        border-radius: 0.6rem;
-        border: 1px solid rgba(190, 212, 233, 0.4);
-        padding: 0.45rem 0.6rem;
-        background: rgba(12, 30, 52, 0.85);
-        color: var(--text-primary);
-        font-size: 0.9rem;
-    }
+	input,
+	select {
+		border-radius: 0.6rem;
+		border: 1px solid rgba(190, 212, 233, 0.4);
+		padding: 0.45rem 0.6rem;
+		background: rgba(12, 30, 52, 0.85);
+		color: var(--text-primary);
+		font-size: 0.9rem;
+	}
 
-    input:focus,
-    select:focus {
-        outline: none;
-        border-color: rgba(190, 212, 233, 0.7);
-        background: rgba(12, 30, 52, 0.95);
-        box-shadow:
-                0 0 0 2px rgba(51, 115, 176, 0.3),
-                inset 0 0 0 1px rgba(190, 212, 233, 0.5);
-        transition: all 0.2s ease;
-    }
+	input:focus,
+	select:focus {
+		outline: none;
+		border-color: rgba(190, 212, 233, 0.7);
+		background: rgba(12, 30, 52, 0.95);
+		box-shadow:
+			0 0 0 2px rgba(51, 115, 176, 0.3),
+			inset 0 0 0 1px rgba(190, 212, 233, 0.5);
+		transition: all 0.2s ease;
+	}
 
-    .timer-card {
-        margin-top: 0.4rem;
-        border-radius: 0.8rem;
-        background: rgba(10, 24, 41, 0.9);
-        padding: 0.95rem 1rem 1rem;
-        box-shadow:
-                inset 0 0 0 1px rgba(0, 0, 0, 0.5),
-                inset 0 0 12px rgba(0, 0, 0, 0.65);
-    }
+	.timer-card {
+		margin-top: 0.4rem;
+		border-radius: 0.8rem;
+		background: rgba(10, 24, 41, 0.9);
+		padding: 0.95rem 1rem 1rem;
+		box-shadow:
+			inset 0 0 0 1px rgba(0, 0, 0, 0.5),
+			inset 0 0 12px rgba(0, 0, 0, 0.65);
+	}
 
-    .timer-row {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 1rem;
-        align-items: start;
-    }
+	.timer-row {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		gap: 1rem;
+		align-items: start;
+	}
 
-    .timer-fields {
-        display: flex;
-        flex-direction: column;
-        gap: 0.7rem;
-    }
+	.timer-fields {
+		display: flex;
+		flex-direction: column;
+		gap: 0.7rem;
+	}
 
-    .elapsed-block {
-        margin-top: 1rem;
-        display: grid;
-        justify-items: center;
-        gap: 0.35rem;
-    }
+	.elapsed-block {
+		margin-top: 1rem;
+		display: grid;
+		justify-items: center;
+		gap: 0.35rem;
+	}
 
-    .elapsed-box {
-        width: min(420px, 100%);
-        padding: 1rem 1.25rem;
-        border-radius: 0.95rem; /* curvature but not pill */
-        border: 1px solid rgba(190, 212, 233, 0.45);
-        background: rgba(12, 30, 52, 0.75);
-        box-shadow:
-                inset 0 0 0 1px rgba(0, 0, 0, 0.35),
-                0 10px 18px rgba(0, 0, 0, 0.28);
+	.elapsed-box {
+		width: min(420px, 100%);
+		padding: 1rem 1.25rem;
+		border-radius: 0.95rem; /* curvature but not pill */
+		border: 1px solid rgba(190, 212, 233, 0.45);
+		background: rgba(12, 30, 52, 0.75);
+		box-shadow:
+			inset 0 0 0 1px rgba(0, 0, 0, 0.35),
+			0 10px 18px rgba(0, 0, 0, 0.28);
 
-        font-weight: 800;
-        font-size: clamp(2.2rem, 4vw, 3.1rem);
-        letter-spacing: 0.04em;
-        font-variant-numeric: tabular-nums;
-        text-align: center;
-    }
+		font-weight: 800;
+		font-size: clamp(2.2rem, 4vw, 3.1rem);
+		letter-spacing: 0.04em;
+		font-variant-numeric: tabular-nums;
+		text-align: center;
+	}
 
-    .timer-cta {
-        display: flex;
-        justify-content: flex-end;
-        padding-top: 1.45rem;
-    }
+	.timer-cta {
+		display: flex;
+		justify-content: flex-end;
+		padding-top: 1.45rem;
+	}
 
-    .timer-btn {
-        padding: 0.65rem 1.25rem;
-        min-width: 8.75rem;
-				height: 2.75rem;
-        border-radius: 0.75rem;
-        font-size: 0.95rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        border: 1px solid transparent;
-        white-space: nowrap;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
+	.timer-btn {
+		padding: 0.65rem 1.25rem;
+		min-width: 8.75rem;
+		height: 2.75rem;
+		border-radius: 0.75rem;
+		font-size: 0.95rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.15s ease;
+		border: 1px solid transparent;
+		white-space: nowrap;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
 
-    .timer-btn:disabled {
-        opacity: 0.65;
-        cursor: not-allowed;
-    }
+	.timer-btn:disabled {
+		opacity: 0.65;
+		cursor: not-allowed;
+	}
 
-    .timer-start {
-        background: rgba(59, 176, 126, 0.25);
-        color: #a5ffcf;
-        border-color: rgba(59, 176, 126, 0.55);
-    }
+	.timer-start {
+		background: rgba(59, 176, 126, 0.25);
+		color: #a5ffcf;
+		border-color: rgba(59, 176, 126, 0.55);
+	}
 
-    .timer-start:hover:not(:disabled) {
-        background: rgba(59, 176, 126, 0.45);
-        transform: translateY(-1px);
-    }
+	.timer-start:hover:not(:disabled) {
+		background: rgba(59, 176, 126, 0.45);
+		transform: translateY(-1px);
+	}
 
-    .timer-stop {
-        background: rgba(214, 88, 95, 0.25);
-        color: #ffb3c1;
-        border-color: rgba(214, 88, 95, 0.6);
-    }
+	.timer-stop {
+		background: rgba(214, 88, 95, 0.25);
+		color: #ffb3c1;
+		border-color: rgba(214, 88, 95, 0.6);
+	}
 
-    .timer-stop:hover:not(:disabled) {
-        background: rgba(214, 88, 95, 0.5);
-        transform: translateY(-1px);
-    }
+	.timer-stop:hover:not(:disabled) {
+		background: rgba(214, 88, 95, 0.5);
+		transform: translateY(-1px);
+	}
 
-    .history-header {
-        display: flex;
-        flex-direction: column;
-        gap: 0.6rem;
-    }
+	.history-header {
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+	}
 
-    .filters-row {
-        display: grid;
-        grid-template-columns: 1fr minmax(180px, 0.55fr);
-        gap: 0.8rem;
-        align-items: end;
-    }
+	.filters-row {
+		display: grid;
+		grid-template-columns: 1fr minmax(180px, 0.55fr);
+		gap: 0.8rem;
+		align-items: end;
+	}
 
-    .search-wrapper input {
-        width: 100%;
-    }
+	.search-wrapper input {
+		width: 100%;
+	}
 
-    .history-scroll {
-        margin-top: 0.4rem;
-        border-radius: 0.8rem;
-        background: rgba(10, 24, 41, 0.9);
-        padding: 0.75rem 0.8rem;
-        overflow: auto;
-        max-height: 360px;
-        box-shadow:
-                inset 0 0 0 1px rgba(0, 0, 0, 0.5),
-                inset 0 0 12px rgba(0, 0, 0, 0.65);
-    }
+	.history-scroll {
+		margin-top: 0.4rem;
+		border-radius: 0.8rem;
+		background: rgba(10, 24, 41, 0.9);
+		padding: 0.75rem 0.8rem;
+		overflow: auto;
+		max-height: 360px;
+		box-shadow:
+			inset 0 0 0 1px rgba(0, 0, 0, 0.5),
+			inset 0 0 12px rgba(0, 0, 0, 0.65);
+	}
 
-    .empty-state {
-        margin: 0.4rem 0;
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-    }
+	.empty-state {
+		margin: 0.4rem 0;
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+	}
 
-    .date-group {
-        margin-bottom: 0.9rem;
-    }
+	.date-group {
+		margin-bottom: 0.9rem;
+	}
 
-    .date-group-header {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        margin-bottom: 0.4rem;
-        padding: 0.15rem 0.35rem;
-        background: linear-gradient(to right, rgba(16, 40, 65, 0.98), rgba(16, 40, 65, 0.8));
-        border-radius: 999px;
-        display: inline-flex;
-        max-width: max-content;
-    }
+	.date-group-header {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		margin-bottom: 0.4rem;
+		padding: 0.15rem 0.35rem;
+		background: linear-gradient(to right, rgba(16, 40, 65, 0.98), rgba(16, 40, 65, 0.8));
+		border-radius: 999px;
+		display: inline-flex;
+		max-width: max-content;
+	}
 
-    .date-group-date-label {
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-    }
+	.date-group-date-label {
+		font-size: 0.8rem;
+		color: var(--text-secondary);
+	}
 
-    .time-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: grid;
-        gap: 0.4rem;
-    }
+	.time-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.4rem;
+	}
 
-    .time-item {
-        border-radius: 0.7rem;
-        padding: 0.45rem 0.55rem;
-        background: radial-gradient(circle at top left, rgba(51, 115, 176, 0.42), rgba(7, 20, 37, 0.9));
-        box-shadow:
-                0 6px 14px rgba(0, 0, 0, 0.45),
-                0 0 0 1px rgba(0, 0, 0, 0.55);
-    }
+	.time-item {
+		border-radius: 0.7rem;
+		padding: 0.45rem 0.55rem;
+		background: radial-gradient(circle at top left, rgba(51, 115, 176, 0.42), rgba(7, 20, 37, 0.9));
+		box-shadow:
+			0 6px 14px rgba(0, 0, 0, 0.45),
+			0 0 0 1px rgba(0, 0, 0, 0.55);
+	}
 
-    .time-row {
-        display: grid;
-        grid-template-columns: 1fr auto auto;
-        gap: 0.75rem 0.5rem;
-        align-items: center;
-    }
+	.time-row {
+		display: grid;
+		grid-template-columns: 1fr auto auto;
+		gap: 0.75rem 0.5rem;
+		align-items: center;
+	}
 
-    .time-main {
-        display: flex;
-        flex-direction: column;
-        gap: 0.1rem;
-        min-width: 0;
-    }
+	.time-main {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		min-width: 0;
+	}
 
-    .time-task {
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: var(--text-primary);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+	.time-task {
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--text-primary);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 
-    .time-sub {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        min-width: 0;
-        flex-wrap: wrap;
-    }
+	.time-sub {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+		min-width: 0;
+		flex-wrap: wrap;
+	}
 
-    .time-chip {
-        font-size: 0.75rem;
-        padding: 0.08rem 0.45rem;
-        border-radius: 999px;
-        border: 1px solid rgba(190, 212, 233, 0.55);
-        background: rgba(51, 115, 176, 0.22);
-        color: var(--text-primary);
-    }
+	.time-chip {
+		font-size: 0.75rem;
+		padding: 0.08rem 0.45rem;
+		border-radius: 999px;
+		border: 1px solid rgba(190, 212, 233, 0.55);
+		background: rgba(51, 115, 176, 0.22);
+		color: var(--text-primary);
+	}
 
-    .time-dates {
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-    }
+	.time-dates {
+		font-size: 0.8rem;
+		color: var(--text-secondary);
+	}
 
-    .time-meta {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        text-align: right;
-        padding-right: 0.4rem;
-    }
+	.time-meta {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		text-align: right;
+		padding-right: 0.4rem;
+	}
 
-    .time-duration {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        font-variant-numeric: tabular-nums;
-    }
+	.time-duration {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--text-primary);
+		font-variant-numeric: tabular-nums;
+	}
 
-    .time-actions {
-        display: flex;
-        justify-content: flex-end;
-        opacity: 0;
-        transition: opacity 0.2s ease;
-    }
+	.time-actions {
+		display: flex;
+		justify-content: flex-end;
+		opacity: 0;
+		transition: opacity 0.2s ease;
+	}
 
-    .time-item:hover .time-actions {
-        opacity: 1;
-    }
+	.time-item:hover .time-actions {
+		opacity: 1;
+	}
 
-    .time-actions form {
-        margin: 0;
-    }
+	.time-actions form {
+		margin: 0;
+	}
 
-    .delete-btn {
-        background: rgba(214, 88, 95, 0.3);
-        border: 1px solid rgba(214, 88, 95, 0.6);
-        color: #ffb3c1;
-        padding: 0.25rem 0.6rem;
-        border-radius: 0.4rem;
-        font-size: 0.75rem;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.15s ease;
-        white-space: nowrap;
-    }
+	.delete-btn {
+		background: rgba(214, 88, 95, 0.3);
+		border: 1px solid rgba(214, 88, 95, 0.6);
+		color: #ffb3c1;
+		padding: 0.25rem 0.6rem;
+		border-radius: 0.4rem;
+		font-size: 0.75rem;
+		cursor: pointer;
+		font-weight: 500;
+		transition: all 0.15s ease;
+		white-space: nowrap;
+	}
 
-    .delete-btn:hover {
-        background: rgba(214, 88, 95, 0.5);
-    }
+	.delete-btn:hover {
+		background: rgba(214, 88, 95, 0.5);
+	}
 
-		.delete-btn:disabled {
-				opacity: 0.75;
-				cursor: not-allowed;
-				pointer-events: none;
+	.delete-btn:disabled {
+		opacity: 0.75;
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+
+	@media (max-width: 840px) {
+		.time-layout {
+			grid-template-columns: minmax(0, 1fr);
+			max-width: 640px;
 		}
 
-    @media (max-width: 840px) {
-        .time-layout {
-            grid-template-columns: minmax(0, 1fr);
-            max-width: 640px;
-        }
+		.panel--history {
+			max-height: none;
+		}
 
-        .panel--history {
-            max-height: none;
-        }
+		.history-scroll {
+			max-height: 320px;
+		}
 
-        .history-scroll {
-            max-height: 320px;
-        }
+		.filters-row {
+			grid-template-columns: 1fr;
+		}
 
-        .filters-row {
-            grid-template-columns: 1fr;
-        }
+		.timer-row {
+			grid-template-columns: 1fr;
+		}
 
-        .timer-row {
-            grid-template-columns: 1fr;
-        }
-
-        .timer-cta {
-            padding-top: 0;
-            justify-content: flex-start;
-        }
-    }
+		.timer-cta {
+			padding-top: 0;
+			justify-content: flex-start;
+		}
+	}
 </style>
