@@ -222,7 +222,7 @@
 
 <section class="time-layout">
   <!-- flash notifications from user actions -->
-	<FlashNotification flashType={showSuccess ? 'success' : 'error'} message={form?.message ?? null} durationMs={5000} />
+	<FlashNotification flashType={showSuccess ? 'success' : showError ? 'error' : 'neutral'} message={form?.message ?? null} durationMs={5000} />
 <!--	<div class="flash-container" aria-live="polite" aria-atomic="true">-->
 <!--		{#if showSuccess}-->
 <!--			<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
