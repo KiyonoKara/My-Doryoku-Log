@@ -4,8 +4,8 @@
 	import { type Transaction } from '$lib/server/db/schema';
 	import { capitalizeFirstLetter } from '$lib/utils/util';
 
-	const FORECAST_EXP_API_URL = 'http://127.0.0.1:5000/api/finance/forecast-expense';
-	const FORECAST_INC_API_URL = 'http://127.0.0.1:5000/api/finance/forecast-income';
+	const FORECAST_EXP_API_URL = '/finance/forecast-expense';
+	const FORECAST_INC_API_URL = '/finance/forecast-income';
 
 	let { transactions } = $props<{ transactions?: Transaction[] }>();
 
