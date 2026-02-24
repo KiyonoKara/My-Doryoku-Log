@@ -3,6 +3,7 @@ import { fail } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { transactions, type Transaction } from '$lib/server/db/schema';
 import { desc, eq } from 'drizzle-orm';
+import { forecastNextExpense, forecastNextIncome } from '$lib/server/ml/forecasting';
 
 // load page with this
 export const load: PageServerLoad = async () => {
@@ -11,9 +12,13 @@ export const load: PageServerLoad = async () => {
 		.from(transactions)
 		.orderBy(desc(transactions.date), desc(transactions.id))
 		.limit(50);
+	const expenseForecast = await forecastNextExpense();
+	const incomeForecast = await forecastNextIncome();
 
 	return {
-		transactions: rows
+		transactions: rows as Transaction[],
+		expenseForecast,
+		incomeForecast
 	};
 };
 
