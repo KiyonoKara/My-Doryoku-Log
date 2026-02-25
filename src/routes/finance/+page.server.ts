@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { transactions, type Transaction } from '$lib/server/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, inArray } from 'drizzle-orm';
 import { forecastNextExpense, forecastNextIncome } from '$lib/server/ml/forecasting';
 
 // load page with this
@@ -105,6 +105,93 @@ export const actions: Actions = {
 			success: true,
 			deleted: true,
 			message: 'Entry deleted'
+		};
+	},
+
+	// for editing and updating transactions
+	update: async ({ request }) => {
+		if (request.method !== 'POST') {
+			return fail(405, { success: false, message: 'Method not allowed' });
+		}
+		const formData = await request.formData();
+		const id = Number(formData.get('id'));
+		const date = formData.get('date');
+		const amount = formData.get('amount');
+		const category = formData.get('category');
+		const type = formData.get('type');
+		const description = formData.get('description');
+
+		if (!Number.isFinite(id)) {
+			return fail(400, {
+				success: false,
+				message: 'Invalid ID'
+			});
+		}
+
+		if (typeof date !== 'string' || typeof amount !== 'string' || typeof category !== 'string' || typeof type !== 'string') {
+			return fail(400, {
+				success: false,
+				message: 'Invalid form data'
+			});
+		}
+
+		const parsedAmount = Number(amount);
+		if (!Number.isFinite(parsedAmount)) {
+			return fail(400, {
+				success: false,
+				message: 'Amount must be a number'
+			});
+		}
+
+		if (type !== 'income' && type !== 'expense') {
+			return fail(400, {
+				success: false,
+				message: 'Invalid type'
+			});
+		}
+
+		await db
+			.update(transactions)
+			.set({
+				date,
+				amount: parsedAmount,
+				category,
+				type,
+				description: typeof description === 'string' && description.length > 0 ? description : null
+			})
+			.where(eq(transactions.id, id));
+		return {
+			success: true,
+			action: 'update',
+			message: 'Entry updated'
+		};
+	},
+
+	// for deleting multiple transactions
+	bulkDelete: async ({ request }) => {
+		if (request.method !== 'POST') {
+			return fail(405, {
+				success: false,
+				message: 'Method not allowed'
+			});
+		}
+
+		const formData = await request.formData();
+		const rawIds = formData.getAll('ids');
+		const ids = rawIds.map(Number).filter(Number.isFinite) as number[];
+
+		if (ids.length === 0) {
+			return fail(400, {
+				success: false,
+				message: 'No IDs provided'
+			});
+		}
+
+		await db.delete(transactions).where(inArray(transactions.id, ids));
+		return {
+			success: true,
+			action: 'bulkDelete',
+			message: `${ids.length} entries deleted`
 		};
 	}
 };
