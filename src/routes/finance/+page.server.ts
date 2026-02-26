@@ -128,7 +128,12 @@ export const actions: Actions = {
 			});
 		}
 
-		if (typeof date !== 'string' || typeof amount !== 'string' || typeof category !== 'string' || typeof type !== 'string') {
+		if (
+			typeof date !== 'string' ||
+			typeof amount !== 'string' ||
+			typeof category !== 'string' ||
+			typeof type !== 'string'
+		) {
 			return fail(400, {
 				success: false,
 				message: 'Invalid form data'

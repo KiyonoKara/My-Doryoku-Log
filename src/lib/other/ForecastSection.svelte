@@ -27,19 +27,19 @@
 
 	function hashTransactions(txs: Transaction[], type: TxType): string {
 		return txs
-			.filter(t => t.type === type)
-			.map(t => `${t.id}:${t.amount}:${t.category}:${t.date}`)
+			.filter((t) => t.type === type)
+			.map((t) => `${t.id}:${t.amount}:${t.category}:${t.date}`)
 			.join(',');
 	}
 
 	let expenseHash = $derived(hashTransactions(transactions, 'expense'));
-	let incomeHash  = $derived(hashTransactions(transactions, 'income'));
+	let incomeHash = $derived(hashTransactions(transactions, 'income'));
 
 	let lastExpenseHash = $state('');
-	let lastIncomeHash  = $state('');
+	let lastIncomeHash = $state('');
 
 	let needsExpenseRefresh = $derived(expenseHash !== lastExpenseHash);
-	let needsIncomeRefresh  = $derived(incomeHash  !== lastIncomeHash);
+	let needsIncomeRefresh = $derived(incomeHash !== lastIncomeHash);
 
 	let needsRefresh = $derived(needsExpenseRefresh || needsIncomeRefresh);
 
@@ -87,7 +87,7 @@
 				return;
 			}
 			lastExpenseHash = expenseHash;
-			lastIncomeHash  = incomeHash;
+			lastIncomeHash = incomeHash;
 		} finally {
 			isLoading = false;
 		}
@@ -96,7 +96,7 @@
 	// auto-fetch on mount
 	onMount(() => {
 		lastExpenseHash = expenseHash;
-		lastIncomeHash  = incomeHash;
+		lastIncomeHash = incomeHash;
 		fetchPredictions();
 	});
 </script>
