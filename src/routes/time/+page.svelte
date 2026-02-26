@@ -492,44 +492,11 @@
 		transform: translateY(-1px);
 	}
 
-	.history-header {
-		display: flex;
-		flex-direction: column;
-		gap: 0.6rem;
-	}
-
 	.filters-row {
 		display: grid;
 		grid-template-columns: 1fr minmax(180px, 0.55fr);
 		gap: 0.8rem;
 		align-items: end;
-	}
-
-	.empty-state {
-		margin: 0.4rem 0;
-		font-size: 0.9rem;
-		color: var(--text-secondary);
-	}
-
-	.date-group {
-		margin-bottom: 0.9rem;
-	}
-
-	.date-group-header {
-		position: sticky;
-		top: 0;
-		z-index: 1;
-		margin-bottom: 0.4rem;
-		padding: 0.15rem 0.35rem;
-		background: linear-gradient(to right, rgba(16, 40, 65, 0.98), rgba(16, 40, 65, 0.8));
-		border-radius: 999px;
-		display: inline-flex;
-		max-width: max-content;
-	}
-
-	.date-group-date-label {
-		font-size: 0.8rem;
-		color: var(--text-secondary);
 	}
 
 	.time-list {

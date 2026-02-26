@@ -398,15 +398,15 @@
 							<!--	/>-->
 							<!--{/if}-->
 							{#if bulkMode}
-								<label class="tx-checkbox-label">
+								<label class="checkbox-label">
 									<input
 										type="checkbox"
-										class="tx-checkbox"
+										class="checkbox"
 										checked={allGroupSelected}
 										onchange={() =>
 											allGroupSelected ? deselectAll(groupIds) : selectAll(groupIds)}
 									/>
-									<span class="tx-checkbox-custom"></span>
+									<span class="checkbox-custom"></span>
 								</label>
 							{/if}
 						</header>
@@ -563,16 +563,16 @@
 													<div class="tx-main-top">
 														<span class="tx-category">{tx.category}</span>
 														<label
-															class="tx-checkbox-label"
-															class:tx-checkbox-label--hidden={!bulkMode}
+															class="checkbox-label"
+															class:checkbox-label--hidden={!bulkMode}
 														>
 															<input
 																type="checkbox"
-																class="tx-checkbox"
+																class="checkbox"
 																checked={selectedIds.has(tx.id)}
 																onchange={() => toggleSelect(tx.id)}
 															/>
-															<span class="tx-checkbox-custom"></span>
+															<span class="checkbox-custom"></span>
 														</label>
 													</div>
 													{#if tx.description}
@@ -789,51 +789,11 @@
 		margin-top: 0.4rem;
 	}
 
-	.history-header {
-		display: flex;
-		flex-direction: column;
-		gap: 0.6rem;
-	}
 
 	.history-title-row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-	}
-
-	.empty-state {
-		margin: 0.4rem 0;
-		font-size: 0.9rem;
-		color: var(--text-secondary);
-	}
-
-	.date-group {
-		margin-bottom: 0.9rem;
-	}
-
-	.date-group__header {
-		position: sticky;
-		top: 0;
-		z-index: 1;
-		margin-bottom: 0.4rem;
-		padding: 0.15rem 0.35rem;
-		background: linear-gradient(to right, rgba(16, 40, 65, 0.98), rgba(16, 40, 65, 0.8));
-		border-radius: 999px;
-		display: inline-flex;
-		max-width: max-content;
-		gap: 0.5rem;
-	}
-
-	.date-group__date-label {
-		font-size: 0.8rem;
-		color: var(--text-secondary);
-	}
-
-	.group-checkbox {
-		width: 14px;
-		height: 14px;
-		cursor: pointer;
-		accent-color: #3373b0;
 	}
 
 	.tx-list {
@@ -866,68 +826,6 @@
 		box-shadow:
 			0 0 0 2px rgba(190, 212, 233, 0.35),
 			0 6px 14px rgba(0, 0, 0, 0.45);
-	}
-
-	.tx-checkbox-label {
-		display: inline-flex;
-		align-items: center;
-		cursor: pointer;
-		flex-shrink: 0;
-	}
-
-	.tx-checkbox {
-		position: absolute;
-		opacity: 0;
-		width: 0;
-		height: 0;
-		pointer-events: none;
-	}
-
-	.tx-checkbox-custom {
-		width: 15px;
-		height: 15px;
-		border-radius: 4px;
-		border: 2px solid rgba(190, 212, 233, 0.35);
-		background: rgba(12, 30, 52, 0.6);
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		transition:
-			background 0.15s ease,
-			border-color 0.15s ease,
-			box-shadow 0.15s ease;
-		flex-shrink: 0;
-	}
-
-	.tx-checkbox-custom::after {
-		content: '';
-		display: block;
-		width: 4px;
-		height: 7px;
-		border-right: 2px solid #a8d4f0;
-		border-bottom: 2px solid #a8d4f0;
-		transform: rotate(45deg) translateY(-1px);
-		opacity: 0;
-		transition: opacity 0.12s ease;
-	}
-
-	.tx-checkbox:checked + .tx-checkbox-custom {
-		background: rgba(51, 115, 176, 0.45);
-		border-color: rgba(190, 212, 233, 0.7);
-		box-shadow: 0 0 0 2px rgba(51, 115, 176, 0.25);
-	}
-
-	.tx-checkbox:checked + .tx-checkbox-custom::after {
-		opacity: 1;
-	}
-
-	.tx-checkbox-label:hover .tx-checkbox-custom {
-		border-color: rgba(190, 212, 233, 0.6);
-		background: rgba(51, 115, 176, 0.2);
-	}
-
-	.tx-checkbox-label--hidden {
-		visibility: hidden;
 	}
 
 	.tx-edit-form {
@@ -1141,50 +1039,6 @@
 		box-sizing: border-box;
 	}
 
-	.delete-btn.bulk {
-		background: rgba(214, 88, 95, 0.1);
-		border: 1px solid rgba(214, 88, 95, 0.9);
-		color: #ffb3c1;
-	}
-
-	.bulk-bar {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 0.5rem 0.75rem;
-		border-radius: 0.6rem;
-		background: rgba(214, 88, 95, 0.12);
-		border: 1px solid rgba(214, 88, 95, 0.9);
-		margin-top: 0.25rem;
-	}
-
-	.bulk-bar__count {
-		font-size: 0.85rem;
-		color: #ffb3c1;
-	}
-
-	.bulk-toggle-btn {
-		font-size: 0.78rem;
-		padding: 0.25rem 0.75rem;
-		border-radius: 8px;
-		border: 1px solid var(--border);
-		background: transparent;
-		color: var(--text-secondary);
-		cursor: pointer;
-		transition: all 0.15s ease;
-	}
-
-	.bulk-toggle-btn:hover {
-		color: var(--text-primary);
-		border-color: rgba(190, 212, 233, 0.7);
-	}
-
-	.bulk-toggle-btn--active {
-		background: rgba(214, 88, 95, 0.15);
-		border-color: rgba(214, 88, 95, 0.9);
-		color: #ffb3c1;
-	}
-
 	.tx-edit-expanded {
 		display: flex;
 		flex-direction: column;
@@ -1192,90 +1046,9 @@
 		padding: 0.25rem 0;
 	}
 
-	.edit-field-row {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-	}
-
-	.edit-label {
-		font-size: 0.78rem;
-		color: var(--text-secondary);
-		width: 4.5rem;
-		flex-shrink: 0;
-	}
-
-	.edit-actions {
-		display: flex;
-		gap: 0.4rem;
-		justify-content: flex-end;
-		margin-top: 0.25rem;
-	}
-
-	.edit-btn {
-		background: rgba(51, 115, 176, 0.2);
-		border: 1px solid rgba(51, 115, 176, 0.5);
-		color: #a8d4f0;
-		padding: 0.25rem 0.6rem;
-		border-radius: 0.4rem;
-		font-size: 0.75rem;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.15s ease;
-		white-space: nowrap;
-	}
-
-	.edit-btn:hover {
-		background: rgba(51, 115, 176, 0.35);
-	}
-
-	.edit-btn--disabled {
-		opacity: 0.35;
-		cursor: not-allowed;
-		pointer-events: none;
-	}
-
 	.tx-date-label {
 		font-size: 0.7rem;
 		color: rgba(190, 212, 233, 0.45);
-	}
-
-	.save-btn {
-		background: rgba(59, 176, 126, 0.25);
-		border: 1px solid rgba(59, 176, 126, 0.5);
-		color: #a8f0d5;
-		padding: 0.25rem 0.55rem;
-		border-radius: 0.4rem;
-		font-size: 0.75rem;
-		cursor: pointer;
-		font-weight: 500;
-		white-space: nowrap;
-		transition: all 0.15s ease;
-	}
-
-	.save-btn:hover {
-		background: rgba(59, 176, 126, 0.4);
-	}
-
-	.save-btn--disabled {
-		opacity: 0.35;
-		cursor: not-allowed;
-		pointer-events: none;
-	}
-
-	.cancel-btn {
-		background: rgba(190, 212, 233, 0.08);
-		border: 1px solid rgba(190, 212, 233, 0.2);
-		color: var(--text-secondary);
-		padding: 0.2rem 0.45rem;
-		border-radius: 0.4rem;
-		font-size: 0.75rem;
-		cursor: pointer;
-		transition: all 0.15s ease;
-	}
-
-	.cancel-btn:hover {
-		background: rgba(190, 212, 233, 0.15);
 	}
 
 	@media (max-width: 840px) {
