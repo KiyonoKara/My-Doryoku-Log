@@ -689,35 +689,6 @@
 		gap: 1.5rem;
 	}
 
-	.panel {
-		border-radius: 1rem;
-		border: 1px solid var(--border);
-		background: linear-gradient(145deg, var(--bg-secondary), var(--bg-surface));
-		box-shadow:
-			0 12px 24px rgba(0, 0, 0, 0.35),
-			0 0 0 1px rgba(0, 0, 0, 0.45);
-		padding: 1.25rem 1.5rem 1.4rem;
-		display: flex;
-		flex-direction: column;
-		gap: 0.8rem;
-	}
-
-	.panel-title {
-		margin: 0 0 0.3rem 0;
-		font-size: 1.1rem;
-		font-weight: 600;
-	}
-
-	.panel--form {
-		min-height: 0;
-		max-height: 550px;
-	}
-
-	.panel--history {
-		min-height: 360px;
-		max-height: 550px;
-	}
-
 	.entry-form {
 		display: flex;
 		flex-direction: column;
@@ -749,29 +720,6 @@
 	.field-label {
 		font-size: 0.85rem;
 		color: var(--text-secondary);
-	}
-
-	input,
-	select,
-	textarea {
-		border-radius: 0.6rem;
-		border: 1px solid rgba(190, 212, 233, 0.4);
-		padding: 0.45rem 0.6rem;
-		background: rgba(12, 30, 52, 0.85);
-		color: var(--text-primary);
-		font-size: 0.9rem;
-	}
-
-	input:focus,
-	select:focus,
-	textarea:focus {
-		outline: none;
-		border-color: rgba(190, 212, 233, 0.7);
-		background: rgba(12, 30, 52, 0.95);
-		box-shadow:
-			0 0 0 2px rgba(51, 115, 176, 0.3),
-			inset 0 0 0 1px rgba(190, 212, 233, 0.5);
-		transition: all 0.2s ease;
 	}
 
 	.today-input-btn {
@@ -851,22 +799,6 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-	}
-
-	.search-wrapper input {
-		width: 100%;
-	}
-
-	.history-scroll {
-		margin-top: 0.4rem;
-		border-radius: 0.8rem;
-		background: rgba(10, 24, 41, 0.9);
-		padding: 0.75rem 0.8rem;
-		overflow: auto;
-		max-height: 360px;
-		box-shadow:
-			inset 0 0 0 1px rgba(0, 0, 0, 0.5),
-			inset 0 0 12px rgba(0, 0, 0, 0.65);
 	}
 
 	.empty-state {
@@ -1207,23 +1139,6 @@
 		width: 100%;
 		text-align: center;
 		box-sizing: border-box;
-	}
-
-	.delete-btn {
-		background: rgba(214, 88, 95, 0.3);
-		border: 1px solid rgba(214, 88, 95, 0.6);
-		color: #ffb3c1;
-		padding: 0.25rem 0.6rem;
-		border-radius: 0.4rem;
-		font-size: 0.75rem;
-		cursor: pointer;
-		font-weight: 500;
-		transition: all 0.15s ease;
-		white-space: nowrap;
-	}
-
-	.delete-btn:hover {
-		background: rgba(214, 88, 95, 0.5);
 	}
 
 	.delete-btn.bulk {
