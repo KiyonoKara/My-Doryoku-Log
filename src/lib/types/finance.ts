@@ -1,5 +1,3 @@
-import { TIME_CATEGORIES } from '$lib/types/time';
-
 export type TxType = 'income' | 'expense';
 
 export const EXPENSE_CATEGORIES = [
