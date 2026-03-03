@@ -151,7 +151,7 @@
 		await invalidateAll();
 	}
 
-	// confirmation and deletion of more than one transactions
+	// confirmation and deletion of more than one transaction
 	async function handleBulkDelete(msg: string) {
 		if (!confirm(msg)) {
 			return;

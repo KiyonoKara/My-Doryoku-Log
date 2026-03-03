@@ -39,10 +39,12 @@
 				: null
 	);
 
+	// elapsed time
 	let elapsedMs = $derived(
 		effectiveRunningStartMs != null ? Math.max(0, nowMs - effectiveRunningStartMs) : 0
 	);
 
+	// filter by keywords and/or selected category
 	let filtered = $derived(
 		entries.filter((e) => {
 			if (categoryFilter !== 'all' && e.category !== categoryFilter) {
