@@ -492,13 +492,6 @@
 		transform: translateY(-1px);
 	}
 
-	.filters-row {
-		display: grid;
-		grid-template-columns: 1fr minmax(180px, 0.55fr);
-		gap: 0.8rem;
-		align-items: end;
-	}
-
 	.time-list {
 		list-style: none;
 		margin: 0;

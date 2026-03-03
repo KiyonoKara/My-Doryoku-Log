@@ -1,3 +1,5 @@
+import { TIME_CATEGORIES } from '$lib/types/time';
+
 export type TxType = 'income' | 'expense';
 
 export const EXPENSE_CATEGORIES = [
@@ -20,6 +22,10 @@ export const INCOME_CATEGORIES = [
 	'Gifts',
 	'Sales'
 ];
+
+export const ALL_CATEGORIES = EXPENSE_CATEGORIES.concat(INCOME_CATEGORIES);
+
+export type TransactionCategory = (typeof EXPENSE_CATEGORIES | typeof INCOME_CATEGORIES)[number];
 
 export interface FinMLPrediction {
 	type: string;

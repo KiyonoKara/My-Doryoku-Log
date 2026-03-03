@@ -418,3 +418,10 @@ textarea:focus {
 .checkbox-label--hidden {
     visibility: hidden;
 }
+
+.filters-row {
+    display: grid;
+    grid-template-columns: 1fr minmax(180px, 0.55fr);
+    gap: 0.8rem;
+    align-items: end;
+}

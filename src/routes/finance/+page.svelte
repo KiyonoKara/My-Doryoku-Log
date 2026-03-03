@@ -7,7 +7,8 @@
 	import CategoryBarChart from '$lib/other/CategoryBarChart.svelte';
 	import ForecastSection from '$lib/other/ForecastSection.svelte';
 	import { capitalizeFirstLetter } from '$lib/utils/util';
-	import { type TxType, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '$lib/types/finance';
+	import { type TxType, type TransactionCategory,
+		EXPENSE_CATEGORIES, INCOME_CATEGORIES, ALL_CATEGORIES } from '$lib/types/finance';
 	import { MONTH_NAMES } from '$lib/types/time';
 	import './type_toggle.css';
 	import fileReport from '$lib/assets/file-report.svg';
@@ -22,6 +23,7 @@
 	let search = $state('');
 	let category = $state('');
 	let chartType = $state<TxType>('expense');
+	let categoryFilter = $state<'all' | TransactionCategory>('all');
 
 	// run once then set to today's date
 	$effect(() => {
@@ -179,9 +181,12 @@
 		);
 	}
 
-	// filter by keywords
+	// filter by keywords and/or selected category
 	let filtered = $derived(
 		transactions.filter((tx) => {
+			if (categoryFilter !== 'all' && tx.category !== categoryFilter) {
+				return false;
+			}
 			if (!search) {
 				return true;
 			}
@@ -361,8 +366,20 @@
 		<div class="history-header">
 			<h2 class="panel-title">Recent transactions</h2>
 			<!-- search bar -->
-			<div class="search-wrapper">
-				<input type="search" placeholder="Search by category or description" bind:value={search} />
+			<div class="filters-row">
+				<div class="search-wrapper">
+					<input type="search" placeholder="Search by category or description" bind:value={search} />
+				</div>
+			<!-- filter by category -->
+				<div class="category-filter">
+					<label class="field-label" for="catFilter">Category</label>
+					<select id="catFilter" bind:value={categoryFilter}>
+						<option value="all">All</option>
+						{#each ALL_CATEGORIES as c (c)}
+							<option value={c}>{c}</option>
+						{/each}
+					</select>
+				</div>
 			</div>
 			<!-- bulk mode toggle -->
 			<button
@@ -665,13 +682,11 @@
 	</div>
 
 	<!-- display transaction history as a bar chart -->
-	<div class="history-chart-row">
 		<CategoryBarChart
 			type={chartType}
 			incomeTotals={categoryTotals.income}
 			expenseTotals={categoryTotals.expense}
 		/>
-	</div>
 
 	<!-- ML predictions section, can be toggled on or off	-->
 	<div class="ml-forecast">
@@ -1068,22 +1083,5 @@
 		.field-row--inline {
 			flex-direction: column;
 		}
-	}
-
-	.ml-forecast {
-		border-radius: 1em;
-		border: 1px solid var(--border);
-		background: radial-gradient(
-			circle at top left,
-			rgba(51, 115, 176, 0.35),
-			rgba(7, 20, 37, 0.98)
-		);
-		padding: 1.5em;
-		box-shadow:
-			0 10px 20px rgba(0, 0, 0, 0.4),
-			0 0 0 1px rgba(0, 0, 0, 0.55);
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
 	}
 </style>
