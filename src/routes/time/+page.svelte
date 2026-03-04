@@ -23,6 +23,10 @@
 	let runningId = $state<number | null>(null);
 	let runningStartMs = $state<number | null>(null);
 
+	let isPaused = $state(false);
+	let accumulatedMs = $state(0);
+	let segmentStartMs = $state<number | null>(null);
+
 	let startBusy = $state(false);
 	let stopBusy = $state(false);
 
@@ -32,18 +36,43 @@
 	// tick while a timer is running OR if there's a running entry in DB (refresh-safe)
 	let dbRunningEntry = $derived(entries.find((e) => e.end_date == null) ?? null);
 
-	let effectiveRunningStartMs = $derived(
-		runningStartMs && Number.isFinite(runningStartMs)
-			? runningStartMs
-			: dbRunningEntry && Number.isFinite(Date.parse(dbRunningEntry.start_date))
-				? Date.parse(dbRunningEntry.start_date)
-				: null
-	);
-
 	// elapsed time
-	let elapsedMs = $derived(
-		effectiveRunningStartMs != null ? Math.max(0, nowMs - effectiveRunningStartMs) : 0
-	);
+	let elapsedMs = $derived((() => {
+		if (isPaused) {
+			return accumulatedMs;
+		}
+		if (segmentStartMs != null) {
+			return accumulatedMs + Math.max(0, nowMs - segmentStartMs);
+		}
+		// recover data from DB where page/app refreshed or quit mid-run with no pause state
+		const dbStart = dbRunningEntry ? Date.parse(dbRunningEntry.start_date) : NaN;
+		if (Number.isFinite(dbStart)) {
+			return Math.max(0, nowMs - dbStart);
+		}
+		return 0;
+	})());
+
+	function togglePause() {
+		if (!isRunning && !dbRunningEntry) {
+			return;
+		}
+
+		if (isPaused) {
+			// resume and start a new segment
+			segmentStartMs = Date.now();
+			isPaused = false;
+		} else {
+			// pause by freezing accumulated and clear segment
+			if (segmentStartMs != null) {
+				accumulatedMs += Math.max(0, Date.now() - segmentStartMs);
+			} else if (dbRunningEntry) {
+				//pause after a page refresh then get from DB
+				accumulatedMs = Math.max(0, Date.now() - Date.parse(dbRunningEntry.start_date));
+			}
+			segmentStartMs = null;
+			isPaused = true;
+		}
+	}
 
 	// for bulk selecting and deleting
 	let bulkMode = $state(false);
@@ -74,6 +103,7 @@
 		drafts.set(id, { ...d, category: category });
 	}
 
+	// check if modified
 	function isModified(entry: TimeEntry, draft: TimeEntry): boolean {
 		return (
 			draft.task !== entry.task ||
@@ -229,16 +259,20 @@
 			const data = result.data;
 			if (!isStartData(data)) {
 				console.error(
-					'Start missing id/start_date. Fix +page.server.ts start to return them.',
+					'Start missing id/start_date.',
 					data
 				);
 				return;
 			}
 
 			runningId = data.id;
-
 			const ms = Date.parse(data.start_date);
 			runningStartMs = Number.isFinite(ms) ? ms : Date.now();
+
+			// reset paused state
+			accumulatedMs = 0;
+			segmentStartMs = runningStartMs;
+			isPaused = false;
 
 			isRunning = true;
 			nowMs = Date.now();
@@ -260,10 +294,16 @@
 				return;
 			}
 
+			// reset timer state
 			isRunning = false;
 			runningId = null;
 			runningStartMs = null;
 			taskName = '';
+
+			// reset pause state
+			isPaused = false;
+			accumulatedMs = 0;
+			segmentStartMs = null;
 
 			// write result data so the form prop triggers
 			await applyAction(result);
@@ -273,7 +313,7 @@
 	};
 
 	$effect(() => {
-		const shouldTick = isRunning || !!dbRunningEntry;
+		const shouldTick = (isRunning || !!dbRunningEntry) && !isPaused;
 		if (!shouldTick) {
 			if (interval) {
 				clearInterval(interval);
@@ -288,30 +328,6 @@
 
 		return () => {
 			if (interval) clearInterval(interval);
-			interval = null;
-		};
-	});
-
-	// live tracking
-	$effect(() => {
-		const hasStart = effectiveRunningStartMs != null;
-
-		if (!hasStart) {
-			if (interval) {
-				clearInterval(interval);
-			}
-			interval = null;
-			return;
-		}
-
-		interval = setInterval(() => {
-			nowMs = Date.now();
-		}, 250);
-
-		return () => {
-			if (interval) {
-				clearInterval(interval);
-			}
 			interval = null;
 		};
 	});
@@ -365,9 +381,21 @@
 
 				<div class="timer-cta">
 					{#if isRunning || dbRunningEntry}
+						<!-- pause and resume -->
+						<button
+							type="button"
+							class="timer-btn"
+							class:timer-pause={!isPaused}
+							class:timer-resume={isPaused}
+							onclick={togglePause}
+						>
+							{isPaused ? 'Resume' : 'Pause'}
+						</button>
+						<!-- stop -->
 						<form method="POST" action="?/stop" use:enhance={enhanceStop}>
 							<input type="hidden" name="id" value={runningId ?? dbRunningEntry?.id ?? ''} />
-							<button type="submit" class="timer-btn timer-stop" disabled={stopBusy}>
+							<button
+								type="submit" class="timer-btn timer-stop" disabled={stopBusy}>
 								{stopBusy ? 'Stopping…' : 'Stop'}
 							</button>
 						</form>
@@ -387,8 +415,16 @@
 				</div>
 			</div>
 			<div class="elapsed-block" aria-live="polite">
-				<div class="field-label" id="elapsed-label">Elapsed</div>
-				<div class="elapsed-box" role="status" aria-live="polite" aria-labelledby="elapsed-label">
+				<div class="field-label" id="elapsed-label">
+					Elapsed
+				</div>
+				<div
+					class="elapsed-box"
+					class:elapsed-box--paused={isPaused}
+					role="status"
+					aria-live="polite"
+					aria-labelledby="elapsed-label"
+				>
 					{formatDuration(elapsedMs)}
 				</div>
 			</div>
@@ -729,17 +765,32 @@
 		box-shadow:
 			inset 0 0 0 1px rgba(0, 0, 0, 0.35),
 			0 10px 18px rgba(0, 0, 0, 0.28);
-
 		font-weight: 800;
 		font-size: clamp(2.2rem, 4vw, 3.1rem);
 		letter-spacing: 0.04em;
 		font-variant-numeric: tabular-nums;
 		text-align: center;
+		transition:
+						border-color 0.25s ease,
+						background 0.25s ease,
+						color 0.25s ease;
 	}
+
+  .elapsed-box--paused {
+      border-color: rgba(255, 180, 70, 0.8);
+      background: rgba(20, 20, 8, 0.2);
+      color: rgba(255, 240, 130, 0.8);
+      box-shadow:
+              inset 0 0 0 1px rgba(0, 0, 0, 0.35),
+              0 10px 18px rgba(0, 0, 0, 0.28);
+  }
 
 	.timer-cta {
 		display: flex;
+		flex-direction: column;
+		align-items: stretch;
 		justify-content: flex-end;
+		gap: 0.45rem;
 		padding-top: 1.45rem;
 	}
 
@@ -769,6 +820,28 @@
 		color: #a5ffcf;
 		border-color: rgba(59, 176, 126, 0.55);
 	}
+
+  .timer-pause {
+      border-color: rgba(255, 180, 70, 0.8);
+      background: rgba(210, 160, 40, 0.1);
+      color: rgba(255, 240, 130, 0.8);
+  }
+
+  .timer-pause:hover:not(:disabled) {
+      background: rgba(210, 160, 40, 0.2);
+      transform: translateY(-1px);
+  }
+
+  .timer-resume {
+      background: rgba(51, 145, 210, 0.1);
+      color: #a8d8ff;
+      border-color: rgba(51, 145, 210, 0.5);
+  }
+
+  .timer-resume:hover:not(:disabled) {
+      background: rgba(51, 145, 210, 0.2);
+      transform: translateY(-1px);
+  }
 
 	.timer-start:hover:not(:disabled) {
 		background: rgba(59, 176, 126, 0.45);
