@@ -167,12 +167,15 @@
 		for (const id of selectedIds) {
 			body.append('ids', String(id));
 		}
-		await fetch('?/bulkDelete', {
+		const response = await fetch('?/bulkDelete', {
 			method: 'POST',
 			body
 		});
 		selectedIds.clear();
 		bulkMode = false;
+
+		const result = deserialize(await response.text());
+		await applyAction(result);
 		await invalidateAll();
 	}
 
@@ -664,9 +667,6 @@
 
 		{#if bulkMode && selectedIds.size > 0}
 			<div class="bulk-bar">
-				{#each [...selectedIds] as id (id)}
-					<!-- track IDs in a set, then bulk delete -->
-				{/each}
 				<span class="bulk-bar__count">{selectedIds.size} selected</span>
 				<button
 					type="button"
