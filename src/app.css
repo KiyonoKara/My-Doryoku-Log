@@ -20,6 +20,11 @@
     /* edit and save buttons */
     --color-edit-text: #a8d4f0;
     --color-save-text: #a8f0d5;
+    /* delete and bulk delete buttons */
+    --color-delete-border: rgba(214, 88, 95, 0.9);
+    --color-delete-background: rgba(214, 88, 95, 0.3);
+    --color-delete-background-hover: rgba(214, 88, 95, 0.5);
+    --color-delete-text: #ffb3c1;
     /* inline borders */
     --border-subtle: rgba(190, 212, 233, 0.3);
     --border-mid: rgba(190, 212, 233, 0.5);
@@ -161,9 +166,9 @@ textarea:focus {
 }
 
 .delete-btn {
-    background: rgba(214, 88, 95, 0.3);
-    border: 1px solid rgba(214, 88, 95, 0.6);
-    color: #ffb3c1;
+    background: var(--color-delete-background);
+    border: 1px solid var(--color-delete-border);
+    color: var(--color-delete-text);
     padding: 0.25rem 0.6rem;
     border-radius: 0.4rem;
     font-size: 0.75rem;
@@ -174,7 +179,7 @@ textarea:focus {
 }
 
 .delete-btn:hover {
-    background: rgba(214, 88, 95, 0.5);
+    background: var(--color-delete-background-hover);
 }
 
 .delete-btn:disabled {
@@ -184,13 +189,13 @@ textarea:focus {
 }
 
 .delete-btn.bulk {
-    background: rgba(214, 88, 95, 0.1);
-    border: 1px solid rgba(214, 88, 95, 0.9);
-    color: #ffb3c1;
+    background: var(--color-delete-background);
+    border: 1px solid var(--color-delete-border);
+    color: var(--color-delete-text);
 }
 
 .delete-btn.bulk:hover {
-    background: rgba(214, 88, 95, 0.5);
+    background: var(--color-delete-background-hover);
 }
 
 .bulk-bar {
@@ -199,14 +204,15 @@ textarea:focus {
     justify-content: space-between;
     padding: 0.5rem 0.75rem;
     border-radius: 0.6rem;
-    background: rgba(214, 88, 95, 0.12);
-    border: 1px solid rgba(214, 88, 95, 0.9);
+    /*background: var(--color-delete-background);*/
+    background: linear-gradient(to top, var(--color-delete-background),  rgba(214, 88, 95, 0.1));
+    border: 1px solid var(--color-delete-border);
     margin-top: 0.25rem;
 }
 
 .bulk-bar__count {
     font-size: 0.85rem;
-    color: #ffb3c1;
+    color: var(--color-delete-text);
 }
 
 .bulk-toggle-btn {
@@ -226,9 +232,9 @@ textarea:focus {
 }
 
 .bulk-toggle-btn--active {
-    background: rgba(214, 88, 95, 0.15);
-    border-color: rgba(214, 88, 95, 0.9);
-    color: #ffb3c1;
+    background: var(--color-delete-background);
+    border-color: var(--color-delete-border);
+    color: var(--color-delete-text);
 }
 
 .edit-field-row {
@@ -277,7 +283,7 @@ textarea:focus {
 .save-btn {
     background: rgba(59, 176, 126, 0.25);
     border: 1px solid rgba(59, 176, 126, 0.5);
-    color: #a8f0d5;
+    color: var(--color-save-text);
     padding: 0.25rem 0.55rem;
     border-radius: 0.4rem;
     font-size: 0.75rem;
@@ -292,13 +298,13 @@ textarea:focus {
 }
 
 .save-btn--disabled {
-    opacity: 0.35;
+    opacity: 0.3;
     cursor: not-allowed;
     pointer-events: none;
 }
 
 .cancel-btn {
-    background: rgba(190, 212, 233, 0.08);
+    background: rgba(190, 212, 233, 0.1);
     border: 1px solid rgba(190, 212, 233, 0.2);
     color: var(--text-secondary);
     padding: 0.2rem 0.45rem;
@@ -309,7 +315,7 @@ textarea:focus {
 }
 
 .cancel-btn:hover {
-    background: rgba(190, 212, 233, 0.15);
+    background: rgba(190, 212, 233, 0.2);
 }
 
 .search-wrapper input {
