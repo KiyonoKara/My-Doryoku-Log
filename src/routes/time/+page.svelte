@@ -361,7 +361,13 @@
 										</div>
 
 										<div class="time-meta">
-											<span class="time-duration">{formatDuration(rowLiveMs)}</span>
+											<span class="time-duration">
+												{#if isRowRunning}
+													In progress...
+												{:else}
+													{formatDuration(rowLiveMs)}
+												{/if}
+											</span>
 										</div>
 									</div>
 								</li>
