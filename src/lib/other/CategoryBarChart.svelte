@@ -68,17 +68,17 @@
 			class:active={type === 'expense'}
 			onclick={() => {
 				type = 'expense';
-			}}>Expense
-		</button
-		>
+			}}
+			>Expense
+		</button>
 		<button
 			type="button"
 			class:active={type === 'income'}
 			onclick={() => {
 				type = 'income';
-			}}>Income
-		</button
-		>
+			}}
+			>Income
+		</button>
 	</div>
 
 	{#if entries.length === 0}
@@ -128,83 +128,84 @@
 </div>
 
 <style>
-    .category-chart {
-        border-radius: 1em;
-        border: 1px solid var(--border);
-        background: radial-gradient(
-                circle at top left,
-                rgba(51, 115, 176, 0.35),
-                rgba(7, 20, 37, 0.98)
-        );
-        padding: 1.5em;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(0, 0, 0, 0.55);
-        min-height: 360px;
-        max-height: 360px;
-    }
+	.category-chart {
+		border-radius: 1em;
+		border: 1px solid var(--border);
+		background: radial-gradient(
+			circle at top left,
+			rgba(51, 115, 176, 0.35),
+			rgba(7, 20, 37, 0.98)
+		);
+		padding: 1.5em;
+		box-shadow:
+			0 10px 20px rgba(0, 0, 0, 0.4),
+			0 0 0 1px rgba(0, 0, 0, 0.55);
+		min-height: 360px;
+		max-height: 360px;
+	}
 
-    .category-chart__header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.4rem;
-    }
+	.category-chart__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 0.4rem;
+	}
 
-    .category-chart__header h3 {
-        margin: 0;
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--text-primary);
-    }
+	.category-chart__header h3 {
+		margin: 0;
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--text-primary);
+	}
 
-    .category-chart__chip {
-        font-size: 0.75rem;
-        padding: 0.12rem 0.6rem;
-        border-radius: 999px;
-        border: 1px solid var(--border-hover);
-        background: rgba(12, 30, 52, 0.95);
-        color: var(--text-secondary);
-    }
+	.category-chart__chip {
+		font-size: 0.75rem;
+		padding: 0.12rem 0.6rem;
+		border-radius: 999px;
+		border: 1px solid var(--border-hover);
+		background: rgba(12, 30, 52, 0.95);
+		color: var(--text-secondary);
+	}
 
-    .category-chart__empty {
-        margin: 0.4rem 0 0;
-        font-size: 0.85rem;
-        padding: 1rem;
-        color: var(--text-secondary);
-    }
+	.category-chart__empty {
+		margin: 0.4rem 0 0;
+		font-size: 0.85rem;
+		padding: 1rem;
+		color: var(--text-secondary);
+	}
 
-    .category-chart__svg {
-        display: block;
-        max-width: 100%;
-        height: auto;
-        margin-top: 0.2rem;
-    }
+	.category-chart__svg {
+		display: block;
+		max-width: 100%;
+		height: auto;
+		margin-top: 0.2rem;
+	}
 
-    .category-chart__label {
-        fill: var(--text-secondary);
-        font-size: 0.75rem;
-    }
+	.category-chart__label {
+		fill: var(--text-secondary);
+		font-size: 0.75rem;
+	}
 
-    .category-chart__bar {
-        fill: rgba(51, 115, 176, 0.9);
-    }
+	.category-chart__bar {
+		fill: rgba(51, 115, 176, 0.9);
+	}
 
-    .category-chart__bar.type-income {
-        fill: rgba(59, 176, 126, 0.9);
-    }
+	.category-chart__bar.type-income {
+		fill: rgba(59, 176, 126, 0.9);
+	}
 
-    .category-chart__bar.type-expense {
-        fill: rgba(214, 88, 95, 0.9);
-    }
+	.category-chart__bar.type-expense {
+		fill: rgba(214, 88, 95, 0.9);
+	}
 
-    .category-chart__value {
-        fill: var(--text-primary);
-        font-size: 0.75rem;
-    }
+	.category-chart__value {
+		fill: var(--text-primary);
+		font-size: 0.75rem;
+	}
 
-    @media (max-width: 840px) {
-        .category-chart {
-            padding: 0.75rem 0.8rem;
-        }
-    }
+	@media (max-width: 840px) {
+		.category-chart {
+			padding: 0.75rem 0.8rem;
+		}
+	}
 </style>

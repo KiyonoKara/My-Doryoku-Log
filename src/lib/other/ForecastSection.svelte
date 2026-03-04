@@ -116,7 +116,7 @@
 			onclick={() => {
 				type = 'expense';
 			}}
-		>Expense
+			>Expense
 		</button>
 		<button
 			type="button"
@@ -124,7 +124,7 @@
 			onclick={() => {
 				type = 'income';
 			}}
-		>Income
+			>Income
 		</button>
 	</div>
 	<button
@@ -214,183 +214,167 @@
 </div>
 
 <style>
-    .ml-forecast {
-        border-radius: 1em;
-        border: 1px solid var(--border);
-        background: radial-gradient(
-                circle at top left,
-                rgba(51, 115, 176, 0.35),
-                rgba(7, 20, 37, 0.98)
-        );
-        padding: 1.5em;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(0, 0, 0, 0.55);
-        flex-direction: column;
-        gap: 1rem;
-        min-height: 360px;
-        max-height: 360px;
-    }
+	.ml-forecast {
+		border-radius: 1em;
+		border: 1px solid var(--border);
+		background: radial-gradient(
+			circle at top left,
+			rgba(51, 115, 176, 0.35),
+			rgba(7, 20, 37, 0.98)
+		);
+		padding: 1.5em;
+		box-shadow:
+			0 10px 20px rgba(0, 0, 0, 0.4),
+			0 0 0 1px rgba(0, 0, 0, 0.55);
+		flex-direction: column;
+		gap: 1rem;
+		min-height: 360px;
+		max-height: 360px;
+	}
 
-    .ml-forecast__header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.4rem;
-    }
+	.ml-forecast__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 0.4rem;
+	}
 
-    .ml-forecast__header h3 {
-        margin: 0;
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--text-primary);
-    }
+	.ml-forecast__header h3 {
+		margin: 0;
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--text-primary);
+	}
 
-    .ml-forecast__chip {
-        font-size: 0.75rem;
-        padding: 0.12rem 0.6rem;
-        border-radius: 999px;
-        border: 1px solid var(--border-hover);
-        background: rgba(12, 30, 52, 0.95);
-        color: var(--text-secondary);
-    }
+	.ml-forecast__chip {
+		font-size: 0.75rem;
+		padding: 0.12rem 0.6rem;
+		border-radius: 999px;
+		border: 1px solid var(--border-hover);
+		background: rgba(12, 30, 52, 0.95);
+		color: var(--text-secondary);
+	}
 
-    .ml-forecast__toggle {
-        font-size: 0.85rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-        background: rgba(12, 30, 52, 0.95);
-        color: var(--text-secondary);
-        cursor: pointer;
-        transition: all 0.15s ease;
-        margin-bottom: 0.7rem;
-    }
+	.ml-forecast__toggle {
+		font-size: 0.85rem;
+		padding: 0.25rem 0.75rem;
+		border-radius: 999px;
+		border: 1px solid var(--border);
+		background: rgba(12, 30, 52, 0.95);
+		color: var(--text-secondary);
+		cursor: pointer;
+		transition: all 0.15s ease;
+		margin-bottom: 0.7rem;
+	}
 
-    .ml-forecast__toggle:hover:not(:disabled) {
-        background: var(--accent-hover);
-        color: var(--text-primary);
-    }
+	.ml-forecast__toggle:hover:not(:disabled) {
+		background: var(--accent-hover);
+		color: var(--text-primary);
+	}
 
-    .ml-forecast__toggle.dimmed {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+	.ml-forecast__toggle.dimmed {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 
-    .ml-forecast__toggle.expanded {
-        background: var(--accent);
-        color: var(--text-primary);
-        border-color: var(--accent);
-    }
+	.ml-forecast__toggle.expanded {
+		background: var(--accent);
+		color: var(--text-primary);
+		border-color: var(--accent);
+	}
 
-    .ml-forecast__grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1.1fr);
-        justify-content: center;
-        margin: 0 auto;
-        max-width: 100%;
-        gap: 0.75rem;
-    }
+	.ml-forecast__grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1.1fr);
+		justify-content: center;
+		margin: 0 auto;
+		max-width: 100%;
+		gap: 0.75rem;
+	}
 
-    .ml-forecast__card {
-        margin-top: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem 1rem;
-        border-radius: 0.75rem;
-        border: 1px solid rgba(190, 212, 233, 0.3);
-        background: rgba(12, 30, 52, 0.9);
-        transition: all 0.2s ease;
-        cursor: pointer;
-        width: 100%;
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45),
-        0 0 0 1px rgba(0, 0, 0, 0.55);
-    }
+	.ml-forecast__card {
+		margin-top: 0.5rem;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem 1rem;
+		border-radius: 0.75rem;
+		border: 1px solid rgba(190, 212, 233, 0.3);
+		background: rgba(12, 30, 52, 0.9);
+		transition: all 0.2s ease;
+		cursor: pointer;
+		width: 100%;
+		box-shadow:
+			0 6px 14px rgba(0, 0, 0, 0.45),
+			0 0 0 1px rgba(0, 0, 0, 0.55);
+	}
 
-    .ml-forecast__card:hover {
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-    }
+	.ml-forecast__card:hover {
+		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+	}
 
-    .ml-forecast__card--expense {
-        border-left: 3px solid rgba(214, 88, 95, 0.9);
-    }
+	.ml-forecast__card--expense {
+		border-left: 3px solid rgba(214, 88, 95, 0.9);
+	}
 
-    .ml-forecast__card--income {
-        border-left: 3px solid rgba(59, 176, 126, 0.9);
-    }
+	.ml-forecast__card--income {
+		border-left: 3px solid rgba(59, 176, 126, 0.9);
+	}
 
-    .ml-forecast__main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.1rem;
-    }
+	.ml-forecast__main {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+	}
 
-    .ml-forecast__category {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--text-primary);
-    }
+	.ml-forecast__category {
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--text-primary);
+	}
 
-    .ml-forecast__amount {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
+	.ml-forecast__amount {
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: var(--text-primary);
+	}
 
-    .ml-forecast__label {
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-        text-align: right;
-        flex-shrink: 0;
-        min-width: 5rem;
-    }
+	.ml-forecast__label {
+		font-size: 0.8rem;
+		color: var(--text-secondary);
+		text-align: right;
+		flex-shrink: 0;
+		min-width: 5rem;
+	}
 
-    .ml-forecast__status {
-        padding: 0.6rem;
-        border-radius: 0.6rem;
-        font-size: 0.85rem;
-        text-align: center;
-        margin-top: 0.5rem;
-    }
+	.ml-forecast__status {
+		padding: 0.6rem;
+		border-radius: 0.6rem;
+		font-size: 0.85rem;
+		text-align: center;
+		margin-top: 0.5rem;
+	}
 
-    .ml-forecast__status--not-ready {
-        background: rgba(214, 88, 95, 0.15);
-        border: 1px solid rgba(214, 88, 95, 0.4);
-        color: var(--text-secondary);
-    }
+	.ml-forecast__status--not-ready {
+		background: rgba(214, 88, 95, 0.15);
+		border: 1px solid rgba(214, 88, 95, 0.4);
+		color: var(--text-secondary);
+	}
 
-    .ml-forecast__loading {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 1.5rem;
-        color: var(--text-secondary);
-        font-style: italic;
-    }
+	.ml-forecast__loading {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 1.5rem;
+		color: var(--text-secondary);
+		font-style: italic;
+	}
 
-    .spinner {
-        width: 1.2rem;
-        height: 1.2rem;
-        border: 2px solid rgba(190, 212, 233, 0.3);
-        border-top: 2px solid var(--accent);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-
-    @media (max-width: 840px) {
-        .ml-forecast__grid {
-            grid-template-columns: 1fr;
-        }
-    }
+	@media (max-width: 840px) {
+		.ml-forecast__grid {
+			grid-template-columns: 1fr;
+		}
+	}
 </style>

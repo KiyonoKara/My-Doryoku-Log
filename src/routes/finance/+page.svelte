@@ -7,8 +7,13 @@
 	import CategoryBarChart from '$lib/other/CategoryBarChart.svelte';
 	import ForecastSection from '$lib/other/ForecastSection.svelte';
 	import { capitalizeFirstLetter } from '$lib/utils/util';
-	import { type TxType, type TransactionCategory,
-		EXPENSE_CATEGORIES, INCOME_CATEGORIES, ALL_CATEGORIES } from '$lib/types/finance';
+	import {
+		type TxType,
+		type TransactionCategory,
+		EXPENSE_CATEGORIES,
+		INCOME_CATEGORIES,
+		ALL_CATEGORIES
+	} from '$lib/types/finance';
 	import { MONTH_NAMES } from '$lib/types/time';
 	import './type_toggle.css';
 	import fileReport from '$lib/assets/file-report.svg';
@@ -368,9 +373,13 @@
 			<!-- search bar -->
 			<div class="filters-row">
 				<div class="search-wrapper">
-					<input type="search" placeholder="Search by category or description" bind:value={search} />
+					<input
+						type="search"
+						placeholder="Search by category or description"
+						bind:value={search}
+					/>
 				</div>
-			<!-- filter by category -->
+				<!-- filter by category -->
 				<div class="category-filter">
 					<label class="field-label" for="catFilter">Category</label>
 					<select id="catFilter" bind:value={categoryFilter}>
@@ -579,10 +588,7 @@
 												<div class="tx-main">
 													<div class="tx-main-top">
 														<span class="tx-category">{tx.category}</span>
-														<label
-															class="checkbox-label"
-															class:checkbox-label--hidden={!bulkMode}
-														>
+														<label class="checkbox-label" class:checkbox-label--hidden={!bulkMode}>
 															<input
 																type="checkbox"
 																class="checkbox"
@@ -682,11 +688,11 @@
 	</div>
 
 	<!-- display transaction history as a bar chart -->
-		<CategoryBarChart
-			type={chartType}
-			incomeTotals={categoryTotals.income}
-			expenseTotals={categoryTotals.expense}
-		/>
+	<CategoryBarChart
+		type={chartType}
+		incomeTotals={categoryTotals.income}
+		expenseTotals={categoryTotals.expense}
+	/>
 
 	<!-- ML predictions section, can be toggled on or off	-->
 	<div class="ml-forecast">
@@ -803,7 +809,6 @@
 		justify-content: flex-end;
 		margin-top: 0.4rem;
 	}
-
 
 	.history-title-row {
 		display: flex;
