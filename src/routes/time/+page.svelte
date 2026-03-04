@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { enhance, applyAction } from '$app/forms';
+	import { enhance, applyAction, deserialize } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
 	import type { TimeEntry } from '$lib/server/db/schema';
@@ -128,10 +128,12 @@
 		}
 		const body = new FormData();
 		body.set('id', String(id));
-		await fetch('?/delete', {
+		const response = await fetch('?/delete', {
 			method: 'POST',
 			body
 		});
+		const result = deserialize(await response.text());
+		await applyAction(result);
 		await invalidateAll();
 	}
 
@@ -141,10 +143,18 @@
 			return;
 		}
 		const body = new FormData();
-		for (const id of selectedIds) body.append('ids', String(id));
-		await fetch('?/bulkDelete', { method: 'POST', body });
+		for (const id of selectedIds) {
+			body.append('ids', String(id));
+		}
+		const response = await fetch('?/bulkDelete', {
+			method: 'POST',
+			body
+		});
 		selectedIds.clear();
 		bulkMode = false;
+
+		const result = deserialize(await response.text());
+		await applyAction(result);
 		await invalidateAll();
 	}
 
@@ -322,6 +332,7 @@
 	<!--		{/if}-->
 	<!--	</div>-->
 
+	<!--timer form panel -->
 	<div class="panel panel--form">
 		<h2 class="panel-title">Timer</h2>
 
@@ -384,6 +395,7 @@
 		</div>
 	</div>
 
+	<!-- time entry history panel -->
 	<div class="panel panel--history">
 		<div class="history-header">
 			<h2 class="panel-title">History</h2>
@@ -403,6 +415,15 @@
 					</select>
 				</div>
 			</div>
+			<!-- bulk mode toggle -->
+			<button
+				type="button"
+				class="bulk-toggle-btn"
+				class:bulk-toggle-btn--active={bulkMode}
+				onclick={toggleBulkMode}
+			>
+				{bulkMode ? 'Cancel' : 'Select'}
+			</button>
 		</div>
 
 		<div class="history-scroll">
@@ -410,11 +431,29 @@
 				<p class="empty-state">No entries yet.</p>
 			{:else}
 				{#each groupedDates as d (d.toString())}
+					{@const groupEntries = groupedByDate[d]}
+					{@const groupIds = groupEntries
+						.filter((e) => e.end_date != null)
+						.map((e) => e.id)}
+					{@const allGroupSelected = bulkMode && groupIds.length > 0 && groupIds.every((id) => selectedIds.has(id))}
 					<section class="date-group">
 						<header class="date-group-header">
 							<span class="date-group-date-label"
 								>{d === 'Unknown date' ? 'Unknown date' : formatDateLabel(d)}</span
 							>
+							<!-- checkboxes for date groups -->
+							{#if bulkMode}
+								<label class="checkbox-label">
+									<input
+										type="checkbox"
+										class="checkbox"
+										checked={allGroupSelected}
+										onchange={() =>
+											allGroupSelected ? deselectAll(groupIds) : selectAll(groupIds)}
+									/>
+									<span class="checkbox-custom"></span>
+								</label>
+							{/if}
 						</header>
 
 						<ul class="time-list">
@@ -425,49 +464,184 @@
 									isRowRunning && Number.isFinite(startParsed)
 										? Math.max(0, nowMs - startParsed)
 										: (entry.duration_ms ?? 0)}
+								<!-- entry editing -->
+								{@const draft = drafts.get(entry.id)}
+								{@const isEditing = !!draft}
+								{@const formModified = isEditing && isModified(entry, draft)}
 
-								<li class="time-item">
-									<div class="time-row">
-										<div class="time-main">
-											<span class="time-task">{entry.task}</span>
-											<span class="time-sub">
-												<span class="time-chip">{entry.category ?? 'Uncategorized'}</span>
-												<span class="time-dates">
-													{formatDate(entry.start_date)}
-													{formatTime(entry.start_date)}
-													{#if entry.end_date}
-														to {formatTime(entry.end_date)}
-													{:else}
-														(running)
+								<li
+									class="time-item"
+									class:time-item--selected={selectedIds.has(entry.id)}
+									class:time-item--editing={isEditing}
+								>
+									<form method="POST" action="?/update" class="time-edit-form" use:enhance>
+										<input type="hidden" name="id" value={entry.id} />
+
+										{#if isEditing}
+											<!-- draft values -->
+											<input type="hidden" name="task" value={draft.task} />
+											<input type="hidden" name="category" value={draft.category} />
+											<input type="hidden" name="start_date" value={draft.start_date} />
+											<input type="hidden" name="end_date" value={draft.end_date ?? ''} />
+											<input type="hidden" name="duration_ms" value={draft.duration_ms ?? 0} />
+
+											<div class="tx-edit-expanded">
+												<!-- task name edit field -->
+												<div class="edit-field-row">
+													<span class="edit-label">Task</span>
+													<input
+														type="text"
+														class="inline-input inline-input--description"
+														placeholder="Task name"
+														value={draft.task}
+														oninput={(e) => {
+															const d = drafts.get(entry.id);
+															if (d) {
+																drafts.set(entry.id, {
+																	...d,
+																	task: e.currentTarget.value
+																});
+															}
+														}}
+													/>
+												</div>
+
+												<!-- category edit field -->
+												<div class="edit-field-row">
+													<span class="edit-label">Category</span>
+													<select
+														class="inline-select"
+														bind:value={draft.category}
+														onchange={(e) => setDraftCategory(entry.id, e.currentTarget.value)}
+													>
+														{#each TIME_CATEGORIES as c (c)}
+															<option value={c}>{c}</option>
+														{/each}
+													</select>
+												</div>
+
+												<!-- start date edit field -->
+												<div class="edit-field-row">
+													<span class="edit-label">Start</span>
+													<input
+														type="datetime-local"
+														class="inline-input inline-input--date"
+														value={draft.start_date ? draft.start_date.slice(0, 16) : ''}
+														oninput={(e) => {
+															const d = drafts.get(entry.id);
+															if (!d) {
+																return;
+															}
+															const iso = e.currentTarget.value ? new Date(e.currentTarget.value).toISOString() : d.start_date;
+															drafts.set(entry.id, {
+																...d,
+																start_date: iso
+															});
+														}}
+													/>
+												</div>
+
+												<!-- end date edit field -->
+												<div class="edit-field-row">
+													<span class="edit-label">End</span>
+													<input
+														type="datetime-local"
+														class="inline-input inline-input--date"
+														value={draft.end_date
+															? draft.end_date.slice(0, 16)
+															: ''}
+														oninput={(e) => {
+															const d = drafts.get(entry.id);
+															if (!d) return;
+															const iso = e.currentTarget.value
+																? new Date(e.currentTarget.value).toISOString()
+																: null;
+															drafts.set(entry.id, { ...d, end_date: iso });
+														}}
+													/>
+												</div>
+
+												<!-- edit actions edit field -->
+												<div class="edit-actions">
+													<button
+														type="submit"
+														class="save-btn"
+														class:save-btn--disabled={!formModified}
+														disabled={!formModified}
+													>
+														Save
+													</button>
+													<button
+														type="button"
+														class="cancel-btn"
+														onclick={() => cancelEdit(entry.id)}
+													>
+														Cancel
+													</button>
+												</div>
+											</div>
+										{:else}
+											<!-- view mode row -->
+											<div class="time-row">
+												<div class="time-main">
+													<span class="time-task">{entry.task}</span>
+													<span class="time-sub">
+														<span class="time-chip">{entry.category ?? 'Uncategorized'}</span>
+														<span class="time-dates">
+															{formatDate(entry.start_date)}
+															{formatTime(entry.start_date)}
+															{#if entry.end_date}
+																to {formatTime(entry.end_date)}
+															{:else}
+																(running)
+															{/if}
+														</span>
+													</span>
+												</div>
+
+												<div class="time-actions" class:time-actions--hidden={bulkMode}>
+													<button
+														type="button"
+														class="edit-btn"
+														class:edit-btn--disabled={isRowRunning}
+														disabled={isRowRunning || !!dbRunningEntry}
+														onclick={() => startEdit(entry)}
+													>
+														Edit
+													</button>
+													<button
+														type="button"
+														class="delete-btn"
+														disabled={isRowRunning || !!dbRunningEntry}
+														onclick={() => handleDelete(entry.id, 'Delete this entry?')}
+													>Delete
+													</button>
+												</div>
+
+												<div class="time-meta">
+													{#if bulkMode && !isRowRunning}
+														<label class="checkbox-label">
+															<input
+																type="checkbox"
+																class="checkbox"
+																checked={selectedIds.has(entry.id)}
+																onchange={() => toggleSelect(entry.id)}
+															/>
+															<span class="checkbox-custom"></span>
+														</label>
 													{/if}
-												</span>
-											</span>
-										</div>
-
-										<div class="time-actions">
-											<form method="POST" action="?/delete" use:enhance>
-												<input type="hidden" name="id" value={entry.id} />
-												<button
-													type="submit"
-													class="delete-btn"
-													disabled={isRowRunning || !!dbRunningEntry}
-													onclick={() => handleDelete(entry.id, 'Delete this transaction?')}
-												>
-													Delete
-												</button>
-											</form>
-										</div>
-
-										<div class="time-meta">
-											<span class="time-duration">
-												{#if isRowRunning}
-													In progress...
-												{:else}
-													{formatDuration(rowLiveMs)}
-												{/if}
-											</span>
-										</div>
-									</div>
+													<!-- shows times for entries that aren't active -->
+													<span class="time-duration">
+														{#if isRowRunning}
+															In progress...
+														{:else}
+															{formatDuration(rowLiveMs)}
+														{/if}
+													</span>
+												</div>
+											</div>
+										{/if}
+									</form>
 								</li>
 							{/each}
 						</ul>
@@ -475,6 +649,20 @@
 				{/each}
 			{/if}
 		</div>
+
+		<!-- bulk delete bar -->
+		{#if bulkMode && selectedIds.size > 0}
+			<div class="bulk-bar">
+				<span class="bulk-bar__count">{selectedIds.size} selected</span>
+				<button
+					type="button"
+					class="delete-btn bulk"
+					onclick={() => handleBulkDelete(`Delete ${selectedIds.size} ${selectedIds.size === 1 ? 'entry' : 'entries'}?`)}
+				>
+					Delete selected
+				</button>
+			</div>
+		{/if}
 
 		{#if entriesCsv}
 			<CsvExportButton
@@ -608,12 +796,28 @@
 
 	.time-item {
 		border-radius: 0.7rem;
-		padding: 0.45rem 0.55rem;
+		padding: 0.75rem 0.55rem;
 		background: radial-gradient(circle at top left, rgba(51, 115, 176, 0.42), rgba(7, 20, 37, 0.9));
 		box-shadow:
 			0 6px 14px rgba(0, 0, 0, 0.45),
 			0 0 0 1px rgba(0, 0, 0, 0.55);
 	}
+
+  .time-item--selected {
+      box-shadow:
+              0 0 0 2px rgba(51, 115, 176, 0.7),
+              0 6px 14px rgba(0, 0, 0, 0.45);
+  }
+
+  .time-item--editing {
+      box-shadow:
+              0 0 0 2px rgba(190, 212, 233, 0.35),
+              0 6px 14px rgba(0, 0, 0, 0.45);
+  }
+
+  .time-edit-form {
+      min-width: 0;
+  }
 
 	.time-row {
 		display: grid;
@@ -666,6 +870,7 @@
 		align-items: flex-end;
 		text-align: right;
 		padding-right: 0.4rem;
+		gap: 0.3rem;
 	}
 
 	.time-duration {
@@ -677,8 +882,10 @@
 
 	.time-actions {
 		display: flex;
+		flex-direction: column;
 		justify-content: flex-end;
 		opacity: 0;
+		gap: 0.3rem;
 		transition: opacity 0.2s ease;
 	}
 
@@ -686,9 +893,85 @@
 		opacity: 1;
 	}
 
-	.time-actions form {
-		margin: 0;
-	}
+  .time-actions--hidden {
+      visibility: hidden;
+      pointer-events: none;
+  }
+
+  .time-actions .edit-btn,
+  .time-actions .delete-btn {
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+  }
+
+  /* Reuse finance edit styles */
+  .tx-edit-expanded {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.25rem 0;
+  }
+
+  .edit-field-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+  }
+
+  .edit-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      min-width: 4rem;
+      flex-shrink: 0;
+  }
+
+  .edit-actions {
+      display: flex;
+      gap: 0.4rem;
+      justify-content: flex-end;
+      margin-top: 0.2rem;
+  }
+
+  .inline-input {
+      font-size: 0.85rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.4rem;
+      border: 1px solid rgba(190, 212, 233, 0.5);
+      background: rgba(12, 30, 52, 0.9);
+      color: var(--text-primary);
+  }
+
+  .inline-input--description {
+      width: 100%;
+  }
+
+  .inline-input--date {
+      font-size: 0.75rem;
+  }
+
+  .inline-select {
+      font-size: 0.85rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.4rem;
+      border: 1px solid rgba(190, 212, 233, 0.5);
+      background: rgba(12, 30, 52, 0.9);
+      color: var(--text-primary);
+  }
+
+  .bulk-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0.25rem;
+      border-top: 1px solid rgba(190, 212, 233, 0.12);
+      margin-top: 0.5rem;
+  }
+
+  .bulk-bar__count {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+  }
 
 	@media (max-width: 840px) {
 		.time-layout {
