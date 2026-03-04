@@ -119,7 +119,7 @@
 	}
 
 	.csv-export-button:hover {
-		transform: translateY(-2px);
+		transform: translateY(2px);
 		box-shadow:
 			0 14px 26px rgba(0, 0, 0, 0.45),
 			0 0 0 1px rgba(0, 0, 0, 0.5);
