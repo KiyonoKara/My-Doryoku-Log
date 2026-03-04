@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { enhance, applyAction, deserialize } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { type Transaction } from '$lib/server/db/schema';
 	import SubmitButton from '$lib/buttons/SubmitButton.svelte';
@@ -148,10 +148,12 @@
 		}
 		const body = new FormData();
 		body.set('id', String(id));
-		await fetch('?/delete', {
+		const response = await fetch('?/delete', {
 			method: 'POST',
 			body
 		});
+		const result = deserialize(await response.text());
+		await applyAction(result);
 		await invalidateAll();
 	}
 
