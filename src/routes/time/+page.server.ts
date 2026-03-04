@@ -145,7 +145,10 @@ export const actions: Actions = {
 			});
 		}
 
-		if (typeof category !== 'string' || !(TIME_CATEGORIES as readonly string[]).includes(category.trim())) {
+		if (
+			typeof category !== 'string' ||
+			!(TIME_CATEGORIES as readonly string[]).includes(category.trim())
+		) {
 			return fail(400, {
 				success: false,
 				message: 'Invalid category'
@@ -189,7 +192,8 @@ export const actions: Actions = {
 			});
 		}
 
-		const end_date_val: string | null = typeof end_date === 'string' && end_date.trim() ? end_date.trim() : null;
+		const end_date_val: string | null =
+			typeof end_date === 'string' && end_date.trim() ? end_date.trim() : null;
 		if (end_date_val !== null && !Number.isFinite(Date.parse(end_date_val))) {
 			return fail(400, {
 				success: false,
@@ -312,5 +316,4 @@ export const actions: Actions = {
 			message: `${ids.length} entries deleted`
 		};
 	}
-
 };

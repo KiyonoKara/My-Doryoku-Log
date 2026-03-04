@@ -37,20 +37,22 @@
 	let dbRunningEntry = $derived(entries.find((e) => e.end_date == null) ?? null);
 
 	// elapsed time
-	let elapsedMs = $derived((() => {
-		if (isPaused) {
-			return accumulatedMs;
-		}
-		if (segmentStartMs != null) {
-			return accumulatedMs + Math.max(0, nowMs - segmentStartMs);
-		}
-		// recover data from DB where page/app refreshed or quit mid-run with no pause state
-		const dbStart = dbRunningEntry ? Date.parse(dbRunningEntry.start_date) : NaN;
-		if (Number.isFinite(dbStart)) {
-			return Math.max(0, nowMs - dbStart);
-		}
-		return 0;
-	})());
+	let elapsedMs = $derived(
+		(() => {
+			if (isPaused) {
+				return accumulatedMs;
+			}
+			if (segmentStartMs != null) {
+				return accumulatedMs + Math.max(0, nowMs - segmentStartMs);
+			}
+			// recover data from DB where page/app refreshed or quit mid-run with no pause state
+			const dbStart = dbRunningEntry ? Date.parse(dbRunningEntry.start_date) : NaN;
+			if (Number.isFinite(dbStart)) {
+				return Math.max(0, nowMs - dbStart);
+			}
+			return 0;
+		})()
+	);
 
 	function togglePause() {
 		if (!isRunning && !dbRunningEntry) {
@@ -258,10 +260,7 @@
 
 			const data = result.data;
 			if (!isStartData(data)) {
-				console.error(
-					'Start missing id/start_date.',
-					data
-				);
+				console.error('Start missing id/start_date.', data);
 				return;
 			}
 
@@ -394,8 +393,7 @@
 						<!-- stop -->
 						<form method="POST" action="?/stop" use:enhance={enhanceStop}>
 							<input type="hidden" name="id" value={runningId ?? dbRunningEntry?.id ?? ''} />
-							<button
-								type="submit" class="timer-btn timer-stop" disabled={stopBusy}>
+							<button type="submit" class="timer-btn timer-stop" disabled={stopBusy}>
 								{stopBusy ? 'Stopping…' : 'Stop'}
 							</button>
 						</form>
@@ -415,9 +413,7 @@
 				</div>
 			</div>
 			<div class="elapsed-block" aria-live="polite">
-				<div class="field-label" id="elapsed-label">
-					Elapsed
-				</div>
+				<div class="field-label" id="elapsed-label">Elapsed</div>
 				<div
 					class="elapsed-box"
 					class:elapsed-box--paused={isPaused}
@@ -468,10 +464,9 @@
 			{:else}
 				{#each groupedDates as d (d.toString())}
 					{@const groupEntries = groupedByDate[d]}
-					{@const groupIds = groupEntries
-						.filter((e) => e.end_date != null)
-						.map((e) => e.id)}
-					{@const allGroupSelected = bulkMode && groupIds.length > 0 && groupIds.every((id) => selectedIds.has(id))}
+					{@const groupIds = groupEntries.filter((e) => e.end_date != null).map((e) => e.id)}
+					{@const allGroupSelected =
+						bulkMode && groupIds.length > 0 && groupIds.every((id) => selectedIds.has(id))}
 					<section class="date-group">
 						<header class="date-group-header">
 							<span class="date-group-date-label"
@@ -568,7 +563,9 @@
 															if (!d) {
 																return;
 															}
-															const iso = e.currentTarget.value ? new Date(e.currentTarget.value).toISOString() : d.start_date;
+															const iso = e.currentTarget.value
+																? new Date(e.currentTarget.value).toISOString()
+																: d.start_date;
 															drafts.set(entry.id, {
 																...d,
 																start_date: iso
@@ -583,12 +580,12 @@
 													<input
 														type="datetime-local"
 														class="inline-input inline-input--date"
-														value={draft.end_date
-															? draft.end_date.slice(0, 16)
-															: ''}
+														value={draft.end_date ? draft.end_date.slice(0, 16) : ''}
 														oninput={(e) => {
 															const d = drafts.get(entry.id);
-															if (!d) return;
+															if (!d) {
+																return;
+															}
 															const iso = e.currentTarget.value
 																? new Date(e.currentTarget.value).toISOString()
 																: null;
@@ -650,7 +647,7 @@
 														class="delete-btn"
 														disabled={isRowRunning || !!dbRunningEntry}
 														onclick={() => handleDelete(entry.id, 'Delete this entry?')}
-													>Delete
+														>Delete
 													</button>
 												</div>
 
@@ -693,7 +690,10 @@
 				<button
 					type="button"
 					class="delete-btn bulk"
-					onclick={() => handleBulkDelete(`Delete ${selectedIds.size} ${selectedIds.size === 1 ? 'entry' : 'entries'}?`)}
+					onclick={() =>
+						handleBulkDelete(
+							`Delete ${selectedIds.size} ${selectedIds.size === 1 ? 'entry' : 'entries'}?`
+						)}
 				>
 					Delete selected
 				</button>
@@ -771,19 +771,19 @@
 		font-variant-numeric: tabular-nums;
 		text-align: center;
 		transition:
-						border-color 0.25s ease,
-						background 0.25s ease,
-						color 0.25s ease;
+			border-color 0.25s ease,
+			background 0.25s ease,
+			color 0.25s ease;
 	}
 
-  .elapsed-box--paused {
-      border-color: rgba(255, 180, 70, 0.8);
-      background: rgba(20, 20, 8, 0.2);
-      color: rgba(255, 240, 130, 0.8);
-      box-shadow:
-              inset 0 0 0 1px rgba(0, 0, 0, 0.35),
-              0 10px 18px rgba(0, 0, 0, 0.28);
-  }
+	.elapsed-box--paused {
+		border-color: rgba(255, 180, 70, 0.8);
+		background: rgba(20, 20, 8, 0.2);
+		color: rgba(255, 240, 130, 0.8);
+		box-shadow:
+			inset 0 0 0 1px rgba(0, 0, 0, 0.35),
+			0 10px 18px rgba(0, 0, 0, 0.28);
+	}
 
 	.timer-cta {
 		display: flex;
@@ -821,27 +821,27 @@
 		border-color: rgba(59, 176, 126, 0.55);
 	}
 
-  .timer-pause {
-      border-color: rgba(255, 180, 70, 0.8);
-      background: rgba(210, 160, 40, 0.1);
-      color: rgba(255, 240, 130, 0.8);
-  }
+	.timer-pause {
+		border-color: rgba(255, 180, 70, 0.8);
+		background: rgba(210, 160, 40, 0.1);
+		color: rgba(255, 240, 130, 0.8);
+	}
 
-  .timer-pause:hover:not(:disabled) {
-      background: rgba(210, 160, 40, 0.2);
-      transform: translateY(-1px);
-  }
+	.timer-pause:hover:not(:disabled) {
+		background: rgba(210, 160, 40, 0.2);
+		transform: translateY(-1px);
+	}
 
-  .timer-resume {
-      background: rgba(51, 145, 210, 0.1);
-      color: #a8d8ff;
-      border-color: rgba(51, 145, 210, 0.5);
-  }
+	.timer-resume {
+		background: rgba(51, 145, 210, 0.1);
+		color: #a8d8ff;
+		border-color: rgba(51, 145, 210, 0.5);
+	}
 
-  .timer-resume:hover:not(:disabled) {
-      background: rgba(51, 145, 210, 0.2);
-      transform: translateY(-1px);
-  }
+	.timer-resume:hover:not(:disabled) {
+		background: rgba(51, 145, 210, 0.2);
+		transform: translateY(-1px);
+	}
 
 	.timer-start:hover:not(:disabled) {
 		background: rgba(59, 176, 126, 0.45);
@@ -876,21 +876,21 @@
 			0 0 0 1px rgba(0, 0, 0, 0.55);
 	}
 
-  .time-item--selected {
-      box-shadow:
-              0 0 0 2px rgba(51, 115, 176, 0.7),
-              0 6px 14px rgba(0, 0, 0, 0.45);
-  }
+	.time-item--selected {
+		box-shadow:
+			0 0 0 2px rgba(51, 115, 176, 0.7),
+			0 6px 14px rgba(0, 0, 0, 0.45);
+	}
 
-  .time-item--editing {
-      box-shadow:
-              0 0 0 2px rgba(190, 212, 233, 0.35),
-              0 6px 14px rgba(0, 0, 0, 0.45);
-  }
+	.time-item--editing {
+		box-shadow:
+			0 0 0 2px rgba(190, 212, 233, 0.35),
+			0 6px 14px rgba(0, 0, 0, 0.45);
+	}
 
-  .time-edit-form {
-      min-width: 0;
-  }
+	.time-edit-form {
+		min-width: 0;
+	}
 
 	.time-row {
 		display: grid;
@@ -966,71 +966,71 @@
 		opacity: 1;
 	}
 
-  .time-actions--hidden {
-      visibility: hidden;
-      pointer-events: none;
-  }
+	.time-actions--hidden {
+		visibility: hidden;
+		pointer-events: none;
+	}
 
-  .time-actions .edit-btn,
-  .time-actions .delete-btn {
-      width: 100%;
-      text-align: center;
-      box-sizing: border-box;
-  }
+	.time-actions .edit-btn,
+	.time-actions .delete-btn {
+		width: 100%;
+		text-align: center;
+		box-sizing: border-box;
+	}
 
-  /* Reuse finance edit styles */
-  .tx-edit-expanded {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      padding: 0.25rem 0;
-  }
+	/* Reuse finance edit styles */
+	.tx-edit-expanded {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 0.25rem 0;
+	}
 
-  .edit-field-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-  }
+	.edit-field-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
 
-  .edit-label {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      min-width: 4rem;
-      flex-shrink: 0;
-  }
+	.edit-label {
+		font-size: 0.8rem;
+		color: var(--text-secondary);
+		min-width: 4rem;
+		flex-shrink: 0;
+	}
 
-  .edit-actions {
-      display: flex;
-      gap: 0.4rem;
-      justify-content: flex-end;
-      margin-top: 0.2rem;
-  }
+	.edit-actions {
+		display: flex;
+		gap: 0.4rem;
+		justify-content: flex-end;
+		margin-top: 0.2rem;
+	}
 
-  .inline-input {
-      font-size: 0.85rem;
-      padding: 0.2rem 0.4rem;
-      border-radius: 0.4rem;
-      border: 1px solid rgba(190, 212, 233, 0.5);
-      background: rgba(12, 30, 52, 0.9);
-      color: var(--text-primary);
-  }
+	.inline-input {
+		font-size: 0.85rem;
+		padding: 0.2rem 0.4rem;
+		border-radius: 0.4rem;
+		border: 1px solid rgba(190, 212, 233, 0.5);
+		background: rgba(12, 30, 52, 0.9);
+		color: var(--text-primary);
+	}
 
-  .inline-input--description {
-      width: 100%;
-  }
+	.inline-input--description {
+		width: 100%;
+	}
 
-  .inline-input--date {
-      font-size: 0.75rem;
-  }
+	.inline-input--date {
+		font-size: 0.75rem;
+	}
 
-  .inline-select {
-      font-size: 0.85rem;
-      padding: 0.2rem 0.4rem;
-      border-radius: 0.4rem;
-      border: 1px solid rgba(190, 212, 233, 0.5);
-      background: rgba(12, 30, 52, 0.9);
-      color: var(--text-primary);
-  }
+	.inline-select {
+		font-size: 0.85rem;
+		padding: 0.2rem 0.4rem;
+		border-radius: 0.4rem;
+		border: 1px solid rgba(190, 212, 233, 0.5);
+		background: rgba(12, 30, 52, 0.9);
+		color: var(--text-primary);
+	}
 
 	@media (max-width: 840px) {
 		.time-layout {

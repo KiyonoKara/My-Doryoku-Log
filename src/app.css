@@ -432,55 +432,55 @@ textarea:focus {
 }
 
 .spinner {
-    width: 1.2rem;
-    height: 1.2rem;
-    border: 2px solid rgba(190, 212, 233, 0.3);
-    border-top: 2px solid var(--accent);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+	width: 1.2rem;
+	height: 1.2rem;
+	border: 2px solid rgba(190, 212, 233, 0.3);
+	border-top: 2px solid var(--accent);
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 /* pill toggle */
 .type-toggle {
-    display: inline-flex;
-    padding: 0.16rem;
-    border-radius: 999px;
-    border: 1px solid rgba(190, 212, 233, 0.35);
-    background: rgba(12, 28, 47, 0.9);
-    gap: 0.15rem;
+	display: inline-flex;
+	padding: 0.16rem;
+	border-radius: 999px;
+	border: 1px solid rgba(190, 212, 233, 0.35);
+	background: rgba(12, 28, 47, 0.9);
+	gap: 0.15rem;
 }
 
 .type-toggle button {
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 0.25rem 0.9rem;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    transition:
-            background 0.16s ease,
-            color 0.16s ease,
-            transform 0.12s ease;
+	border: none;
+	background: transparent;
+	color: var(--text-secondary);
+	cursor: pointer;
+	padding: 0.25rem 0.9rem;
+	border-radius: 999px;
+	font-size: 0.85rem;
+	transition:
+		background 0.16s ease,
+		color 0.16s ease,
+		transform 0.12s ease;
 }
 
 .type-toggle button.active {
-    background: linear-gradient(135deg, var(--bg-secondary), var(--accent));
-    color: var(--text-primary);
-    box-shadow:
-            0 6px 14px rgba(0, 0, 0, 0.35),
-            0 0 0 1px rgba(0, 0, 0, 0.45);
+	background: linear-gradient(135deg, var(--bg-secondary), var(--accent));
+	color: var(--text-primary);
+	box-shadow:
+		0 6px 14px rgba(0, 0, 0, 0.35),
+		0 0 0 1px rgba(0, 0, 0, 0.45);
 }
 
 .type-toggle button:hover {
-    color: var(--text-primary);
+	color: var(--text-primary);
 }
