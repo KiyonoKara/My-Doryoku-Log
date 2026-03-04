@@ -1032,20 +1032,6 @@
       color: var(--text-primary);
   }
 
-  .bulk-bar {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem 0.25rem;
-      border-top: 1px solid rgba(190, 212, 233, 0.12);
-      margin-top: 0.5rem;
-  }
-
-  .bulk-bar__count {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-  }
-
 	@media (max-width: 840px) {
 		.time-layout {
 			grid-template-columns: minmax(0, 1fr);
