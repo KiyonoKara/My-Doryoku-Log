@@ -15,7 +15,6 @@
 		ALL_CATEGORIES
 	} from '$lib/types/finance';
 	import { MONTH_NAMES } from '$lib/types/time';
-	import './type_toggle.css';
 	import fileReport from '$lib/assets/file-report.svg';
 	import FlashNotification from '$lib/other/FlashNotification.svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
