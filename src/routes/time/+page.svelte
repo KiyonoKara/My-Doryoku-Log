@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { enhance, applyAction } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
 	import type { TimeEntry } from '$lib/server/db/schema';
 	import fileReport from '$lib/assets/file-report.svg';
-	import { invalidateAll } from '$app/navigation';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { TIME_CATEGORIES, type TimeCategory, isStartData } from '$lib/types/time';
 	import { formatDuration, toYmd, formatDateLabel, formatTime, formatDate } from '$lib/utils/util';
 	import FlashNotification from '$lib/other/FlashNotification.svelte';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 	let { data, form } = $props();
 	let entries = $derived<TimeEntry[]>(data.entries ?? []);
@@ -43,6 +44,109 @@
 	let elapsedMs = $derived(
 		effectiveRunningStartMs != null ? Math.max(0, nowMs - effectiveRunningStartMs) : 0
 	);
+
+	// for bulk selecting and deleting
+	let bulkMode = $state(false);
+	const selectedIds = new SvelteSet<number>();
+
+	// inline editing state mapping
+	const drafts = new SvelteMap<number, TimeEntry>();
+
+	// start edit
+	function startEdit(entry: TimeEntry) {
+		if (drafts.has(entry.id)) {
+			return;
+		}
+		drafts.set(entry.id, { ...entry });
+	}
+
+	// cancel edit
+	function cancelEdit(id: number) {
+		drafts.delete(id);
+	}
+
+	// set draft category
+	function setDraftCategory(id: number, category: string) {
+		const d = drafts.get(id);
+		if (!d) {
+			return;
+		}
+		drafts.set(id, { ...d, category: category });
+	}
+
+	function isModified(entry: TimeEntry, draft: TimeEntry): boolean {
+		return (
+			draft.task !== entry.task ||
+			draft.category !== entry.category ||
+			draft.start_date !== entry.start_date ||
+			draft.end_date !== entry.end_date
+		);
+	}
+
+	// clear drafts after done
+	$effect(() => {
+		if (form?.success && form?.action === 'update') {
+			drafts.clear();
+		}
+		if (form?.success && (form?.action === 'bulkDelete' || form?.deleted)) {
+			selectedIds.clear();
+			bulkMode = false;
+		}
+	});
+
+	// bulk mode for selecting multiple time entries
+	function toggleBulkMode() {
+		bulkMode = !bulkMode;
+		if (!bulkMode) {
+			selectedIds.clear();
+		}
+	}
+
+	// toggling selection
+	function toggleSelect(id: number) {
+		if (selectedIds.has(id)) {
+			selectedIds.delete(id);
+		} else {
+			selectedIds.add(id);
+		}
+	}
+
+	// selects all
+	function selectAll(ids: number[]) {
+		ids.forEach((id) => selectedIds.add(id));
+	}
+
+	// deselects all
+	function deselectAll(ids: number[]) {
+		ids.forEach((id) => selectedIds.delete(id));
+	}
+
+	// confirmation and deletion of time entry
+	async function handleDelete(id: number, msg: string) {
+		if (!confirm(msg)) {
+			return;
+		}
+		const body = new FormData();
+		body.set('id', String(id));
+		await fetch('?/delete', {
+			method: 'POST',
+			body
+		});
+		await invalidateAll();
+	}
+
+	// confirmation and deletion of more than one time entry
+	async function handleBulkDelete(msg: string) {
+		if (!confirm(msg)) {
+			return;
+		}
+		const body = new FormData();
+		for (const id of selectedIds) body.append('ids', String(id));
+		await fetch('?/bulkDelete', { method: 'POST', body });
+		selectedIds.clear();
+		bulkMode = false;
+		await invalidateAll();
+	}
 
 	// filter by keywords and/or selected category
 	let filtered = $derived(
@@ -101,12 +205,6 @@
 	}
 
 	let entriesCsv = $derived(buildEntriesCsv(filtered));
-
-	function confirmDelete(event: Event) {
-		if (!confirm('Delete this entry?')) {
-			event.preventDefault();
-		}
-	}
 
 	// enhanced start function
 	const enhanceStart: SubmitFunction = () => {
@@ -353,7 +451,7 @@
 													type="submit"
 													class="delete-btn"
 													disabled={isRowRunning || !!dbRunningEntry}
-													onclick={confirmDelete}
+													onclick={() => handleDelete(entry.id, 'Delete this transaction?')}
 												>
 													Delete
 												</button>
