@@ -487,7 +487,7 @@
 							{/if}
 						</header>
 
-						<ul class="time-list">
+						<ul class="history-list">
 							{#each groupedByDate[d] as entry (entry.id)}
 								{@const isRowRunning = entry.end_date == null}
 								{@const startParsed = Date.parse(entry.start_date)}
@@ -857,14 +857,6 @@
 	.timer-stop:hover:not(:disabled) {
 		background: rgba(214, 88, 95, 0.5);
 		transform: translateY(-1px);
-	}
-
-	.time-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: grid;
-		gap: 0.4rem;
 	}
 
 	.time-item {
