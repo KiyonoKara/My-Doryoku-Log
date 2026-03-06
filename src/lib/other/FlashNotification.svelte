@@ -68,37 +68,23 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
-		padding: 0.5rem 0.75rem;
-		border-radius: 0.5rem;
+		padding: 0.5rem 0.85rem;
+		border-radius: var(--radius-md);
 		font-size: 0.85rem;
 		font-weight: 500;
 		margin: 0;
-		box-shadow:
-			0 10px 20px rgba(0, 0, 0, 0.5),
-			0 0 0 1px rgba(0, 0, 0, 0.6);
-		/*animation: flashSlideIn 0.25s ease-out;*/
+		box-shadow: var(--shadow-3);
 	}
 
 	.flash--success {
-		background: rgba(59, 176, 126, 0.25);
-		color: #a5ffcf;
-		border: 1px solid rgba(59, 176, 126, 0.5);
+		background: var(--color-positive-bg);
+		color: var(--color-positive-text);
+		border: 1px solid var(--color-positive-border);
 	}
 
 	.flash--error {
-		background: rgba(214, 88, 95, 0.25);
-		color: #ffb3c1;
-		border: 1px solid rgba(214, 88, 95, 0.5);
+		background: var(--color-negative-bg);
+		color: var(--color-negative-text);
+		border: 1px solid var(--color-negative-border);
 	}
-
-	/*@keyframes flashSlideIn {*/
-	/*	from {*/
-	/*	opacity: 0;*/
-	/*	transform: translateX(16px);*/
-	/*}*/
-	/*	to {*/
-	/*	opacity: 1;*/
-	/*	transform: translateX(0);*/
-	/*}*/
-	/*}*/
 </style>

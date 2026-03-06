@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { slide } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
+	import leftArrow from '$lib/assets/left-arrow.svg';
 	import type { TxType, FinMLPredictionResponse } from '$lib/types/finance';
 	import { type Transaction } from '$lib/server/db/schema';
 	import { capitalizeFirstLetter } from '$lib/utils/util';
@@ -101,198 +104,229 @@
 	});
 </script>
 
-<div class="ml-forecast">
+<div class="grid-card">
 	<!-- header and type toggle-->
-	<div class="ml-forecast__header">
+	<div class="grid-card__header">
 		<h3>Predictions</h3>
-		<span class="ml-forecast__chip">
+		<span class="grid-card__chip">
 			{type === 'expense' ? 'Expense' : 'Income'}
 		</span>
 	</div>
-	<div class="type-toggle">
-		<button
-			type="button"
-			class:active={type === 'expense'}
-			onclick={() => {
-				type = 'expense';
-			}}
-			>Expense
-		</button>
-		<button
-			type="button"
-			class:active={type === 'income'}
-			onclick={() => {
-				type = 'income';
-			}}
-			>Income
-		</button>
+	<div class="forecast-header-row">
+		<div class="type-toggle">
+			<button
+				type="button"
+				class:active={type === 'expense'}
+				onclick={() => {
+					type = 'expense';
+				}}
+				>Expense
+			</button>
+			<button
+				type="button"
+				class:active={type === 'income'}
+				onclick={() => {
+					type = 'income';
+				}}
+				>Income
+			</button>
+		</div>
+		<div class="forecast-controls">
+			<button
+				type="button"
+				class="forecast-toggle"
+				class:forecast-toggle--active={showPredictions}
+				onclick={() => (showPredictions = !showPredictions)}
+			>
+				{showPredictions ? 'Hide' : 'Show'}
+				<img
+					src={leftArrow}
+					alt=""
+					aria-hidden="true"
+					class="forecast-toggle__chevron"
+					class:flipped={showPredictions}
+				/>
+			</button>
+			<button
+				class="forecast-refresh"
+				class:forecast-refresh--dimmed={!needsRefresh || isLoading}
+				onclick={refreshPredictions}
+				disabled={!needsRefresh || isLoading}
+				title={needsRefresh ? 'New data available' : 'Up to date'}
+			>
+				{#if isLoading}
+					<span class="spinner"></span> Refreshing...
+				{:else}
+					Refresh
+				{/if}
+			</button>
+		</div>
 	</div>
-	<button
-		type="button"
-		class="ml-forecast__toggle"
-		class:expanded={showPredictions}
-		onclick={() => (showPredictions = !showPredictions)}
-	>
-		{showPredictions ? 'Hide' : 'Show'}
-	</button>
-	<button
-		class="ml-forecast__toggle"
-		class:dimmed={!needsRefresh || isLoading}
-		onclick={refreshPredictions}
-		disabled={!needsRefresh || isLoading}
-		title={needsRefresh ? 'New data available' : 'Up to date'}
-	>
-		{#if isLoading}
-			<span class="spinner"></span> Refreshing...
-		{:else}
-			Refresh
-		{/if}
-	</button>
 
 	{#if showPredictions}
-		{#if isLoading}
-			<div class="ml-forecast__loading">
-				<div class="spinner"></div>
-				Loading predictions...
-			</div>
-		{:else if type === 'expense'}
-			{#if expenseCount >= 10}
-				<!-- show predicted expense if there are at least 10 expense transactions -->
-				{#if expPrediction.success && expPrediction.pred}
-					<div class="ml-forecast__grid">
-						<div class="ml-forecast__card ml-forecast__card--expense">
-							<div class="ml-forecast__main">
-								<div class="ml-forecast__category">
-									{expPrediction.pred.coarse_category || '—'}
+		<div transition:slide={{ duration: 240, easing: cubicOut }} class="forecast-body">
+			{#if isLoading}
+				<div class="forecast__loading">
+					<div class="spinner"></div>
+					Loading predictions...
+				</div>
+			{:else if type === 'expense'}
+				{#if expenseCount >= 10}
+					<!-- show predicted expense if there are at least 10 expense transactions -->
+					{#if expPrediction.success && expPrediction.pred}
+						<div class="forecast__grid">
+							<div class="forecast__card forecast__card--expense">
+								<div class="forecast__main">
+									<div class="forecast__category">
+										{expPrediction.pred.coarse_category || '—'}
+									</div>
+									<div class="forecast__amount">
+										-${expPrediction.pred.amount?.toFixed(2) || '0.00'}
+									</div>
 								</div>
-								<div class="ml-forecast__amount">
-									-${expPrediction.pred.amount?.toFixed(2) || '0.00'}
+								<div class="forecast__label">Next expense</div>
+							</div>
+						</div>
+					{:else}
+						<div class="forecast__status forecast__status--not-ready">Something went wrong...</div>
+					{/if}
+				{:else}
+					<!-- show status if insufficient -->
+					<div class="forecast__status forecast__status--not-ready">
+						Enter {10 - expenseCount} more expenses for predictions
+					</div>
+				{/if}
+			{:else if incomeCount >= 10}
+				{#if incPrediction.success && incPrediction.pred}
+					<!-- show predicted income if there are at least 10 income transactions -->
+					<div class="forecast__grid">
+						<div class="forecast__card forecast__card--income">
+							<div class="forecast__main">
+								<div class="forecast__category">
+									{incPrediction.pred.coarse_category || '—'}
+								</div>
+								<div class="forecast__amount">
+									+${incPrediction.pred.amount?.toFixed(2) || '0.00'}
 								</div>
 							</div>
-							<div class="ml-forecast__label">Next expense</div>
+							<div class="forecast__label">Next income</div>
 						</div>
 					</div>
 				{:else}
-					<div class="ml-forecast__status ml-forecast__status--not-ready">
-						Something went wrong...
-					</div>
+					<div class="forecast__status forecast__status--not-ready">Something went wrong...</div>
 				{/if}
 			{:else}
 				<!-- show status if insufficient -->
-				<div class="ml-forecast__status ml-forecast__status--not-ready">
-					Enter {10 - expenseCount} more expenses for predictions
+				<div class="forecast__status forecast__status--not-ready">
+					Enter {10 - incomeCount} more income transactions for predictions
 				</div>
 			{/if}
-		{:else if incomeCount >= 10}
-			{#if incPrediction.success && incPrediction.pred}
-				<!-- show predicted income if there are at least 10 income transactions -->
-				<div class="ml-forecast__grid">
-					<div class="ml-forecast__card ml-forecast__card--income">
-						<div class="ml-forecast__main">
-							<div class="ml-forecast__category">
-								{incPrediction.pred.coarse_category || '—'}
-							</div>
-							<div class="ml-forecast__amount">
-								+${incPrediction.pred.amount?.toFixed(2) || '0.00'}
-							</div>
-						</div>
-						<div class="ml-forecast__label">Next income</div>
-					</div>
-				</div>
-			{:else}
-				<div class="ml-forecast__status ml-forecast__status--not-ready">
-					Something went wrong...
-				</div>
-			{/if}
-		{:else}
-			<!-- show status if insufficient -->
-			<div class="ml-forecast__status ml-forecast__status--not-ready">
-				Enter {10 - incomeCount} more income transactions for predictions
-			</div>
-		{/if}
+		</div>
 	{/if}
 </div>
 
 <style>
-	.ml-forecast {
-		border-radius: 1em;
-		border: 1px solid var(--border);
-		background: radial-gradient(
-			circle at top left,
-			rgba(51, 115, 176, 0.35),
-			rgba(7, 20, 37, 0.98)
-		);
-		padding: 1.5em;
-		box-shadow:
-			0 10px 20px rgba(0, 0, 0, 0.4),
-			0 0 0 1px rgba(0, 0, 0, 0.55);
-		flex-direction: column;
-		gap: 1rem;
-		min-height: 360px;
-		max-height: 360px;
+	.forecast-header-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
-	.ml-forecast__header {
+	.forecast-controls {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.forecast-toggle {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		margin-bottom: 0.4rem;
-	}
-
-	.ml-forecast__header h3 {
-		margin: 0;
-		font-size: 0.95rem;
-		font-weight: 600;
-		color: var(--text-primary);
-	}
-
-	.ml-forecast__chip {
-		font-size: 0.75rem;
-		padding: 0.12rem 0.6rem;
-		border-radius: 999px;
-		border: 1px solid var(--border-hover);
-		background: rgba(12, 30, 52, 0.95);
-		color: var(--text-secondary);
-	}
-
-	.ml-forecast__toggle {
-		font-size: 0.85rem;
-		padding: 0.25rem 0.75rem;
-		border-radius: 999px;
+		padding: 0.3rem 0.85rem;
+		border-radius: var(--radius-pill);
 		border: 1px solid var(--border);
-		background: rgba(12, 30, 52, 0.95);
+		background: color-mix(in srgb, var(--bg-deep) 75%, var(--bg-surface) 30%);
 		color: var(--text-secondary);
+		font-size: 0.85rem;
+		font-weight: 500;
 		cursor: pointer;
-		transition: all 0.15s ease;
-		margin-bottom: 0.7rem;
+		transition:
+			background var(--transition-base),
+			border-color var(--transition-base),
+			color var(--transition-base);
 	}
 
-	.ml-forecast__toggle:hover:not(:disabled) {
-		background: var(--accent-hover);
+	.forecast-toggle:hover {
+		background: var(--bg-raised);
 		color: var(--text-primary);
+		border-color: var(--border-mid);
 	}
 
-	.ml-forecast__toggle.dimmed {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.ml-forecast__toggle.expanded {
+	.forecast-toggle--active {
 		background: var(--accent);
 		color: var(--text-primary);
 		border-color: var(--accent);
 	}
 
-	.ml-forecast__grid {
+	.forecast-toggle__chevron {
+		width: 14px;
+		height: 14px;
+		display: inline-block;
+		margin-left: 0.35rem;
+		flex-shrink: 0;
+		opacity: 0.75;
+		transform: rotate(270deg);
+		transition: transform var(--transition-base);
+		filter: brightness(0) saturate(100%) invert(75%) sepia(30%) saturate(500%) hue-rotate(185deg)
+			brightness(110%);
+	}
+
+	.forecast-toggle__chevron.flipped {
+		transform: rotate(90deg);
+	}
+
+	.forecast-refresh {
+		width: auto;
+		height: auto;
+		padding: 0.3rem 0.85rem;
+		border-radius: var(--radius-pill);
+		border: 1px solid var(--border);
+		background: color-mix(in srgb, var(--bg-deep) 75%, var(--bg-surface) 30%);
+		color: var(--text-secondary);
+		font-size: 0.85rem;
+		font-weight: 500;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		transition:
+			background var(--transition-fast),
+			color var(--transition-fast);
+	}
+
+	.forecast-refresh:hover:not(:disabled) {
+		background: var(--bg-raised);
+		color: var(--text-primary);
+	}
+
+	.forecast-refresh--dimmed {
+		opacity: 0.38;
+		cursor: not-allowed;
+	}
+
+	.forecast-body {
+		margin-top: 0.5rem;
+	}
+
+	.forecast__grid {
 		display: grid;
 		grid-template-columns: minmax(0, 1.1fr);
-		justify-content: center;
 		margin: 0 auto;
 		max-width: 100%;
 		gap: 0.75rem;
 	}
 
-	.ml-forecast__card {
+	.forecast__card {
 		margin-top: 0.5rem;
 		display: flex;
 		align-items: center;
@@ -304,43 +338,41 @@
 		transition: all 0.2s ease;
 		cursor: pointer;
 		width: 100%;
-		box-shadow:
-			0 6px 14px rgba(0, 0, 0, 0.45),
-			0 0 0 1px rgba(0, 0, 0, 0.55);
+		box-shadow: var(--shadow-3);
 	}
 
-	.ml-forecast__card:hover {
-		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+	.forecast__card:hover {
+		box-shadow: var(--shadow-3);
 	}
 
-	.ml-forecast__card--expense {
-		border-left: 3px solid rgba(214, 88, 95, 0.9);
+	.forecast__card--expense {
+		border-left: 3px solid var(--color-negative);
 	}
 
-	.ml-forecast__card--income {
-		border-left: 3px solid rgba(59, 176, 126, 0.9);
+	.forecast__card--income {
+		border-left: 3px solid var(--color-positive);
 	}
 
-	.ml-forecast__main {
+	.forecast__main {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		gap: 0.1rem;
 	}
 
-	.ml-forecast__category {
+	.forecast__category {
 		font-size: 0.95rem;
 		font-weight: 600;
 		color: var(--text-primary);
 	}
 
-	.ml-forecast__amount {
+	.forecast__amount {
 		font-size: 1.15rem;
 		font-weight: 700;
 		color: var(--text-primary);
 	}
 
-	.ml-forecast__label {
+	.forecast__label {
 		font-size: 0.8rem;
 		color: var(--text-secondary);
 		text-align: right;
@@ -348,21 +380,21 @@
 		min-width: 5rem;
 	}
 
-	.ml-forecast__status {
+	.forecast__status {
 		padding: 0.6rem;
-		border-radius: 0.6rem;
+		border-radius: var(--radius-sm);
 		font-size: 0.85rem;
 		text-align: center;
 		margin-top: 0.5rem;
 	}
 
-	.ml-forecast__status--not-ready {
-		background: rgba(214, 88, 95, 0.15);
-		border: 1px solid rgba(214, 88, 95, 0.4);
-		color: var(--text-secondary);
+	.forecast__status--not-ready {
+		background: var(--color-negative-bg);
+		border: 1px solid var(--color-negative-border);
+		color: var(--color-negative-text);
 	}
 
-	.ml-forecast__loading {
+	.forecast__loading {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -373,7 +405,7 @@
 	}
 
 	@media (max-width: 840px) {
-		.ml-forecast__grid {
+		.forecast__grid {
 			grid-template-columns: 1fr;
 		}
 	}

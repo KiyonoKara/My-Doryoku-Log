@@ -3,42 +3,54 @@
 	export let label;
 </script>
 
-<div class="header">
-	<h1 class="logo">{label}</h1>
-	<div class="header-logo" aria-hidden="true">
+<header class="header">
+	<div class="header__icon-wrap" aria-hidden="true">
 		<img src={notebook} alt="" />
 	</div>
-</div>
+	<h1 class="header__label">{label}</h1>
+</header>
 
 <style>
 	.header {
+		position: sticky;
+		top: 0;
+		z-index: 100;
+		height: var(--header-height);
 		display: flex;
 		align-items: center;
-		overflow: hidden;
-		background-color: #e1e2e6;
-		padding: 16px;
+		gap: 0.75rem;
+		padding: 0 1.5rem;
+		background: var(--bg-base);
+		border-bottom: 1px solid var(--border-subtle);
+		box-shadow:
+			0 1px 0 rgba(255, 255, 255, 0.05),
+			0 4px 16px rgba(0, 0, 0, 0.5);
+		justify-content: center;
 	}
 
-	.header h1 {
-		float: left;
-		color: #1c2127;
-		text-align: center;
-		padding: 6px;
-		text-decoration: none;
-		font-size: 28px;
-		line-height: 25px;
-		border-radius: 4px;
-	}
-
-	.header h1.logo {
-		font-weight: bold;
+	.header__icon-wrap {
 		display: flex;
 		align-items: center;
+		justify-content: center;
+		width: 60px;
+		height: 60px;
+		border-radius: var(--radius-sm);
+		background: var(--accent-subtle);
+		border: 1px solid var(--border-subtle);
+		flex-shrink: 0;
 	}
 
-	.header-logo img {
-		width: 40px;
-		height: 40px;
-		display: block;
+	.header__icon-wrap img {
+		width: 48px;
+		height: 48px;
+		filter: brightness(0) saturate(100%) invert(80%) sepia(50%) saturate(600%) hue-rotate(190deg)
+			brightness(110%);
+	}
+
+	.header__label {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: var(--text-primary);
+		letter-spacing: 0.01em;
 	}
 </style>

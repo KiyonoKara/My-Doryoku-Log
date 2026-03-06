@@ -24,44 +24,40 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0.5rem 0.9rem;
-		border-radius: 100px;
-		border: 1px solid var(--border);
-		margin-top: 1.5rem;
-		margin-left: 1.5rem;
-		background: linear-gradient(135deg, var(--bg-secondary), var(--bg-surface));
+		padding: 0.4rem 0.8rem 0.4rem 0.5rem;
+		border-radius: var(--radius-pill);
+		border: 1px solid var(--border-subtle);
+		margin-top: 1.25rem;
+		margin-left: 1.25rem;
+		background: var(--bg-deep);
 		color: var(--text-primary);
 		cursor: pointer;
-		text-decoration: none;
-		font-size: 0.9rem;
+		font-size: 0.88rem;
 		font-weight: 500;
-		box-shadow:
-			0 6px 14px rgba(0, 0, 0, 0.35),
-			0 0 0 1px rgba(0, 0, 0, 0.4);
+		box-shadow: var(--shadow-1);
 		transition:
-			transform 0.15s ease,
-			box-shadow 0.15s ease,
-			border-color 0.15s ease,
-			background 0.2s ease;
+			transform var(--transition-fast),
+			box-shadow var(--transition-fast),
+			border-color var(--transition-fast),
+			background var(--transition-base);
 	}
 
 	.back-button__icon {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 30px;
-		height: 30px;
-		border-radius: 100px;
-		background: rgba(14, 32, 53, 0.8);
-		color: var(--text-primary);
+		width: 36px;
+		height: 36px;
+		border-radius: var(--radius-pill);
+		background: rgba(0, 0, 0, 0.3);
 	}
 
 	.back-button__icon img {
-		width: 20px;
-		height: 20px;
+		width: 16px;
+		height: 16px;
 		display: block;
-		filter: brightness(0) saturate(100%) invert(84%) sepia(65%) saturate(1137%) hue-rotate(180deg)
-			brightness(115%) contrast(97%) drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
+		filter: brightness(0) saturate(100%) invert(84%) sepia(55%) saturate(900%) hue-rotate(185deg)
+			brightness(112%);
 	}
 
 	.back-button__text {
@@ -70,19 +66,14 @@
 
 	.back-button:hover {
 		transform: translateY(-1px);
-		box-shadow:
-			0 10px 20px rgba(0, 0, 0, 0.45),
-			0 0 0 1px rgba(0, 0, 0, 0.5);
-		border-color: var(--border-hover);
-		background: linear-gradient(135deg, var(--bg-secondary), var(--accent-hover));
+		box-shadow: var(--shadow-2);
+		border-color: var(--border-mid);
+		background: var(--bg-raised);
 	}
 
 	.back-button:active {
 		transform: translateY(0);
-		box-shadow:
-			0 4px 10px rgba(0, 0, 0, 0.35),
-			0 0 0 1px rgba(0, 0, 0, 0.5);
-		background: linear-gradient(135deg, var(--bg-secondary), var(--accent));
+		box-shadow: var(--shadow-1);
 	}
 
 	.back-button:focus-visible {
