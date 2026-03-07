@@ -176,6 +176,12 @@ textarea {
 	max-height: 550px;
 }
 
+.panel--entry-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
 /* for bottom cards */
 .grid-card {
 	border-radius: 1em;
@@ -521,6 +527,10 @@ textarea:focus {
 .today-input-btn:focus-visible {
     outline: 2px solid var(--border-hover);
     outline-offset: 3px;
+}
+
+.today-input-btn__field-group {
+    align-items: flex-end;
 }
 
 /* custom checkbox */
@@ -891,6 +901,12 @@ textarea:focus {
     min-width: 0;
 }
 
+.history-item__main-top {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
 .history-item__category,
 .history-item__task {
     font-size: 0.9rem;
@@ -969,8 +985,12 @@ textarea:focus {
     box-sizing: border-box;
 }
 
-.history-item--edit-form
-
+.history-item__edit-mode-expanded {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+}
 
 .filters-row {
 	display: grid;

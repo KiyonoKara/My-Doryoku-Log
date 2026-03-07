@@ -280,7 +280,7 @@
 
 	<div class="panel panel--form">
 		<h2 class="panel-title">Log transaction</h2>
-		<form method="POST" action="?/submit" class="entry-form" use:enhance>
+		<form method="POST" action="?/submit" class="panel--entry-form" use:enhance>
 			<div class="field-row">
 				<div class="field-label">Type</div>
 				<div class="type-toggle">
@@ -308,7 +308,7 @@
 					<label for="date" class="field-label">Date</label>
 					<input id="date" name="date" type="date" bind:value={date} required />
 				</div>
-				<div class="field-group field-group--today">
+				<div class="field-group today-input-btn__field-group">
 					<div class="field-label">&nbsp;</div>
 					<button type="button" class="today-input-btn" onclick={setToday}> Today</button>
 				</div>
@@ -456,7 +456,7 @@
 											<input type="hidden" name="amount" value={draft.amount} />
 											<input type="hidden" name="description" value={draft.description ?? ''} />
 
-											<div class="tx-edit-expanded">
+											<div class="history-item__edit-mode-expanded">
 												<!-- type toggle in edit mode -->
 												<div class="edit-field-row">
 													<span class="edit-label">Type</span>
@@ -571,10 +571,10 @@
 											</div>
 										{:else}
 											<!-- view mode row -->
-											<div class="tx-row">
-												<div class="tx-main">
-													<div class="tx-main-top">
-														<span class="tx-category">{tx.category}</span>
+											<div class="history-item__row">
+												<div class="history-item__main">
+													<div class="history-item__main-top">
+														<span class="history-item__category">{tx.category}</span>
 														<label class="checkbox-label" class:checkbox-label--hidden={!bulkMode}>
 															<input
 																type="checkbox"
@@ -586,7 +586,7 @@
 														</label>
 													</div>
 													{#if tx.description}
-														<span class="tx-description">{tx.description}</span>
+														<span class="history-item__description">{tx.description}</span>
 													{/if}
 												</div>
 
@@ -660,61 +660,14 @@
 </section>
 
 <style>
-	.entry-form {
-		display: flex;
-		flex-direction: column;
-		gap: 0.8rem;
-	}
-
-	.field-group--today {
-		align-items: flex-end;
-	}
-
 	.form-actions {
 		display: flex;
 		justify-content: flex-end;
 		margin-top: 0.4rem;
 	}
 
-	.tx-row {
-		display: grid;
-		grid-template-columns: 1fr auto auto;
-		gap: 0.75rem 0.5rem;
-		align-items: center;
-	}
-
-	.tx-main {
-		display: flex;
-		flex-direction: column;
-		gap: 0.1rem;
-	}
-
-	.tx-main-top {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-	}
-
-	.tx-category {
-		font-size: 0.9rem;
-		font-weight: 500;
-		color: var(--text-primary);
-	}
-
-	.tx-description {
-		font-size: 0.8rem;
-		color: var(--text-secondary);
-	}
-
-	.tx-edit-expanded {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		padding: 0.25rem 0;
-	}
-
 	@media (max-width: 840px) {
-		.finance-layout {
+		.section-grid-layout {
 			grid-template-columns: minmax(0, 1fr);
 			max-width: 640px;
 		}
