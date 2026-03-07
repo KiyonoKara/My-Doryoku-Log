@@ -271,30 +271,15 @@
 	let categoryTotals = $derived(getCategoryTotals(filtered));
 </script>
 
-<section class="finance-layout">
+<section class="section-grid-layout">
 	<FlashNotification
 		flashType={form?.success ? 'success' : 'error'}
 		message={form?.message ?? null}
 		durationMs={5000}
 	/>
-	<!--	<div class="flash-container" aria-live="polite" aria-atomic="true">-->
-	<!--		{#if showSuccess}-->
-	<!--			<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
-	<!--		{:else if showError}-->
-	<!--			<p class="flash flash&#45;&#45;error">{form?.message}</p>-->
-	<!--		{/if}-->
-	<!--	</div>-->
 
 	<div class="panel panel--form">
 		<h2 class="panel-title">Log transaction</h2>
-		<!-- on the form UI -->
-		<!--{#if showSuccess}-->
-		<!--	<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
-		<!--{/if}-->
-		<!--{#if showError}-->
-		<!--	<p class="flash flash&#45;&#45;error">{form?.message}</p>-->
-		<!--{/if}-->
-
 		<form method="POST" action="?/submit" class="entry-form" use:enhance>
 			<div class="field-row">
 				<div class="field-label">Type</div>
@@ -332,9 +317,16 @@
 			<!-- amount -->
 			<div class="field-row">
 				<label for="amount" class="field-label">Amount</label>
-				<div class="amount-input-wrapper">
+				<div class="inline-amount-wrapper">
 					<span class="amount-prefix">$</span>
-					<input id="amount" name="amount" type="number" step="0.01" min="0" required />
+					<input
+						id="amount"
+						name="amount"
+						type="number"
+						step="0.01"
+						min="0"
+						required
+					/>
 				</div>
 			</div>
 
@@ -385,8 +377,8 @@
 				</div>
 				<!-- filter by category -->
 				<div class="category-filter">
-					<label class="field-label" for="catFilter">Category</label>
-					<select id="catFilter" bind:value={categoryFilter}>
+					<label class="field-label" for="c-filter">Category</label>
+					<select id="c-filter" bind:value={categoryFilter}>
 						<option value="all">All</option>
 						{#each ALL_CATEGORIES as c (c)}
 							<option value={c}>{c}</option>
@@ -419,14 +411,6 @@
 							<span class="date-group__date-label">
 								{formatDateLabel(d)}
 							</span>
-							<!--{#if bulkMode}-->
-							<!--	<input-->
-							<!--		type="checkbox"-->
-							<!--		class="group-checkbox"-->
-							<!--		checked={allGroupSelected}-->
-							<!--		onchange={() => allGroupSelected ? deselectAll(groupIds) : selectAll(groupIds)}-->
-							<!--	/>-->
-							<!--{/if}-->
 							{#if bulkMode}
 								<label class="checkbox-label">
 									<input
@@ -441,20 +425,19 @@
 							{/if}
 						</header>
 						<!-- transactions list -->
-						<ul class="tx-list">
+						<ul class="history-list">
 							{#each groupedByDate[d] as tx (tx.id)}
 								{@const draft = drafts.get(tx.id)}
 								{@const isEditing = !!draft}
 								{@const formModified = isEditing && isModified(tx, draft)}
 								<li
-									class="tx-item"
-									class:tx-item--selected={selectedIds.has(tx.id)}
-									class:tx-item--editing={isEditing}
+									class="history-item"
+									class:history-item--selected={selectedIds.has(tx.id)}
+									class:history-item--editing={isEditing}
 								>
 									<form
 										method="POST"
 										action="?/update"
-										class="tx-edit-form"
 										use:enhance
 										onsubmit={(e) => {
 											if (!draft?.category) {
@@ -513,7 +496,7 @@
 												<div class="edit-field-row">
 													<span class="edit-label">Amount</span>
 													<div class="inline-amount-wrapper">
-														<span class="amount-prefix-sm">$</span>
+														<span class="amount-prefix">$</span>
 														<input
 															type="number"
 															step="0.01"
@@ -607,7 +590,7 @@
 													{/if}
 												</div>
 
-												<div class="tx-actions" class:tx-actions--hidden={bulkMode}>
+												<div class="history-item__actions" class:history-item__actions--hidden={bulkMode}>
 													<button
 														type="button"
 														class="edit-btn"
@@ -622,41 +605,16 @@
 														>Delete
 													</button>
 												</div>
-												<div class="tx-meta">
-													<span class="tx-type tx-type-{tx.type}">{tx.type}</span>
-													<span class="tx-amount">
+												<div class="history-item__meta">
+													<span class="history-item__type history-item__type--{tx.type}">{tx.type}</span>
+													<span class="history-item__amount">
 														{tx.type === 'expense' ? '-' : '+'}${tx.amount}
 													</span>
-													<span class="tx-date-label">{formatDateLabel(tx.date)}</span>
+													<span class="history-item__date-label">{formatDateLabel(tx.date)}</span>
 												</div>
 											</div>
 										{/if}
 									</form>
-									<!-- old legacy code -->
-									<!--									<div class="tx-row">-->
-									<!--										<div class="tx-main">-->
-									<!--											<span class="tx-category">{tx.category}</span>-->
-									<!--											{#if tx.description}-->
-									<!--												<span class="tx-description">{tx.description}</span>-->
-									<!--											{/if}-->
-									<!--										</div>-->
-									<!--										<div class="tx-actions">-->
-									<!--											<form method="POST" action="?/delete" use:enhance>-->
-									<!--												<input type="hidden" name="id" value={tx.id} />-->
-									<!--												<button type="submit" class="delete-btn" onclick={confirmDelete}>-->
-									<!--													Delete-->
-									<!--												</button>-->
-									<!--											</form>-->
-									<!--										</div>-->
-									<!--										<div class="tx-meta">-->
-									<!--											<span class="tx-type tx-type-{tx.type}">-->
-									<!--												{tx.type}-->
-									<!--											</span>-->
-									<!--											<span class="tx-amount">-->
-									<!--												{tx.type === 'expense' ? '-' : '+'}{tx.amount}-->
-									<!--											</span>-->
-									<!--										</div>-->
-									<!--									</div>-->
 								</li>
 							{/each}
 						</ul>
@@ -702,272 +660,20 @@
 </section>
 
 <style>
-	.finance-layout {
-		max-width: 1100px;
-		margin: 1.5rem auto;
-		padding: 0 1.5rem 2rem;
-		display: grid;
-		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
-		gap: 1.5rem;
-	}
-
 	.entry-form {
 		display: flex;
 		flex-direction: column;
 		gap: 0.8rem;
 	}
 
-	.field-row {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-	}
-
-	.field-row--inline {
-		flex-direction: row;
-		gap: 0.8rem;
-	}
-
-	.field-group {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-	}
-
 	.field-group--today {
 		align-items: flex-end;
-	}
-
-	.field-label {
-		font-size: 0.85rem;
-		color: var(--text-secondary);
-	}
-
-	.today-input-btn {
-		border-radius: 999px;
-		border: 1px solid var(--border);
-		padding: 0.3rem 0.9rem;
-		background: rgba(16, 40, 65, 0.95);
-		color: var(--text-primary);
-		font-size: 0.8rem;
-		cursor: pointer;
-		box-shadow:
-			0 6px 12px rgba(0, 0, 0, 0.35),
-			0 0 0 1px rgba(0, 0, 0, 0.4);
-		transition:
-			background 0.15s ease,
-			box-shadow 0.15s ease,
-			transform 0.12s ease;
-	}
-
-	.today-input-btn:hover {
-		background: var(--accent-hover);
-	}
-
-	.amount-input-wrapper {
-		display: flex;
-		align-items: center;
-		border-radius: 0.6rem;
-		border: 1px solid rgba(190, 212, 233, 0.4);
-		background: rgba(12, 30, 52, 0.85);
-		overflow: hidden;
-		transition: all 0.2s ease;
-	}
-
-	.amount-input-wrapper input {
-		border: none;
-		border-radius: 0;
-		flex: 1;
-		padding: 0.45rem 0.6rem 0.45rem 0.5rem;
-		background: transparent;
-		color: var(--text-primary);
-		font-size: 0.9rem;
-	}
-
-	.amount-input-wrapper:focus-within {
-		border-color: rgba(190, 212, 233, 0.7);
-		background: rgba(12, 30, 52, 0.95);
-		box-shadow:
-			0 0 0 2px rgba(51, 115, 176, 0.3),
-			inset 0 0 0 1px rgba(190, 212, 233, 0.5);
-	}
-
-	.amount-input-wrapper input:focus {
-		outline: none;
-		box-shadow: none;
-	}
-
-	.amount-prefix {
-		padding: 0.45rem 0.7rem;
-		font-size: 0.9rem;
-		color: var(--text-secondary);
-		background: rgba(12, 30, 52, 0.95);
 	}
 
 	.form-actions {
 		display: flex;
 		justify-content: flex-end;
 		margin-top: 0.4rem;
-	}
-
-	.history-title-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.tx-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: grid;
-		gap: 0.4rem;
-	}
-
-	.tx-item {
-		position: relative;
-		border-radius: 0.7rem;
-		padding: 0.45rem 0.55rem;
-		background: radial-gradient(circle at top left, rgba(51, 115, 176, 0.42), rgba(7, 20, 37, 0.9));
-		box-shadow:
-			0 6px 14px rgba(0, 0, 0, 0.45),
-			0 0 0 1px rgba(0, 0, 0, 0.55);
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.tx-item--selected {
-		box-shadow:
-			0 0 0 2px rgba(51, 115, 176, 0.7),
-			0 6px 14px rgba(0, 0, 0, 0.45);
-	}
-
-	.tx-item--editing {
-		box-shadow:
-			0 0 0 2px rgba(190, 212, 233, 0.35),
-			0 6px 14px rgba(0, 0, 0, 0.45);
-	}
-
-	.tx-edit-form {
-		min-width: 0;
-	}
-
-	.tx-category--editable {
-		font-size: 0.9rem;
-		font-weight: 500;
-		color: var(--text-primary);
-		background: none;
-		border: none;
-		padding: 0;
-		cursor: pointer;
-		text-align: left;
-		border-bottom: 1px dashed transparent;
-		transition: border-color 0.15s;
-	}
-
-	.tx-category--editable:hover {
-		border-bottom-color: rgba(190, 212, 233, 0.5);
-	}
-
-	/* editable description button with dashed lines */
-	.tx-description--editable {
-		font-size: 0.8rem;
-		color: var(--text-secondary);
-		background: none;
-		border: none;
-		padding: 0;
-		cursor: pointer;
-		text-align: left;
-		border-bottom: 1px dashed transparent;
-		transition: border-color 0.15s;
-	}
-
-	.tx-description--editable:hover {
-		border-bottom-color: rgba(190, 212, 233, 0.4);
-	}
-
-	.tx-description--empty {
-		color: rgba(190, 212, 233, 0.3);
-		font-style: italic;
-	}
-
-	/* for the inline inputs */
-	.inline-input {
-		font-size: 0.85rem;
-		padding: 0.2rem 0.4rem;
-		border-radius: 0.4rem;
-		border: 1px solid rgba(190, 212, 233, 0.5);
-		background: rgba(12, 30, 52, 0.9);
-		color: var(--text-primary);
-	}
-
-	.inline-input--description {
-		width: 100%;
-	}
-
-	.inline-input--amount {
-		width: 80px;
-	}
-
-	.inline-input--date {
-		font-size: 0.75rem;
-	}
-
-	.inline-select {
-		font-size: 0.85rem;
-		padding: 0.2rem 0.4rem;
-		border-radius: 0.4rem;
-		border: 1px solid rgba(190, 212, 233, 0.5);
-		background: rgba(12, 30, 52, 0.9);
-		color: var(--text-primary);
-	}
-
-	.inline-type-toggle {
-		display: flex;
-		gap: 0.2rem;
-	}
-
-	.inline-type-btn {
-		font-size: 0.7rem;
-		padding: 0.1rem 0.4rem;
-		border-radius: 999px;
-		border: 1px solid rgba(190, 212, 233, 0.3);
-		background: transparent;
-		color: var(--text-secondary);
-		cursor: pointer;
-		transition: all 0.15s ease;
-	}
-
-	.inline-type-btn--active {
-		background: rgba(51, 115, 176, 0.35);
-		border-color: rgba(190, 212, 233, 0.6);
-		color: var(--text-primary);
-	}
-
-	.inline-type-btn:not(.inline-type-btn--active):hover {
-		background: rgba(190, 212, 233, 0.08);
-	}
-
-	.inline-amount-wrapper {
-		display: flex;
-		align-items: center;
-		gap: 0.1rem;
-	}
-
-	.amount-prefix-sm {
-		font-size: 0.8rem;
-		color: var(--text-secondary);
-	}
-
-	.tx-date-edit {
-		font-size: 0.7rem;
-		color: rgba(190, 212, 233, 0.5);
-		background: none;
-		border: none;
-		cursor: pointer;
-		padding: 0;
-		border-bottom: 1px dashed rgba(190, 212, 233, 0.3);
 	}
 
 	.tx-row {
@@ -1000,76 +706,11 @@
 		color: var(--text-secondary);
 	}
 
-	.tx-meta {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 0.1rem;
-		text-align: right;
-		padding-right: 0.5em;
-	}
-
-	.tx-type {
-		font-size: 0.75rem;
-		text-transform: capitalize;
-		padding: 0.08rem 0.4rem;
-		border-radius: 999px;
-		border: 1px solid rgba(190, 212, 233, 0.6);
-		color: var(--text-primary);
-	}
-
-	.tx-type-income {
-		background: rgba(59, 176, 126, 0.25);
-	}
-
-	.tx-type-expense {
-		background: rgba(214, 88, 95, 0.25);
-	}
-
-	.tx-type:hover {
-		filter: brightness(1.3);
-	}
-
-	.tx-amount {
-		font-size: 0.9rem;
-		font-weight: 600;
-	}
-
-	.tx-actions {
-		display: flex;
-		justify-content: flex-end;
-		opacity: 0;
-		transition: opacity 0.2s ease;
-		flex-direction: column;
-		gap: 0.3rem;
-	}
-
-	.tx-item:hover .tx-actions {
-		opacity: 1;
-	}
-
-	.tx-actions--hidden {
-		visibility: hidden;
-		pointer-events: none;
-	}
-
-	.tx-actions .edit-btn,
-	.tx-actions .delete-btn {
-		width: 100%;
-		text-align: center;
-		box-sizing: border-box;
-	}
-
 	.tx-edit-expanded {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
 		padding: 0.25rem 0;
-	}
-
-	.tx-date-label {
-		font-size: 0.7rem;
-		color: rgba(190, 212, 233, 0.45);
 	}
 
 	@media (max-width: 840px) {

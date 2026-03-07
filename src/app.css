@@ -136,12 +136,19 @@ textarea {
 	font-family: inherit;
 	font-size: inherit;
 }
+/* grid layout of pages */
+.section-grid-layout {
+    max-width: 1100px;
+    margin: 1.5rem auto;
+    padding: 0 1.5rem 2rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+    gap: 1.5rem;
+}
 
 /* panel card */
 .panel {
 	border-radius: var(--radius-lg);
-	/*border: 1px solid var(--border);*/
-	/*background: var(--bg-secondary);*/
 	border: 1px solid var(--border);
 	background: var(--card-grad-top);
 	box-shadow: var(--shadow-3);
@@ -229,7 +236,7 @@ textarea {
 }
 
 .field-label {
-	font-size: 0.82rem;
+	font-size: 0.85rem;
 	font-weight: 500;
 	color: var(--text-secondary);
 	letter-spacing: 0.02em;
@@ -482,6 +489,40 @@ textarea:focus {
 	color: var(--color-delete-text);
 }
 
+/* button for setting current day */
+.today-input-btn {
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.9rem;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-3);
+    transition:
+            transform var(--transition-base),
+            box-shadow var(--transition-base),
+            border-color var(--transition-base),
+            background var(--transition-base);
+}
+
+.today-input-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+    border-color: var(--border-hover);
+    background: color-mix(in srgb, var(--bg-raised) 80%, var(--bg-surface) 20%);
+}
+
+.today-input-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-3);
+}
+
+.today-input-btn:focus-visible {
+    outline: 2px solid var(--border-hover);
+    outline-offset: 3px;
+}
+
 /* custom checkbox */
 .checkbox-label {
 	display: inline-flex;
@@ -582,6 +623,76 @@ textarea:focus {
 	background: var(--bg-deep);
 	color: var(--text-primary);
 }
+
+.inline-type-toggle {
+    display: flex;
+    gap: 0.2rem;
+}
+
+.inline-type-btn {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-mid);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.inline-type-btn--active {
+    background: rgba(51, 115, 176, 0.35);
+    border-color: rgba(190, 212, 233, 0.6);
+    color: var(--text-primary);
+}
+
+.inline-type-btn:not(.inline-type-btn--active):hover {
+    background: rgba(190, 212, 233, 0.08);
+}
+
+.inline-amount-wrapper {
+    display: flex;
+    align-items: center;
+    border-radius: 0.6rem;
+    border: 1px solid var(--border-subtle);
+    background: color-mix(in srgb, var(--bg-deep) 92%, transparent);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.inline-amount-wrapper input {
+    border: none;
+    border-radius: 0;
+    flex: 1;
+    padding: 0.35rem 0.4rem 0.35rem 0.3rem;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.inline-amount-wrapper:focus-within {
+    border-color: color-mix(in srgb, var(--border-subtle) 75%, white);
+    background: color-mix(in srgb, var(--bg-deep) 95%, transparent);
+}
+
+.inline-amount-wrapper input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.inline-amount-wrapper .amount-prefix {
+    padding: 0.45rem 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    background: color-mix(in srgb, var(--bg-deep-alt) 95%, transparent);
+    flex-shrink: 0;
+}
+
+.edit-field-row .inline-amount-wrapper input {
+    padding: 0.35rem 0.4rem 0.35rem 0.3rem;
+    font-size: 0.9rem;
+    background: transparent;
+}
+
 
 /* search bar */
 .search-wrapper input {
@@ -736,6 +847,130 @@ textarea:focus {
 	flex-direction: column;
 	gap: 0.55rem;
 }
+
+.history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+}
+
+.history-item {
+    position: relative;
+    border-radius: var(--radius-md);
+    padding: 0.65rem 0.75rem 0.65rem 1rem;
+    background: var(--bg-deep);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-2);
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.history-item--selected {
+    box-shadow: var(--shadow-3);
+}
+
+.history-item--editing {
+    border-color: var(--border-mid);
+    box-shadow: var(--shadow-3);
+}
+
+.history-item__row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 0.75rem 0.5rem;
+    align-items: center;
+    width: 100%;
+}
+
+.history-item__main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.history-item__category,
+.history-item__task {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.history-item__description,
+.history-item__sub {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.history-item__type {
+    font-size: 0.75rem;
+    text-transform: capitalize;
+    padding: 0.08rem 0.4rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-mid);
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.history-item__type--income {
+    background: var(--color-positive-bg);
+}
+
+.history-item__type--expense {
+    background: var(--color-negative-bg);
+}
+
+.history-item__amount,
+.history-item__duration {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.history-item__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
+    text-align: right;
+    padding: 0.5rem 0.5rem 0;
+}
+
+.history-item__date-label {
+    font-size: 0.7rem;
+    color: var(--border-mid);
+}
+
+.history-item__actions {
+    display: flex;
+    justify-content: flex-end;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.history-item:hover .history-item__actions {
+    opacity: 1;
+}
+
+.history-item__actions--hidden {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.history-item__actions .edit-btn,
+.history-item__actions .delete-btn {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.history-item--edit-form
+
 
 .filters-row {
 	display: grid;

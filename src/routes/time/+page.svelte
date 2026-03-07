@@ -332,21 +332,13 @@
 	});
 </script>
 
-<section class="time-layout">
+<section class="section-grid-layout">
 	<!-- flash notifications from user actions -->
 	<FlashNotification
 		flashType={form?.success ? 'success' : 'error'}
 		message={form?.message ?? null}
 		durationMs={5000}
 	/>
-	<!--	<div class="flash-container" aria-live="polite" aria-atomic="true">-->
-	<!--		{#if showSuccess}-->
-	<!--			<p class="flash flash&#45;&#45;success">{form?.message}</p>-->
-	<!--		{:else if showError}-->
-	<!--			<p class="flash flash&#45;&#45;error">{form?.message}</p>-->
-	<!--		{/if}-->
-	<!--	</div>-->
-
 	<!--timer form panel -->
 	<div class="panel panel--form">
 		<h2 class="panel-title">Timer</h2>
@@ -505,7 +497,7 @@
 									class:time-item--selected={selectedIds.has(entry.id)}
 									class:time-item--editing={isEditing}
 								>
-									<form method="POST" action="?/update" class="time-edit-form" use:enhance>
+									<form method="POST" action="?/update" use:enhance>
 										<input type="hidden" name="id" value={entry.id} />
 
 										{#if isEditing}
@@ -713,15 +705,6 @@
 </section>
 
 <style>
-	.time-layout {
-		max-width: 1100px;
-		margin: 1.5rem auto;
-		padding: 0 1.5rem 2rem;
-		display: grid;
-		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
-		gap: 1.5rem;
-	}
-
 	.field-row--inline {
 		align-items: flex-end;
 	}
@@ -878,10 +861,6 @@
 		box-shadow:
 			0 0 0 2px rgba(190, 212, 233, 0.35),
 			0 6px 14px rgba(0, 0, 0, 0.45);
-	}
-
-	.time-edit-form {
-		min-width: 0;
 	}
 
 	.time-row {
