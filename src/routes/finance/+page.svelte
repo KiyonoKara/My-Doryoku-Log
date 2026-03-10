@@ -654,9 +654,7 @@
 	/>
 
 	<!-- ML predictions section, can be toggled on or off	-->
-	<div class="ml-forecast">
-		<ForecastSection {transactions} />
-	</div>
+	<ForecastSection {transactions} />
 </section>
 
 <style>

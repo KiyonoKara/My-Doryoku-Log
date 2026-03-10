@@ -4,8 +4,8 @@
 	--bg-primary: #0d1520;
 	--bg-secondary: #0b385f;
 	--bg-surface: #3373b0;
-	--bg-deep: rgba(12, 30, 52, 0.92);
-	--bg-deep-alt: rgba(10, 24, 41, 0.92);
+	--bg-deep: rgba(12, 30, 52, 0.9);
+	--bg-deep-alt: rgba(10, 24, 41, 0.9);
 	--bg-raised: rgba(20, 42, 70, 0.96);
 	--bg-subtle-grad1: rgba(51, 115, 176, 0.35);
 	--bg-subtle-grad2: rgba(7, 20, 37, 0.98);
@@ -48,8 +48,8 @@
 	--color-edit-bg: rgba(51, 115, 176, 0.18);
 	--color-edit-border: rgba(51, 115, 176, 0.45);
 	--color-edit-text: #a8d4f0;
-	--color-save-bg: rgba(59, 176, 126, 0.22);
-	--color-save-border: rgba(59, 176, 126, 0.45);
+	--color-save-bg: rgba(59, 176, 126, 0.25);
+	--color-save-border: rgba(59, 176, 126, 0.5);
 	--color-save-text: #a8f0d5;
 	--color-delete-bg: rgba(214, 88, 95, 0.22);
 	--color-delete-border: rgba(214, 88, 95, 0.8);
