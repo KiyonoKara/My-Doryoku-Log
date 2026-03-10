@@ -345,7 +345,7 @@
 
 		<div class="timer-card">
 			<div class="timer-row">
-				<div class="timer-fields">
+				<div class="panel--entry-form">
 					<div class="field-row">
 						<label for="task" class="field-label">What are you working on?</label>
 						<input
@@ -493,9 +493,9 @@
 								{@const formModified = isEditing && isModified(entry, draft)}
 
 								<li
-									class="time-item"
-									class:time-item--selected={selectedIds.has(entry.id)}
-									class:time-item--editing={isEditing}
+									class="history-item"
+									class:history-item--selected={selectedIds.has(entry.id)}
+									class:history-item--editing={isEditing}
 								>
 									<form method="POST" action="?/update" use:enhance>
 										<input type="hidden" name="id" value={entry.id} />
@@ -508,7 +508,7 @@
 											<input type="hidden" name="end_date" value={draft.end_date ?? ''} />
 											<input type="hidden" name="duration_ms" value={draft.duration_ms ?? 0} />
 
-											<div class="tx-edit-expanded">
+											<div class="history-item__edit-mode-expanded">
 												<!-- task name edit field -->
 												<div class="edit-field-row">
 													<span class="edit-label">Task</span>
@@ -607,10 +607,10 @@
 											</div>
 										{:else}
 											<!-- view mode row -->
-											<div class="time-row">
-												<div class="time-main">
-													<span class="time-task">{entry.task}</span>
-													<span class="time-sub">
+											<div class="history-item__row">
+												<div class="history-item__main">
+													<span class="history-item__task">{entry.task}</span>
+													<span class="history-item__sub">
 														<span class="time-chip">{entry.category ?? 'Uncategorized'}</span>
 														<span class="time-dates">
 															{formatDate(entry.start_date)}
@@ -624,7 +624,7 @@
 													</span>
 												</div>
 
-												<div class="time-actions" class:time-actions--hidden={bulkMode}>
+												<div class="history-item__actions" class:history-item__actions--hidden={bulkMode}>
 													<button
 														type="button"
 														class="edit-btn"
@@ -705,18 +705,12 @@
 </section>
 
 <style>
-	.field-row--inline {
-		align-items: flex-end;
-	}
-
 	.timer-card {
 		margin-top: 0.4rem;
-		border-radius: 0.8rem;
-		background: rgba(10, 24, 41, 0.9);
-		padding: 0.95rem 1rem 1rem;
-		box-shadow:
-			inset 0 0 0 1px rgba(0, 0, 0, 0.5),
-			inset 0 0 12px rgba(0, 0, 0, 0.65);
+		border-radius: var(--radius-md);
+		background: var(--bg-deep-alt);
+		padding: 1rem;
+		box-shadow: var(--shadow-inset)
 	}
 
 	.timer-row {
@@ -724,12 +718,6 @@
 		grid-template-columns: 1fr auto;
 		gap: 1rem;
 		align-items: start;
-	}
-
-	.timer-fields {
-		display: flex;
-		flex-direction: column;
-		gap: 0.7rem;
 	}
 
 	.elapsed-block {
@@ -742,7 +730,7 @@
 	.elapsed-box {
 		width: min(420px, 100%);
 		padding: 1rem 1.25rem;
-		border-radius: 0.95rem; /* curvature but not pill */
+		border-radius: 0.95rem;
 		border: 1px solid rgba(190, 212, 233, 0.45);
 		background: rgba(12, 30, 52, 0.75);
 		box-shadow:
@@ -794,14 +782,14 @@
 	}
 
 	.timer-btn:disabled {
-		opacity: 0.65;
+		opacity: 0.5;
 		cursor: not-allowed;
 	}
 
 	.timer-start {
-		background: rgba(59, 176, 126, 0.25);
-		color: #a5ffcf;
-		border-color: rgba(59, 176, 126, 0.55);
+		background: var(--color-save-bg);
+		color: var(--color-save-text);
+		border-color: var(--color-save-border);
 	}
 
 	.timer-pause {
@@ -842,58 +830,6 @@
 		transform: translateY(-1px);
 	}
 
-	.time-item {
-		border-radius: 0.7rem;
-		padding: 0.75rem 0.55rem;
-		background: radial-gradient(circle at top left, rgba(51, 115, 176, 0.42), rgba(7, 20, 37, 0.9));
-		box-shadow:
-			0 6px 14px rgba(0, 0, 0, 0.45),
-			0 0 0 1px rgba(0, 0, 0, 0.55);
-	}
-
-	.time-item--selected {
-		box-shadow:
-			0 0 0 2px rgba(51, 115, 176, 0.7),
-			0 6px 14px rgba(0, 0, 0, 0.45);
-	}
-
-	.time-item--editing {
-		box-shadow:
-			0 0 0 2px rgba(190, 212, 233, 0.35),
-			0 6px 14px rgba(0, 0, 0, 0.45);
-	}
-
-	.time-row {
-		display: grid;
-		grid-template-columns: 1fr auto auto;
-		gap: 0.75rem 0.5rem;
-		align-items: center;
-	}
-
-	.time-main {
-		display: flex;
-		flex-direction: column;
-		gap: 0.1rem;
-		min-width: 0;
-	}
-
-	.time-task {
-		font-size: 0.9rem;
-		font-weight: 500;
-		color: var(--text-primary);
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.time-sub {
-		display: flex;
-		gap: 0.5rem;
-		align-items: center;
-		min-width: 0;
-		flex-wrap: wrap;
-	}
-
 	.time-chip {
 		font-size: 0.75rem;
 		padding: 0.08rem 0.45rem;
@@ -924,87 +860,8 @@
 		font-variant-numeric: tabular-nums;
 	}
 
-	.time-actions {
-		display: flex;
-		flex-direction: column;
-		justify-content: flex-end;
-		opacity: 0;
-		gap: 0.3rem;
-		transition: opacity 0.2s ease;
-	}
-
-	.time-item:hover .time-actions {
-		opacity: 1;
-	}
-
-	.time-actions--hidden {
-		visibility: hidden;
-		pointer-events: none;
-	}
-
-	.time-actions .edit-btn,
-	.time-actions .delete-btn {
-		width: 100%;
-		text-align: center;
-		box-sizing: border-box;
-	}
-
-	/* Reuse finance edit styles */
-	.tx-edit-expanded {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		padding: 0.25rem 0;
-	}
-
-	.edit-field-row {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.edit-label {
-		font-size: 0.8rem;
-		color: var(--text-secondary);
-		min-width: 4rem;
-		flex-shrink: 0;
-	}
-
-	.edit-actions {
-		display: flex;
-		gap: 0.4rem;
-		justify-content: flex-end;
-		margin-top: 0.2rem;
-	}
-
-	.inline-input {
-		font-size: 0.85rem;
-		padding: 0.2rem 0.4rem;
-		border-radius: 0.4rem;
-		border: 1px solid rgba(190, 212, 233, 0.5);
-		background: rgba(12, 30, 52, 0.9);
-		color: var(--text-primary);
-	}
-
-	.inline-input--description {
-		width: 100%;
-	}
-
-	.inline-input--date {
-		font-size: 0.75rem;
-	}
-
-	.inline-select {
-		font-size: 0.85rem;
-		padding: 0.2rem 0.4rem;
-		border-radius: 0.4rem;
-		border: 1px solid rgba(190, 212, 233, 0.5);
-		background: rgba(12, 30, 52, 0.9);
-		color: var(--text-primary);
-	}
-
 	@media (max-width: 840px) {
-		.time-layout {
+		.section-grid-layout {
 			grid-template-columns: minmax(0, 1fr);
 			max-width: 640px;
 		}
@@ -1015,10 +872,6 @@
 
 		.history-scroll {
 			max-height: 320px;
-		}
-
-		.filters-row {
-			grid-template-columns: 1fr;
 		}
 
 		.timer-row {
