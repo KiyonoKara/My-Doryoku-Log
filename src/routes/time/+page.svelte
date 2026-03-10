@@ -430,8 +430,8 @@
 				</div>
 
 				<div class="category-filter">
-					<label class="field-label" for="catFilter">Category</label>
-					<select id="catFilter" bind:value={categoryFilter}>
+					<label class="field-label" for="category-filter">Category</label>
+					<select id="category-filter" bind:value={categoryFilter}>
 						<option value="all">All</option>
 						{#each TIME_CATEGORIES as c (c)}
 							<option value={c}>{c}</option>
@@ -612,7 +612,7 @@
 													<span class="history-item__task">{entry.task}</span>
 													<span class="history-item__sub">
 														<span class="time-chip">{entry.category ?? 'Uncategorized'}</span>
-														<span class="time-dates">
+														<span class="history-item__date-label">
 															{formatDate(entry.start_date)}
 															{formatTime(entry.start_date)}
 															{#if entry.end_date}
@@ -628,7 +628,7 @@
 													<button
 														type="button"
 														class="edit-btn"
-														class:edit-btn--disabled={isRowRunning}
+														class:edit-btn--disabled={isRowRunning || !!dbRunningEntry}
 														disabled={isRowRunning || !!dbRunningEntry}
 														onclick={() => startEdit(entry)}
 													>
@@ -731,11 +731,9 @@
 		width: min(420px, 100%);
 		padding: 1rem 1.25rem;
 		border-radius: 0.95rem;
-		border: 1px solid rgba(190, 212, 233, 0.45);
-		background: rgba(12, 30, 52, 0.75);
-		box-shadow:
-			inset 0 0 0 1px rgba(0, 0, 0, 0.35),
-			0 10px 18px rgba(0, 0, 0, 0.28);
+		border: 1px solid var(--border-mid);
+		background: var(--bg-deep-light);
+		box-shadow: var(--shadow-inset-alt);
 		font-weight: 800;
 		font-size: clamp(2.2rem, 4vw, 3.1rem);
 		letter-spacing: 0.04em;
@@ -748,12 +746,10 @@
 	}
 
 	.elapsed-box--paused {
-		border-color: rgba(255, 180, 70, 0.8);
+		border-color: var(--color-pause-border);
 		background: rgba(20, 20, 8, 0.2);
-		color: rgba(255, 240, 130, 0.8);
-		box-shadow:
-			inset 0 0 0 1px rgba(0, 0, 0, 0.35),
-			0 10px 18px rgba(0, 0, 0, 0.28);
+		color: var(--color-pause-text);
+		box-shadow: var(--shadow-inset-alt);
 	}
 
 	.timer-cta {
@@ -793,40 +789,40 @@
 	}
 
 	.timer-pause {
-		border-color: rgba(255, 180, 70, 0.8);
-		background: rgba(210, 160, 40, 0.1);
-		color: rgba(255, 240, 130, 0.8);
+		border-color: var(--color-pause-border);
+		background: var(--color-pause-bg);
+		color: var(--color-pause-text);
 	}
 
 	.timer-pause:hover:not(:disabled) {
-		background: rgba(210, 160, 40, 0.2);
+		background: var(--color-pause-bg-disabled);
 		transform: translateY(-1px);
 	}
 
 	.timer-resume {
-		background: rgba(51, 145, 210, 0.1);
-		color: #a8d8ff;
-		border-color: rgba(51, 145, 210, 0.5);
+		background: var(--color-resume-bg);
+		color: var(--text-secondary);
+		border-color: var(--color-resume-border);
 	}
 
 	.timer-resume:hover:not(:disabled) {
-		background: rgba(51, 145, 210, 0.2);
+		background: var(--color-resume-bg-hover);
 		transform: translateY(-1px);
 	}
 
 	.timer-start:hover:not(:disabled) {
-		background: rgba(59, 176, 126, 0.45);
+		background: var(--color-positive-border);
 		transform: translateY(-1px);
 	}
 
 	.timer-stop {
-		background: rgba(214, 88, 95, 0.25);
-		color: #ffb3c1;
-		border-color: rgba(214, 88, 95, 0.6);
+		background: var(--color-delete-bg);
+		color: var(--color-negative-text);
+		border-color: var(--color-delete-border);
 	}
 
 	.timer-stop:hover:not(:disabled) {
-		background: rgba(214, 88, 95, 0.5);
+		background: var(--color-negative-border);
 		transform: translateY(-1px);
 	}
 
@@ -834,14 +830,9 @@
 		font-size: 0.75rem;
 		padding: 0.08rem 0.45rem;
 		border-radius: 999px;
-		border: 1px solid rgba(190, 212, 233, 0.55);
-		background: rgba(51, 115, 176, 0.22);
+		border: 1px solid var(--border-mid);
+		background: var(--accent-subtle);
 		color: var(--text-primary);
-	}
-
-	.time-dates {
-		font-size: 0.8rem;
-		color: var(--text-secondary);
 	}
 
 	.time-meta {
