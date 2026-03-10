@@ -318,41 +318,131 @@ textarea:focus {
 
 /* toggles */
 .type-toggle {
-	display: inline-flex;
-	gap: 0;
-	background: var(--bg-deep);
-	border: 1px solid var(--border-subtle);
-	border-radius: var(--radius-pill);
-	padding: 0.18rem;
-	box-shadow: var(--shadow-inset);
+    --pill-w: 0px;
+    --pill-l: 4px;
+    position: relative;
+    display: inline-flex;
+    background: var(--bg-deep);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-pill);
+    padding: 4px;
+    box-shadow: var(--shadow-inset);
+    overflow: hidden;
+    inline-size: fit-content;
+    flex-shrink: 0;
+    contain: layout style;
+}
+
+.type-toggle::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    inset-block: 4px;
+    left: var(--pill-l, 4px);
+    width: var(--pill-w, 0px);
+    background: var(--bg-raised);
+    border-radius: calc(var(--radius-pill) - 2px);
+    box-shadow: var(--shadow-1);
+    z-index: 0;
+    transition:
+            left 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+            width 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: left, width;
 }
 
 .type-toggle button {
-	padding: 0.28rem 0.9rem;
-	border-radius: var(--radius-pill);
-	border: none;
-	background: transparent;
-	color: var(--text-secondary);
-	font-size: 0.82rem;
-	font-weight: 500;
-	cursor: pointer;
-	transition:
-		background var(--transition-base),
-		color var(--transition-base),
-		box-shadow var(--transition-base);
+    position: relative;
+    z-index: 1;
+    padding-block: 0.3rem;
+    padding-inline: 0.7rem;
+    border-radius: var(--radius-pill);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    will-change: transform, box-shadow;
+    transition:
+            color 0.2s var(--transition-fast),
+            background 0.2s ease,
+            box-shadow 0.2s ease,
+            backdrop-filter 0.2s ease;
+    transition-delay: 0s;
 }
 
-.type-toggle button.active,
-.type-toggle button:focus-visible {
-	background: var(--bg-raised);
-	color: var(--text-primary);
-	box-shadow: var(--shadow-1);
+.type-toggle button.active {
+    color: var(--text-primary);
 }
 
 .type-toggle button:not(.active):hover {
-	color: var(--text-primary);
+    color: var(--text-primary);
+    background: rgba(231, 241, 251, 0.06);
+    backdrop-filter: blur(4px) brightness(1.05);
+    box-shadow:
+            inset 0 0 0 1px rgba(231, 241, 251, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+    transition-delay: 0.05s;
+}
+
+/* for hovering on active toggle */
+/*.type-toggle button.active:hover {*/
+/*    background: rgba(231, 241, 251, 0.12);*/
+/*    backdrop-filter: blur(6px) brightness(1.08);*/
+/*    box-shadow:*/
+/*            inset 0 0 0 1px rgba(231, 241, 251, 0.25),*/
+/*            inset 0 1px 0 rgba(255, 255, 255, 0.12),*/
+/*            inset 0 -1px 0 rgba(0, 0, 0, 0.2);*/
+/*}*/
+
+.type-toggle button:hover:not(.active) {
+    color: var(--text-primary);
     background: rgba(255, 255, 255, 0.05);
 }
+
+/* old toggle button */
+/*.type-toggle {*/
+/*    position: relative;*/
+/*	display: inline-flex;*/
+/*	gap: 0;*/
+/*	background: var(--bg-deep);*/
+/*	border: 1px solid var(--border-subtle);*/
+/*	border-radius: var(--radius-pill);*/
+/*	padding: 0.18rem;*/
+/*	box-shadow: var(--shadow-inset);*/
+/*    inline-size: fit-content;*/
+/*    flex-shrink: 0;*/
+/*}*/
+
+/*.type-toggle button {*/
+/*	padding: 0.28rem 0.9rem;*/
+/*	border-radius: var(--radius-pill);*/
+/*	border: none;*/
+/*	background: transparent;*/
+/*	color: var(--text-secondary);*/
+/*	font-size: 0.82rem;*/
+/*	font-weight: 500;*/
+/*	cursor: pointer;*/
+/*	transition:*/
+/*		background var(--transition-base),*/
+/*		color var(--transition-base),*/
+/*		box-shadow var(--transition-base);*/
+/*}*/
+
+/*.type-toggle button.active,*/
+/*.type-toggle button:focus-visible {*/
+/*	background: var(--bg-raised);*/
+/*	color: var(--text-primary);*/
+/*	box-shadow: var(--shadow-1);*/
+/*}*/
+
+/*.type-toggle button:not(.active):hover {*/
+/*	color: var(--text-primary);*/
+/*    background: rgba(255, 255, 255, 0.05);*/
+/*}*/
 
 /* labeling */
 .chip {

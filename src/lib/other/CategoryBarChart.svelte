@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { TxType } from '$lib/types/finance';
+	import { dynamicToggleSlider } from '$lib/utils/util';
 
 	let { type, incomeTotals, expenseTotals } = $props<{
 		type: TxType;
@@ -62,7 +63,7 @@
 			{type === 'expense' ? 'Expense' : 'Income'}
 		</span>
 	</div>
-	<div class="type-toggle">
+	<div class="type-toggle" use:dynamicToggleSlider data-state={type}>
 		<button
 			type="button"
 			class:active={type === 'expense'}

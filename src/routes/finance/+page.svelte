@@ -6,7 +6,7 @@
 	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
 	import CategoryBarChart from '$lib/other/CategoryBarChart.svelte';
 	import ForecastSection from '$lib/other/ForecastSection.svelte';
-	import { capitalizeFirstLetter } from '$lib/utils/util';
+	import { capitalizeFirstLetter, dynamicToggleSlider } from '$lib/utils/util';
 	import {
 		type TxType,
 		type TransactionCategory,
@@ -283,7 +283,7 @@
 		<form method="POST" action="?/submit" class="panel--entry-form" use:enhance>
 			<div class="field-row">
 				<div class="field-label">Type</div>
-				<div class="type-toggle">
+				<div class="type-toggle" use:dynamicToggleSlider data-state={type}>
 					<button
 						type="button"
 						class:active={type === 'expense'}

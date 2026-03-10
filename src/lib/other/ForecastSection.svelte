@@ -5,7 +5,7 @@
 	import leftArrow from '$lib/assets/left-arrow.svg';
 	import type { TxType, FinMLPredictionResponse } from '$lib/types/finance';
 	import { type Transaction } from '$lib/server/db/schema';
-	import { capitalizeFirstLetter } from '$lib/utils/util';
+	import { capitalizeFirstLetter, dynamicToggleSlider } from '$lib/utils/util';
 
 	const FORECAST_EXP_API_URL = '/finance/forecast-expense';
 	const FORECAST_INC_API_URL = '/finance/forecast-income';
@@ -113,7 +113,7 @@
 		</span>
 	</div>
 	<div class="forecast-header-row">
-		<div class="type-toggle">
+		<div class="type-toggle" use:dynamicToggleSlider data-state={type}>
 			<button
 				type="button"
 				class:active={type === 'expense'}

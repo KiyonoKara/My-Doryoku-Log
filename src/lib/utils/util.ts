@@ -51,3 +51,30 @@ export function formatDate(d: string | null | undefined) {
 	if (Number.isNaN(t.getTime())) return '';
 	return t.toLocaleDateString();
 }
+
+// for resizing toggle sliders
+export function dynamicToggleSlider(node: HTMLElement) {
+	const updateSlider = () => {
+		const buttons = node.querySelectorAll('button');
+		const activeIndex = Array.from(buttons).findIndex(btn => btn.classList.contains('active'));
+		if (activeIndex === -1) {
+			return;
+		}
+
+		const activeBtn = buttons[activeIndex] as HTMLElement;
+		const containerRect = node.getBoundingClientRect();
+		const btnRect = activeBtn.getBoundingClientRect();
+
+		node.style.setProperty('--pill-w', `${btnRect.width}px`);
+		node.style.setProperty('--pill-l', `${btnRect.left - containerRect.left - 1}px`);
+	};
+
+	// resize
+	updateSlider();
+	new ResizeObserver(updateSlider).observe(node);
+	new ResizeObserver(updateSlider).observe(node.querySelector('button.active')!);
+
+	// listen for type changes
+	const handleTypeChange = () => setTimeout(updateSlider, 10);
+	node.addEventListener('click', handleTypeChange);
+}
