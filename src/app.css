@@ -12,7 +12,7 @@
 
 	--text-primary: #e7f1fb;
 	--text-secondary: #bed4e9;
-	--text-muted: rgba(190, 212, 233, 0.55);
+	--text-muted: rgba(190, 212, 233, 0.6);
 
 	/* cards */
 	--card-grad-top: radial-gradient(circle at top, var(--bg-subtle-grad1), var(--bg-subtle-grad2));
@@ -49,12 +49,16 @@
 	--color-edit-border: rgba(51, 115, 176, 0.45);
 	--color-edit-text: #a8d4f0;
 	--color-save-bg: rgba(59, 176, 126, 0.25);
+    --color-save-bg-hover: rgba(59, 176, 126, 0.4);
 	--color-save-border: rgba(59, 176, 126, 0.5);
 	--color-save-text: #a8f0d5;
 	--color-delete-bg: rgba(214, 88, 95, 0.22);
 	--color-delete-border: rgba(214, 88, 95, 0.8);
 	--color-delete-bg-hover: rgba(214, 88, 95, 0.42);
 	--color-delete-text: #ffb3c1;
+    --color-delete-bg-deep: rgba(30, 10, 12, 0.82);
+    --color-deactivate-bg: rgba(190, 212, 233, 0.08);
+    --color-deactivate-bg-hover: rgba(190, 212, 233, 0.16);
 
 	/* different levels of depth */
 	--shadow-1:
@@ -212,7 +216,7 @@ textarea {
 	padding: 0.12rem 0.6rem;
 	border-radius: 999px;
 	border: 1px solid var(--border-hover);
-	background: rgba(12, 30, 52, 0.95);
+	background: var(--bg-deep);
 	color: var(--text-secondary);
 }
 
@@ -337,7 +341,7 @@ textarea:focus {
 
 .type-toggle button:not(.active):hover {
 	color: var(--text-primary);
-	background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 /* labeling */
@@ -367,7 +371,7 @@ textarea:focus {
 }
 
 .edit-btn:hover {
-	background: rgba(51, 115, 176, 0.32);
+	background: var(--bg-subtle-grad1);
 }
 
 .edit-btn--disabled {
@@ -390,7 +394,7 @@ textarea:focus {
 }
 
 .save-btn:hover {
-	background: rgba(59, 176, 126, 0.38);
+	background: var(--color-save-bg-hover);
 }
 
 .save-btn--disabled {
@@ -400,7 +404,7 @@ textarea:focus {
 }
 
 .cancel-btn {
-	background: rgba(190, 212, 233, 0.08);
+	background: var(--color-deactivate-bg);
 	border: 1px solid var(--border-subtle);
 	color: var(--text-secondary);
 	padding: 0.2rem 0.5rem;
@@ -411,7 +415,7 @@ textarea:focus {
 }
 
 .cancel-btn:hover {
-	background: rgba(190, 212, 233, 0.16);
+	background: var(--color-deactivate-bg-hover);
 }
 
 .delete-btn {
@@ -444,7 +448,7 @@ textarea:focus {
 	justify-content: space-between;
 	padding: 0.55rem 0.85rem;
 	border-radius: var(--radius-md);
-	background: rgba(30, 10, 12, 0.82);
+	background: var(--color-delete-bg-deep);
 	border: 1px solid var(--color-delete-border);
 	box-shadow:
 		inset 0 1px 0 rgba(255, 100, 100, 0.08),
@@ -650,13 +654,13 @@ textarea:focus {
     transition: all 0.15s ease;
 }
 .inline-type-btn--active {
-    background: rgba(51, 115, 176, 0.35);
-    border-color: rgba(190, 212, 233, 0.6);
+    background: var(--bg-subtle-grad1);
+    border-color: var(--text-muted);
     color: var(--text-primary);
 }
 
 .inline-type-btn:not(.inline-type-btn--active):hover {
-    background: rgba(190, 212, 233, 0.08);
+    background: var(--color-deactivate-bg);
 }
 
 .inline-amount-wrapper {
