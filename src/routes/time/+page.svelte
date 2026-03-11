@@ -5,7 +5,11 @@
 	import type { TimeEntry } from '$lib/server/db/schema';
 	import fileReport from '$lib/assets/file-report.svg';
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import { TIME_CATEGORIES, type TimeCategory, isStartData } from '$lib/types/time';
+	import {
+		TIME_CATEGORIES,
+		MAX_TASK_LENGTH,
+		type TimeCategory,
+		isStartData } from '$lib/types/time';
 	import { formatDuration, toYmd, formatDateLabel, formatTime, formatDate } from '$lib/utils/util';
 	import FlashNotification from '$lib/other/FlashNotification.svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
@@ -354,8 +358,13 @@
 							bind:value={taskName}
 							placeholder="e.g., Work, study"
 							autocomplete="off"
+							maxlength={MAX_TASK_LENGTH}
 							disabled={isRunning || !!dbRunningEntry}
+							required
 						/>
+						<div class="char-counter" class:visible={taskName.length > MAX_TASK_LENGTH - 10}>
+							{taskName.length}/{MAX_TASK_LENGTH} characters
+						</div>
 					</div>
 
 					<div class="field-row field-row--inline">
@@ -517,6 +526,7 @@
 														class="inline-input inline-input--description"
 														placeholder="Task name"
 														value={draft.task}
+														maxlength={MAX_TASK_LENGTH}
 														oninput={(e) => {
 															const d = drafts.get(entry.id);
 															if (d) {
@@ -527,6 +537,9 @@
 															}
 														}}
 													/>
+													<div class="char-counter" class:visible={draft.task.length > MAX_TASK_LENGTH - 10}>
+														{draft.task.length}/{MAX_TASK_LENGTH} characters
+													</div>
 												</div>
 
 												<!-- category edit field -->
@@ -693,13 +706,15 @@
 		{/if}
 
 		{#if entriesCsv}
-			<CsvExportButton
-				label="Export CSV"
-				description="Download filtered time entries as CSV"
-				csvContent={entriesCsv}
-				iconPath={fileReport}
-				filename={`time-entries-${new Date().toISOString().slice(0, 10)}.csv`}
-			/>
+			<div class="csv-export-container">
+				<CsvExportButton
+					label="Export CSV"
+					description="Download filtered time entries as CSV"
+					csvContent={entriesCsv}
+					iconPath={fileReport}
+					filename={`time-entries-${new Date().toISOString().slice(0, 10)}.csv`}
+				/>
+			</div>
 		{/if}
 	</div>
 </section>
@@ -833,6 +848,7 @@
 		border: 1px solid var(--border-mid);
 		background: var(--accent-subtle);
 		color: var(--text-primary);
+      flex-shrink: 0;
 	}
 
 	.time-meta {

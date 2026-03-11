@@ -12,7 +12,8 @@
 		type TransactionCategory,
 		EXPENSE_CATEGORIES,
 		INCOME_CATEGORIES,
-		ALL_CATEGORIES
+		ALL_CATEGORIES,
+		MAX_DESCRIPTION_LENGTH
 	} from '$lib/types/finance';
 	import { MONTH_NAMES } from '$lib/types/time';
 	import fileReport from '$lib/assets/file-report.svg';
@@ -27,6 +28,7 @@
 	let search = $state('');
 	let category = $state('');
 	let chartType = $state<TxType>('expense');
+	let description = $state('');
 	let categoryFilter = $state<'all' | TransactionCategory>('all');
 
 	// run once then set to today's date
@@ -353,8 +355,19 @@
 			<!-- description, optional field -->
 			<div class="field-row">
 				<label for="description" class="field-label">Details</label>
-				<textarea id="description" name="description" rows="2" placeholder="Description..."
-				></textarea>
+				<div class="textarea-wrapper">
+					<textarea
+						id="description"
+						name="description"
+						bind:value={description}
+						rows="2"
+						placeholder="Description..."
+						maxlength={MAX_DESCRIPTION_LENGTH}
+					></textarea>
+					<div class="char-counter" class:visible={description.length > MAX_DESCRIPTION_LENGTH - 20}>
+						{description.length}/{MAX_DESCRIPTION_LENGTH} characters
+					</div>
+				</div>
 			</div>
 
 			<div class="form-actions">
@@ -543,6 +556,7 @@
 														class="inline-input inline-input--description"
 														placeholder="Description..."
 														value={draft.description ?? ''}
+														maxlength={MAX_DESCRIPTION_LENGTH}
 														oninput={(e) => {
 															const d = drafts.get(tx.id);
 															if (d) {
@@ -553,6 +567,11 @@
 															}
 														}}
 													/>
+													{#if draft.description}
+														<div class="char-counter" class:visible={draft.description.length > MAX_DESCRIPTION_LENGTH - 20}>
+																{draft.description.length}/{MAX_DESCRIPTION_LENGTH} characters
+														</div>
+													{/if}
 												</div>
 
 												<!-- form actions -->
@@ -637,13 +656,15 @@
 		{/if}
 
 		<!-- csv export button for downloading transactions as csv file -->
-		<CsvExportButton
-			label="Export CSV"
-			description="Download all transactions as CSV"
-			csvContent={transactionsCsv}
-			iconPath={fileReport}
-			filename={`transactions-${new Date().toISOString().slice(0, 10)}.csv`}
-		/>
+		<div class="csv-export-container">
+			<CsvExportButton
+				label="Export CSV"
+				description="Download all transactions as CSV"
+				csvContent={transactionsCsv}
+				iconPath={fileReport}
+				filename={`transactions-${new Date().toISOString().slice(0, 10)}.csv`}
+			/>
+		</div>
 	</div>
 
 	<!-- display transaction history as a bar chart -->
