@@ -21,6 +21,8 @@ export const INCOME_CATEGORIES = [
 	'Sales'
 ];
 
+export const MAX_DESCRIPTION_LENGTH = 100;
+
 export const ALL_CATEGORIES = EXPENSE_CATEGORIES.concat(INCOME_CATEGORIES);
 
 export type TransactionCategory = (typeof EXPENSE_CATEGORIES | typeof INCOME_CATEGORIES)[number];
@@ -36,3 +38,4 @@ export interface FinMLPredictionResponse {
 	n_transactions: number;
 	pred?: FinMLPrediction;
 }
+

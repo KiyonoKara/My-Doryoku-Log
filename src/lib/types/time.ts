@@ -26,6 +26,8 @@ export const MONTH_NAMES = [
 	'December'
 ];
 
+export const MAX_TASK_LENGTH = 50;
+
 export type TimeCategory = (typeof TIME_CATEGORIES)[number];
 
 export type StartSuccessData = {
