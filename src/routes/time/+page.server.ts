@@ -3,7 +3,7 @@ import { fail } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { time_entries, type TimeEntry } from '$lib/server/db/schema';
 import { desc, eq, inArray } from 'drizzle-orm';
-import { TIME_CATEGORIES } from '$lib/types/time';
+import { MAX_TASK_LENGTH, TIME_CATEGORIES } from '$lib/types/time';
 
 export const load: PageServerLoad = async () => {
 	const rows: TimeEntry[] = await db
@@ -35,6 +35,13 @@ export const actions: Actions = {
 				success: false,
 				message: 'Task name required'
 			});
+		}
+
+		if (task.length > MAX_TASK_LENGTH) {
+			return fail(400, {
+				success: false,
+				message: `Task name cannot be longer than ${MAX_TASK_LENGTH} characters`
+			})
 		}
 
 		const start_date = new Date().toISOString();

@@ -4,6 +4,7 @@ import { db } from '$lib/server/db';
 import { transactions, type Transaction } from '$lib/server/db/schema';
 import { desc, eq, inArray } from 'drizzle-orm';
 import { forecastNextExpense, forecastNextIncome } from '$lib/server/ml/forecasting';
+import { MAX_DESCRIPTION_LENGTH } from '$lib/types/finance';
 
 // load page with this
 export const load: PageServerLoad = async () => {
@@ -63,6 +64,13 @@ export const actions: Actions = {
 			return fail(400, {
 				success: false,
 				message: 'Invalid type'
+			});
+		}
+
+		if (typeof description === 'string' && (description.length > MAX_DESCRIPTION_LENGTH)) {
+			return fail(400, {
+				success: false,
+				message: `Description cannot be over ${MAX_DESCRIPTION_LENGTH} characters`
 			});
 		}
 
