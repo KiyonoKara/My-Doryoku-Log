@@ -321,14 +321,7 @@
 				<label for="amount" class="field-label">Amount</label>
 				<div class="inline-amount-wrapper">
 					<span class="amount-prefix">$</span>
-					<input
-						id="amount"
-						name="amount"
-						type="number"
-						step="0.01"
-						min="0"
-						required
-					/>
+					<input id="amount" name="amount" type="number" step="0.01" min="0" required />
 				</div>
 			</div>
 
@@ -364,7 +357,10 @@
 						placeholder="Description..."
 						maxlength={MAX_DESCRIPTION_LENGTH}
 					></textarea>
-					<div class="char-counter" class:visible={description.length > MAX_DESCRIPTION_LENGTH - 20}>
+					<div
+						class="char-counter"
+						class:visible={description.length > MAX_DESCRIPTION_LENGTH - 20}
+					>
 						{description.length}/{MAX_DESCRIPTION_LENGTH} characters
 					</div>
 				</div>
@@ -568,8 +564,11 @@
 														}}
 													/>
 													{#if draft.description}
-														<div class="char-counter" class:visible={draft.description.length > MAX_DESCRIPTION_LENGTH - 20}>
-																{draft.description.length}/{MAX_DESCRIPTION_LENGTH} characters
+														<div
+															class="char-counter"
+															class:visible={draft.description.length > MAX_DESCRIPTION_LENGTH - 20}
+														>
+															{draft.description.length}/{MAX_DESCRIPTION_LENGTH} characters
 														</div>
 													{/if}
 												</div>
@@ -609,7 +608,10 @@
 													{/if}
 												</div>
 
-												<div class="history-item__actions" class:history-item__actions--hidden={bulkMode}>
+												<div
+													class="history-item__actions"
+													class:history-item__actions--hidden={bulkMode}
+												>
 													<button
 														type="button"
 														class="edit-btn"
@@ -625,7 +627,9 @@
 													</button>
 												</div>
 												<div class="history-item__meta">
-													<span class="history-item__type history-item__type--{tx.type}">{tx.type}</span>
+													<span class="history-item__type history-item__type--{tx.type}"
+														>{tx.type}</span
+													>
 													<span class="history-item__amount">
 														{tx.type === 'expense' ? '-' : '+'}${tx.amount}
 													</span>

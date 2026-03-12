@@ -67,7 +67,7 @@ export const actions: Actions = {
 			});
 		}
 
-		if (typeof description === 'string' && (description.length > MAX_DESCRIPTION_LENGTH)) {
+		if (typeof description === 'string' && description.length > MAX_DESCRIPTION_LENGTH) {
 			return fail(400, {
 				success: false,
 				message: `Description cannot be over ${MAX_DESCRIPTION_LENGTH} characters`

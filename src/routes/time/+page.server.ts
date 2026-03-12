@@ -41,7 +41,7 @@ export const actions: Actions = {
 			return fail(400, {
 				success: false,
 				message: `Task name cannot be longer than ${MAX_TASK_LENGTH} characters`
-			})
+			});
 		}
 
 		const start_date = new Date().toISOString();

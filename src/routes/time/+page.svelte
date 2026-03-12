@@ -9,7 +9,8 @@
 		TIME_CATEGORIES,
 		MAX_TASK_LENGTH,
 		type TimeCategory,
-		isStartData } from '$lib/types/time';
+		isStartData
+	} from '$lib/types/time';
 	import { formatDuration, toYmd, formatDateLabel, formatTime, formatDate } from '$lib/utils/util';
 	import FlashNotification from '$lib/other/FlashNotification.svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
@@ -537,7 +538,10 @@
 															}
 														}}
 													/>
-													<div class="char-counter" class:visible={draft.task.length > MAX_TASK_LENGTH - 10}>
+													<div
+														class="char-counter"
+														class:visible={draft.task.length > MAX_TASK_LENGTH - 10}
+													>
 														{draft.task.length}/{MAX_TASK_LENGTH} characters
 													</div>
 												</div>
@@ -637,7 +641,10 @@
 													</span>
 												</div>
 
-												<div class="history-item__actions" class:history-item__actions--hidden={bulkMode}>
+												<div
+													class="history-item__actions"
+													class:history-item__actions--hidden={bulkMode}
+												>
 													<button
 														type="button"
 														class="edit-btn"
@@ -725,7 +732,7 @@
 		border-radius: var(--radius-md);
 		background: var(--bg-deep-alt);
 		padding: 1rem;
-		box-shadow: var(--shadow-inset)
+		box-shadow: var(--shadow-inset);
 	}
 
 	.timer-row {
@@ -848,7 +855,7 @@
 		border: 1px solid var(--border-mid);
 		background: var(--accent-subtle);
 		color: var(--text-primary);
-      flex-shrink: 0;
+		flex-shrink: 0;
 	}
 
 	.time-meta {
