@@ -1,5 +1,7 @@
 <script>
 	import notebook from '$lib/assets/notebook.svg';
+	import ThemeSwitch from '$lib/components/ThemeSwitch.svelte';
+
 	export let label;
 </script>
 
@@ -8,6 +10,10 @@
 		<img src={notebook} alt="" />
 	</div>
 	<h1 class="header__label">{label}</h1>
+
+	<div class="header__controls">
+		<ThemeSwitch />
+	</div>
 </header>
 
 <style>
@@ -43,8 +49,7 @@
 	.header__icon-wrap img {
 		width: 48px;
 		height: 48px;
-		filter: brightness(0) saturate(100%) invert(80%) sepia(50%) saturate(600%) hue-rotate(190deg)
-			brightness(110%);
+		filter: var(--icon-filter);
 	}
 
 	.header__label {
@@ -52,5 +57,15 @@
 		font-weight: 700;
 		color: var(--text-primary);
 		letter-spacing: 0.01em;
+	}
+
+	.header__controls {
+		position: absolute;
+		right: 1.5rem;
+		top: 50%;
+		transform: translateY(-50%);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 	}
 </style>

@@ -38,4 +38,3 @@ export interface FinMLPredictionResponse {
 	n_transactions: number;
 	pred?: FinMLPrediction;
 }
-

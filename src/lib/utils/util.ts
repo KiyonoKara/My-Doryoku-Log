@@ -56,7 +56,7 @@ export function formatDate(d: string | null | undefined) {
 export function dynamicToggleSlider(node: HTMLElement) {
 	const updateSlider = () => {
 		const buttons = node.querySelectorAll('button');
-		const activeIndex = Array.from(buttons).findIndex(btn => btn.classList.contains('active'));
+		const activeIndex = Array.from(buttons).findIndex((btn) => btn.classList.contains('active'));
 		if (activeIndex === -1) {
 			return;
 		}

@@ -56,8 +56,7 @@
 		width: 16px;
 		height: 16px;
 		display: block;
-		filter: brightness(0) saturate(100%) invert(84%) sepia(55%) saturate(900%) hue-rotate(185deg)
-			brightness(112%);
+		filter: var(--icon-filter);
 	}
 
 	.back-button__text {

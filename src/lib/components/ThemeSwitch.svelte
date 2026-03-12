@@ -1,4 +1,3 @@
-<!-- src/lib/layout/ThemePicker.svelte -->
 <script lang="ts">
 	import { themeStore } from '$lib/stores/theme.svelte';
 
