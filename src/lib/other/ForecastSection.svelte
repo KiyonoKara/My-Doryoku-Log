@@ -334,8 +334,8 @@
 		gap: 0.75rem;
 		padding: 0.75rem 1rem;
 		border-radius: 0.75rem;
-		border: 1px solid rgba(190, 212, 233, 0.3);
-		background: rgba(12, 30, 52, 0.9);
+		border: 1px solid var(--border-subtle);
+		background: var(--bg-deep);
 		transition: all 0.2s ease;
 		cursor: pointer;
 		width: 100%;
