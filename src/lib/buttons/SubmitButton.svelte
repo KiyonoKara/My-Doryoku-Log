@@ -33,7 +33,7 @@
 		padding: 0.5em 1em;
 		border-radius: 0.5em;
 		border: 1px solid var(--border);
-		margin-top: 1.5rem;
+		margin-top: 0.75rem;
 		margin-left: 1.5rem;
 		background: linear-gradient(180deg, var(--bg-secondary), var(--bg-surface));
 		color: var(--text-primary);

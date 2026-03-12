@@ -185,7 +185,7 @@ textarea {
 /* size modifiers */
 .panel--form {
 	min-height: 550px;
-	max-height: 550px;
+	max-height: 610px;
 }
 
 .panel--history {
