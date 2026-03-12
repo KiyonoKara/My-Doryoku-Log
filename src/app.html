@@ -5,6 +5,22 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		%sveltekit.head%
 	</head>
+
+	<script>
+		(function () {
+			const VALID_THEMES = ['system', 'blueberry', 'light', 'dark'];
+			const saved = localStorage.getItem('doryoku-theme');
+			const theme = saved && VALID_THEMES.includes(saved) ? saved : 'blueberry';
+			const resolved =
+				theme === 'system'
+					? window.matchMedia('(prefers-color-scheme: dark)').matches
+						? 'dark'
+						: 'light'
+					: theme;
+			document.documentElement.setAttribute('data-theme', resolved);
+		})();
+	</script>
+
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>

@@ -11,7 +11,9 @@ function createThemeStore() {
 	let current = $state<Theme>(DEFAULT);
 
 	function init() {
-		if (typeof localStorage === 'undefined') return;
+		if (typeof localStorage === 'undefined') {
+			return;
+		}
 		const saved = localStorage.getItem(STORAGE_KEY) as Theme | null;
 		if (saved && ['blueberry', 'system', 'light', 'dark'].includes(saved)) {
 			current = saved;
