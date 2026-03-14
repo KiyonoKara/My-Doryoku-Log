@@ -6,7 +6,7 @@
 	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
 	import CategoryBarChart from '$lib/other/CategoryBarChart.svelte';
 	import ForecastSection from '$lib/other/ForecastSection.svelte';
-	import { capitalizeFirstLetter, dynamicToggleSlider } from '$lib/utils/util';
+	import { capitalizeFirstLetter, dynamicToggleSlider, numValidator } from '$lib/utils/util';
 	import {
 		type TxType,
 		type TransactionCategory,
@@ -271,22 +271,6 @@
 	}
 
 	let categoryTotals = $derived(getCategoryTotals(filtered));
-
-	// restrict number input to numbers on input field
-	function numValidator(e: KeyboardEvent) {
-		const input = e.currentTarget as HTMLInputElement;
-		if (e.key.length > 1) {
-			return;
-		}
-
-		if (!/^\d*\.?\d*$/.test(e.key)) {
-			return e.preventDefault();
-		}
-
-		if (e.key === '.' && input.value.includes('.')) {
-			return e.preventDefault();
-		}
-	}
 </script>
 
 <section class="section-grid-layout">

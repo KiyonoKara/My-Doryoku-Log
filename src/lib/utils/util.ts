@@ -88,3 +88,19 @@ export function dynamicToggleSlider(node: HTMLElement) {
 	const handleTypeChange = () => setTimeout(updateSlider, 10);
 	node.addEventListener('click', handleTypeChange);
 }
+
+// restrict number input to numbers on input field
+export function numValidator(e: KeyboardEvent) {
+	const input = e.currentTarget as HTMLInputElement;
+	if (e.key.length > 1) {
+		return;
+	}
+
+	if (!/^\d*\.?\d*$/.test(e.key)) {
+		return e.preventDefault();
+	}
+
+	if (e.key === '.' && input.value.includes('.')) {
+		return e.preventDefault();
+	}
+}
