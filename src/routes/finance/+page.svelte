@@ -271,6 +271,22 @@
 	}
 
 	let categoryTotals = $derived(getCategoryTotals(filtered));
+
+	// restrict number input to numbers on input field
+	function numValidator(e: KeyboardEvent) {
+		const input = e.currentTarget as HTMLInputElement;
+		if (e.key.length > 1) {
+			return;
+		}
+
+		if (!/^\d*\.?\d*$/.test(e.key)) {
+			return e.preventDefault();
+		}
+
+		if (e.key === '.' && input.value.includes('.')) {
+			return e.preventDefault();
+		}
+	}
 </script>
 
 <section class="section-grid-layout">
@@ -321,7 +337,15 @@
 				<label for="amount" class="field-label">Amount</label>
 				<div class="inline-amount-wrapper">
 					<span class="amount-prefix">$</span>
-					<input id="amount" name="amount" type="number" step="0.01" min="0" required />
+					<input
+						id="amount"
+						name="amount"
+						type="number"
+						step="0.01"
+						min="0"
+						onkeydown={numValidator}
+						required
+					/>
 				</div>
 			</div>
 
@@ -512,6 +536,7 @@
 															min="0"
 															class="inline-input inline-input--amount"
 															value={draft.amount}
+															onkeydown={numValidator}
 															oninput={(e) => {
 																const d = drafts.get(tx.id);
 																if (d) {

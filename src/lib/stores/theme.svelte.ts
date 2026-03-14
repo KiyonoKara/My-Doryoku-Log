@@ -3,7 +3,7 @@ const DEFAULT: Theme = 'blueberry';
 
 // get system's preferred theme
 function getSystemTheme(): Theme {
-	return window.matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light';
+	return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 // store theme
