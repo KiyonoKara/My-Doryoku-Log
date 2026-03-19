@@ -29,7 +29,7 @@
 
 <button
 	type="button"
-	class="action-card csv-export-btn"
+	class="action-card action-button csv-export-btn"
 	onclick={handleExport}
 	aria-label={ariaLabel || label}
 >
@@ -39,7 +39,7 @@
 				<img src={iconPath} alt="" aria-hidden="true" />
 			</div>
 		{/if}
-		<div class="action-card__text">
+		<div class="action-button__text">
 			<h2>{label}</h2>
 			{#if description}
 				<p>{description}</p>
