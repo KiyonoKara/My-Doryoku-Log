@@ -1,6 +1,6 @@
 # My Doryoku Log
 
-App made for two sole things: logging finances and timed tasks. My Doryoku Log also means something like My Effort Log.
+App made for two things: logging finances and timed tasks. My Doryoku Log also means something like My Effort Log.
 
 ## Running project in Dev Mode
 
@@ -21,3 +21,6 @@ npm run build
 ```
 
 You can preview the production build with `npm run preview`.
+
+## Resources Used
+- Vector Icons: https://tablericons.com/
