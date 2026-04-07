@@ -2,6 +2,7 @@
 	import { enhance, applyAction, deserialize } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
+	import CsvImportButton from '$lib/buttons/CsvImportButton.svelte';
 	import type { TimeEntry } from '$lib/server/db/schema';
 	import fileReport from '$lib/assets/file-report.svg';
 	import type { SubmitFunction } from '@sveltejs/kit';
@@ -712,8 +713,8 @@
 			</div>
 		{/if}
 
-		{#if entriesCsv}
-			<div class="csv-export-container">
+			<div class="action-button-container">
+				{#if entriesCsv}
 				<CsvExportButton
 					label="Export CSV"
 					description="Download filtered time entries as CSV"
@@ -721,8 +722,12 @@
 					iconPath={fileReport}
 					filename={`time-entries-${new Date().toISOString().slice(0, 10)}.csv`}
 				/>
+				{/if}
+				<CsvImportButton
+					formAction="?/importCsv"
+				/>
 			</div>
-		{/if}
+
 	</div>
 </section>
 
