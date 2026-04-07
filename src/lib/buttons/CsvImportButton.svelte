@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import { applyAction, deserialize } from '$app/forms';
+
 	type ImportMode = 'append' | 'replace';
 	let {
 		formAction
@@ -14,7 +16,9 @@
 	async function handleFileChange(e: Event) {
 		const input = e.currentTarget as HTMLInputElement;
 		const file = input.files?.[0];
-		if (!file) return;
+		if (!file) {
+			return;
+		}
 
 		busy = true;
 
@@ -23,10 +27,14 @@
 			fd.set('mode', modeValue);
 			fd.set('file', file);
 
-			await fetch(formAction, {
+			const response = await fetch(formAction, {
 				method: 'POST',
-				body: fd,
+				body: fd
 			});
+
+			// apply data for notifs
+			const result = deserialize(await response.text());
+			await applyAction(result);
 
 			// refresh after import
 			await invalidateAll();
