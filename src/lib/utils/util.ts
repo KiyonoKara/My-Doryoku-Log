@@ -104,3 +104,36 @@ export function numValidator(e: KeyboardEvent) {
 		return e.preventDefault();
 	}
 }
+
+// for parsing CSV lines
+export function parseCSVLine(line: string): string[] {
+	const result: string[] = [];
+	let cur = '';
+	let inQ = false;
+	for (let i = 0; i < line.length; i++) {
+		const ch = line[i];
+		if (inQ) {
+			if (ch === '"' && line[i + 1] === '"') {
+				cur += '"'; i++;
+			}
+			else if (ch === '"') {
+				inQ = false;
+			}
+			else {
+				cur += ch;
+			}
+		} else {
+			if (ch === '"') {
+				inQ = true;
+			}
+			else if (ch === ',') {
+				result.push(cur); cur = '';
+			}
+			else {
+				cur += ch;
+			}
+		}
+	}
+	result.push(cur);
+	return result;
+}

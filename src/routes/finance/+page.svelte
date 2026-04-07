@@ -4,6 +4,7 @@
 	import { type Transaction } from '$lib/server/db/schema';
 	import SubmitButton from '$lib/buttons/SubmitButton.svelte';
 	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
+	import CsvImportButton from '$lib/buttons/CsvImportButton.svelte';
 	import CategoryBarChart from '$lib/other/CategoryBarChart.svelte';
 	import ForecastSection from '$lib/other/ForecastSection.svelte';
 	import { capitalizeFirstLetter, dynamicToggleSlider, numValidator } from '$lib/utils/util';
@@ -669,13 +670,18 @@
 		{/if}
 
 		<!-- csv export button for downloading transactions as csv file -->
-		<div class="csv-export-container">
+		<div class="action-button-container">
+			{#if transactionsCsv}
 			<CsvExportButton
 				label="Export CSV"
 				description="Download all transactions as CSV"
 				csvContent={transactionsCsv}
 				iconPath={fileReport}
 				filename={`transactions-${new Date().toISOString().slice(0, 10)}.csv`}
+			/>
+			{/if}
+			<CsvImportButton
+				formAction="?/importCsv"
 			/>
 		</div>
 	</div>
