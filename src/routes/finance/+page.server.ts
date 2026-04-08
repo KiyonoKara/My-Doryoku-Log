@@ -314,7 +314,7 @@ export const actions: Actions = {
 				message: 'No valid rows found in CSV'
 			});
 
-		// replace everything
+		// replace everything in replace mode
 		if (mode === 'replace') {
 			await db.delete(transactions);
 			await db.insert(transactions).values(
