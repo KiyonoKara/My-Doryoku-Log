@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { applyAction, deserialize } from '$app/forms';
+	import filePlus from '$lib/assets/file-plus.svg';
 
 	type ImportMode = 'append' | 'replace';
 	let {
-		formAction
+		formAction,
 	}: {
 		formAction: string;
 	} = $props();
@@ -68,6 +69,9 @@
 <!-- action card with two options -->
 <div class="action-card action-button csv-import-btn" role="group" aria-label="Import CSV">
 	<div class="action-card__content">
+		<div class="action-card__icon">
+			<img src={filePlus} alt="" aria-hidden="true" />
+		</div>
 		<div class="action-button__text">
 			<h2>Import CSV</h2>
 			<p class="csv-import-btn__sub">
