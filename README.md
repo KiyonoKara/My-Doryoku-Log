@@ -23,4 +23,5 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 ## Resources Used
+
 - Vector Icons: https://tablericons.com/

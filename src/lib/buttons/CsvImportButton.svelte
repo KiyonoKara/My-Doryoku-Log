@@ -5,7 +5,7 @@
 
 	type ImportMode = 'append' | 'replace';
 	let {
-		formAction,
+		formAction
 	}: {
 		formAction: string;
 	} = $props();
@@ -82,15 +82,15 @@
 						type="button"
 						class="csv-import-btn__opt"
 						disabled={busy}
-						onclick={() => promptFile('append')}
-					>Append</button>
+						onclick={() => promptFile('append')}>Append</button
+					>
 					<span class="csv-import-btn__sep" aria-hidden="true">·</span>
 					<button
 						type="button"
 						class="csv-import-btn__opt csv-import-btn__opt--replace"
 						disabled={busy}
-						onclick={() => promptFile('replace')}
-					>Replace all</button>
+						onclick={() => promptFile('replace')}>Replace all</button
+					>
 				{/if}
 			</p>
 		</div>
@@ -98,47 +98,49 @@
 </div>
 
 <style>
-    .csv-import-btn {
-        background: color-mix(in srgb, var(--bg-raised) 75%, var(--bg-surface) 30%);
-        cursor: default;
-    }
-    .csv-import-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-3);
-        border-color: var(--border-hover);
-    }
-    .csv-import-btn__sub {
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        margin: 0;
-        flex-wrap: wrap;
-    }
-    .csv-import-btn__sep {
-        color: var(--text-muted);
-        font-size: 0.75rem;
-        user-select: none;
-    }
-    .csv-import-btn__opt {
-        all: unset;
-        font-size: 0.75rem;
-        color: var(--color-edit-text);
-        cursor: pointer;
-        border-bottom: 1px solid transparent;
-        transition: border-color var(--transition-fast), color var(--transition-fast);
-        white-space: nowrap;
-    }
-    .csv-import-btn__opt:hover:not(:disabled) {
-        border-bottom-color: var(--color-edit-text);
-    }
-    .csv-import-btn__opt--replace {
-        color: var(--color-delete-text);
-    }
-    .csv-import-btn__opt--replace:hover:not(:disabled) {
-        border-bottom-color: var(--color-delete-text);
-    }
-    .csv-import-btn__opt:disabled {
-        opacity: 0.45;
-        cursor: not-allowed;
-    }
+	.csv-import-btn {
+		background: color-mix(in srgb, var(--bg-raised) 75%, var(--bg-surface) 30%);
+		cursor: default;
+	}
+	.csv-import-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-3);
+		border-color: var(--border-hover);
+	}
+	.csv-import-btn__sub {
+		display: flex;
+		align-items: center;
+		gap: 0.3rem;
+		margin: 0;
+		flex-wrap: wrap;
+	}
+	.csv-import-btn__sep {
+		color: var(--text-muted);
+		font-size: 0.75rem;
+		user-select: none;
+	}
+	.csv-import-btn__opt {
+		all: unset;
+		font-size: 0.75rem;
+		color: var(--color-edit-text);
+		cursor: pointer;
+		border-bottom: 1px solid transparent;
+		transition:
+			border-color var(--transition-fast),
+			color var(--transition-fast);
+		white-space: nowrap;
+	}
+	.csv-import-btn__opt:hover:not(:disabled) {
+		border-bottom-color: var(--color-edit-text);
+	}
+	.csv-import-btn__opt--replace {
+		color: var(--color-delete-text);
+	}
+	.csv-import-btn__opt--replace:hover:not(:disabled) {
+		border-bottom-color: var(--color-delete-text);
+	}
+	.csv-import-btn__opt:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
 </style>

@@ -241,7 +241,7 @@ export const actions: Actions = {
 		const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
 
 		// parse CSV lines
-		const header = parseCSVLine(lines[0] ?? '').map(h => h.trim().toLowerCase());
+		const header = parseCSVLine(lines[0] ?? '').map((h) => h.trim().toLowerCase());
 		const required = ['date', 'amount', 'category', 'type'];
 		for (const col of required) {
 			if (!header.includes(col))
@@ -270,7 +270,7 @@ export const actions: Actions = {
 			const amount = cols[csvAmount]?.trim() ?? '';
 			const category = cols[csvCategory]?.trim() ?? '';
 			const trType = cols[csvType]?.trim().toLowerCase() ?? '';
-			const description = csvDescription >= 0 ? (cols[csvDescription]?.trim() || null) : null;
+			const description = csvDescription >= 0 ? cols[csvDescription]?.trim() || null : null;
 			const id = csvId >= 0 ? Number(cols[csvId]?.trim()) : NaN;
 
 			// validate date
@@ -318,12 +318,12 @@ export const actions: Actions = {
 		if (mode === 'replace') {
 			await db.delete(transactions);
 			await db.insert(transactions).values(
-				rows.map(r => ({
+				rows.map((r) => ({
 					date: r.date,
 					amount: r.amount,
 					category: r.category,
 					type: r.type,
-					description: r.description,
+					description: r.description
 				}))
 			);
 			return {
@@ -339,12 +339,12 @@ export const actions: Actions = {
 				amount,
 				category,
 				type,
-				description,
+				description
 			}))
 		);
 		return {
 			success: true,
-			message: `Imported ${rows.length} rows successfully`,
+			message: `Imported ${rows.length} rows successfully`
 		};
 	}
 };

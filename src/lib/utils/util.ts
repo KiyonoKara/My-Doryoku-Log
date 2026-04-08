@@ -72,7 +72,7 @@ export function parseDurationHMS(s: string): number {
 	}
 	const parts = s.split(':').map(Number);
 	if (parts.length === 3) {
-		return ((parts[0] * 3600) + (parts[1] * 60) + parts[2]) * 1000;
+		return (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
 	}
 	return 0;
 }
@@ -129,22 +129,20 @@ export function parseCSVLine(line: string): string[] {
 		const ch = line[i];
 		if (inQ) {
 			if (ch === '"' && line[i + 1] === '"') {
-				cur += '"'; i++;
-			}
-			else if (ch === '"') {
+				cur += '"';
+				i++;
+			} else if (ch === '"') {
 				inQ = false;
-			}
-			else {
+			} else {
 				cur += ch;
 			}
 		} else {
 			if (ch === '"') {
 				inQ = true;
-			}
-			else if (ch === ',') {
-				result.push(cur); cur = '';
-			}
-			else {
+			} else if (ch === ',') {
+				result.push(cur);
+				cur = '';
+			} else {
 				cur += ch;
 			}
 		}

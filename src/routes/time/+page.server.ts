@@ -349,7 +349,7 @@ export const actions: Actions = {
 		const text = await file.text();
 		const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
 
-		const header = parseCSVLine(lines[0] ?? '').map(h => h.trim().toLowerCase());
+		const header = parseCSVLine(lines[0] ?? '').map((h) => h.trim().toLowerCase());
 		const required = ['task', 'category', 'start', 'end', 'duration (hh:mm:ss)'];
 		for (const col of required) {
 			if (!header.includes(col)) {
@@ -365,7 +365,7 @@ export const actions: Actions = {
 		const csvCategory = header.indexOf('category');
 		const csvStart = header.indexOf('start');
 		const csvEnd = header.indexOf('end');
-		const csvDuration = header.findIndex(h => h.startsWith('duration'));
+		const csvDuration = header.findIndex((h) => h.startsWith('duration'));
 
 		const rows: TimeEntry[] = [];
 		for (let i = 1; i < lines.length; i++) {
@@ -397,13 +397,13 @@ export const actions: Actions = {
 			if (!start_date || isNaN(Date.parse(start_date))) {
 				return fail(400, {
 					success: false,
-					message: `Row ${i}: invalid start date ${start_date ? "\"" + start_date + "\"" :  ""}`
+					message: `Row ${i}: invalid start date ${start_date ? '"' + start_date + '"' : ''}`
 				});
 			}
 			if (end_date && isNaN(Date.parse(end_date))) {
 				return fail(400, {
 					success: false,
-					message: `Row ${i}: invalid end date ${start_date ? "\"" + start_date + "\"" :  ""}`
+					message: `Row ${i}: invalid end date ${start_date ? '"' + start_date + '"' : ''}`
 				});
 			}
 
@@ -426,12 +426,12 @@ export const actions: Actions = {
 		if (mode === 'replace') {
 			await db.delete(time_entries);
 			await db.insert(time_entries).values(
-				rows.map(r => ({
+				rows.map((r) => ({
 					task: r.task,
 					category: r.category,
 					start_date: r.start_date,
 					end_date: r.end_date,
-					duration_ms: r.duration_ms,
+					duration_ms: r.duration_ms
 				}))
 			);
 			return {
@@ -447,12 +447,12 @@ export const actions: Actions = {
 				category,
 				start_date,
 				end_date,
-				duration_ms,
+				duration_ms
 			}))
 		);
 		return {
 			success: true,
-			message: `Imported ${rows.length} rows successfully`,
+			message: `Imported ${rows.length} rows successfully`
 		};
-	},
+	}
 };

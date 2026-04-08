@@ -99,7 +99,7 @@
 	--transition-slow: 0.28s ease;
 
 	--header-height: 108px;
-    --panel-length: 1250px
+	--panel-length: 1250px;
 }
 
 *,
@@ -911,46 +911,46 @@ textarea:focus {
 }
 
 .action-button {
-    display: flex;
-    flex: 1 1 0;
-    min-width: 0;
+	display: flex;
+	flex: 1 1 0;
+	min-width: 0;
 }
 
 .action-button__text h2 {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--text-primary);
+	font-weight: 600;
+	font-size: 0.9rem;
+	color: var(--text-primary);
 }
 
 .action-button__text p {
-    margin: 0;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    line-height: 1.35;
+	margin: 0;
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+	line-height: 1.35;
 }
 
 /* keep import/export buttons at bottom */
 .action-button-container {
-    margin-top: auto;
-    padding-top: 0.5rem;
-    display: flex;
-    gap: 0.55rem;
-    align-items: stretch;
+	margin-top: auto;
+	padding-top: 0.5rem;
+	display: flex;
+	gap: 0.55rem;
+	align-items: stretch;
 }
 
 .action-button .action-card__content,
 .action-button .action-card {
-    width: 100%;
+	width: 100%;
 }
 
 @media (max-width: 480px) {
-    .action-button-container {
-        flex-direction: column;
-    }
-    .action-button {
-        flex: unset;
-        width: 100%;
-    }
+	.action-button-container {
+		flex-direction: column;
+	}
+	.action-button {
+		flex: unset;
+		width: 100%;
+	}
 }
 
 @media (max-width: 600px) {

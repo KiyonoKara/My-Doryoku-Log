@@ -738,8 +738,8 @@
 			</div>
 		{/if}
 
-			<div class="action-button-container">
-				{#if entriesCsv}
+		<div class="action-button-container">
+			{#if entriesCsv}
 				<CsvExportButton
 					label="Export CSV"
 					description="Download filtered time entries as CSV"
@@ -747,12 +747,9 @@
 					iconPath={fileReport}
 					filename={`time-entries-${new Date().toISOString().slice(0, 10)}.csv`}
 				/>
-				{/if}
-				<CsvImportButton
-					formAction="?/importCsv"
-				/>
-			</div>
-
+			{/if}
+			<CsvImportButton formAction="?/importCsv" />
+		</div>
 	</div>
 </section>
 

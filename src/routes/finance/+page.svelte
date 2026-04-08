@@ -672,17 +672,15 @@
 		<!-- csv export button for downloading transactions as csv file -->
 		<div class="action-button-container">
 			{#if transactionsCsv}
-			<CsvExportButton
-				label="Export CSV"
-				description="Download all transactions as CSV"
-				csvContent={transactionsCsv}
-				iconPath={fileReport}
-				filename={`transactions-${new Date().toISOString().slice(0, 10)}.csv`}
-			/>
+				<CsvExportButton
+					label="Export CSV"
+					description="Download all transactions as CSV"
+					csvContent={transactionsCsv}
+					iconPath={fileReport}
+					filename={`transactions-${new Date().toISOString().slice(0, 10)}.csv`}
+				/>
 			{/if}
-			<CsvImportButton
-				formAction="?/importCsv"
-			/>
+			<CsvImportButton formAction="?/importCsv" />
 		</div>
 	</div>
 
