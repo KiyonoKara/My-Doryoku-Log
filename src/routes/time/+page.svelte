@@ -41,6 +41,8 @@
 
 	// tick while a timer is running OR if there's a running entry in DB (refresh-safe)
 	let dbRunningEntry = $derived(entries.find((e) => e.end_date == null) ?? null);
+	// active entry id
+	let activeEntryId = $derived(dbRunningEntry?.id ?? runningId);
 
 	// elapsed time
 	let elapsedMs = $derived(
@@ -140,8 +142,18 @@
 		}
 	}
 
+	function isSelectable(entry: TimeEntry) {
+		return entry.id !== activeEntryId && entry.end_date != null;
+	}
+
 	// toggling selection
 	function toggleSelect(id: number) {
+		// check if entry exists
+		const entry = entries.find((e) => e.id === id);
+		if (!entry || !isSelectable(entry)) {
+			return;
+		}
+
 		if (selectedIds.has(id)) {
 			selectedIds.delete(id);
 		} else {
@@ -151,7 +163,12 @@
 
 	// selects all
 	function selectAll(ids: number[]) {
-		ids.forEach((id) => selectedIds.add(id));
+		ids.forEach((id) => {
+			const entry = entries.find((e) => e.id === id);
+			if (entry && isSelectable(entry)) {
+				selectedIds.add(id);
+			}
+		});
 	}
 
 	// deselects all
@@ -177,6 +194,12 @@
 
 	// confirmation and deletion of more than one time entry
 	async function handleBulkDelete(msg: string) {
+		// check if there is anything to delete
+		const deletableIds = [...selectedIds].filter((id) => id !== activeEntryId);
+		if (deletableIds.length === 0) {
+			return;
+		}
+
 		if (!confirm(msg)) {
 			return;
 		}
@@ -467,7 +490,9 @@
 			{:else}
 				{#each groupedDates as d (d.toString())}
 					{@const groupEntries = groupedByDate[d]}
-					{@const groupIds = groupEntries.filter((e) => e.end_date != null).map((e) => e.id)}
+					{@const groupIds = groupEntries
+						.filter((e) => e.end_date != null && e.id !== activeEntryId)
+						.map((e) => e.id)}
 					{@const allGroupSelected =
 						bulkMode && groupIds.length > 0 && groupIds.every((id) => selectedIds.has(id))}
 					<section class="date-group">
@@ -476,7 +501,7 @@
 								>{d === 'Unknown date' ? 'Unknown date' : formatDateLabel(d)}</span
 							>
 							<!-- checkboxes for date groups -->
-							{#if bulkMode}
+							{#if bulkMode && !isRunning}
 								<label class="checkbox-label">
 									<input
 										type="checkbox"
@@ -649,8 +674,8 @@
 													<button
 														type="button"
 														class="edit-btn"
-														class:edit-btn--disabled={isRowRunning || !!dbRunningEntry}
-														disabled={isRowRunning || !!dbRunningEntry}
+														class:edit-btn--disabled={entry.id === activeEntryId}
+														disabled={entry.id === activeEntryId}
 														onclick={() => startEdit(entry)}
 													>
 														Edit
@@ -658,7 +683,7 @@
 													<button
 														type="button"
 														class="delete-btn"
-														disabled={isRowRunning || !!dbRunningEntry}
+														disabled={entry.id === activeEntryId}
 														onclick={() => handleDelete(entry.id, 'Delete this entry?')}
 														>Delete
 													</button>
