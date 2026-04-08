@@ -4,6 +4,7 @@ import { db } from '$lib/server/db';
 import { time_entries, type TimeEntry } from '$lib/server/db/schema';
 import { desc, eq, inArray } from 'drizzle-orm';
 import { MAX_TASK_LENGTH, TIME_CATEGORIES } from '$lib/types/time';
+import { parseCSVLine, parseDurationHMS } from '$lib/utils/util';
 
 export const load: PageServerLoad = async () => {
 	const rows: TimeEntry[] = await db
@@ -322,5 +323,136 @@ export const actions: Actions = {
 			action: 'bulkDelete',
 			message: `${ids.length} entries deleted`
 		};
-	}
+	},
+
+	importCsv: async ({ request }) => {
+		if (request.method !== 'POST') {
+			return fail(405, {
+				success: false,
+				message: 'Method not allowed'
+			});
+		}
+
+		const formData = await request.formData();
+		const mode = formData.get('mode');
+		const file = formData.get('file');
+
+		// check modes
+		if (mode !== 'append' && mode !== 'replace') {
+			return fail(400, { success: false, message: 'Invalid mode' });
+		}
+		// check for file
+		if (!(file instanceof File) || file.size === 0) {
+			return fail(400, { success: false, message: 'No file provided' });
+		}
+
+		const text = await file.text();
+		const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+
+		const header = parseCSVLine(lines[0] ?? '').map(h => h.trim().toLowerCase());
+		const required = ['task', 'category', 'start', 'end', 'duration (hh:mm:ss)'];
+		for (const col of required) {
+			if (!header.includes(col)) {
+				return fail(400, {
+					success: false,
+					message: `Missing required column: ${col}`
+				});
+			}
+		}
+
+		const csvId = header.indexOf('id');
+		const csvTask = header.indexOf('task');
+		const csvCategory = header.indexOf('category');
+		const csvStart = header.indexOf('start');
+		const csvEnd = header.indexOf('end');
+		const csvDuration = header.findIndex(h => h.startsWith('duration'));
+
+		const rows: TimeEntry[] = [];
+		for (let i = 1; i < lines.length; i++) {
+			const line = lines[i].trim();
+			if (!line) {
+				continue;
+			}
+			const cols = parseCSVLine(line);
+
+			const id = csvId >= 0 ? Number(cols[csvId]?.trim()) : NaN;
+			const task = cols[csvTask]?.trim() ?? '';
+			const category = cols[csvCategory]?.trim() || 'Other';
+			const start_date = cols[csvStart]?.trim() ?? '';
+			const end_date = csvEnd >= 0 ? cols[csvEnd]?.trim() : '';
+			const durationMs = csvDuration >= 0 ? parseDurationHMS(cols[csvDuration]?.trim()) : 0;
+			// get start and end dates in ms and calculate duration if absent
+			const startMs = Date.parse(start_date);
+			const endMs = end_date ? Date.parse(end_date) : 0;
+			const duration_ms = durationMs != 0 ? durationMs : Math.max(endMs - startMs, 0);
+
+			// check for task
+			if (!task) {
+				return fail(400, {
+					success: false,
+					message: `Row ${i}: task is empty`
+				});
+			}
+			// check for start and end dates
+			if (!start_date || isNaN(Date.parse(start_date))) {
+				return fail(400, {
+					success: false,
+					message: `Row ${i}: invalid start date ${start_date ? "\"" + start_date + "\"" :  ""}`
+				});
+			}
+			if (end_date && isNaN(Date.parse(end_date))) {
+				return fail(400, {
+					success: false,
+					message: `Row ${i}: invalid end date ${start_date ? "\"" + start_date + "\"" :  ""}`
+				});
+			}
+
+			rows.push({
+				id: id ?? 0,
+				task,
+				category,
+				start_date,
+				end_date,
+				duration_ms
+			});
+		}
+
+		// if no rows
+		if (rows.length === 0) {
+			return fail(400, { success: false, message: 'No valid rows found in CSV' });
+		}
+
+		// replace everything in replace mode
+		if (mode === 'replace') {
+			await db.delete(time_entries);
+			await db.insert(time_entries).values(
+				rows.map(r => ({
+					task: r.task,
+					category: r.category,
+					start_date: r.start_date,
+					end_date: r.end_date,
+					duration_ms: r.duration_ms,
+				}))
+			);
+			return {
+				success: true,
+				message: `Replaced all entries with ${rows.length} rows`
+			};
+		}
+
+		// otherwise append
+		await db.insert(time_entries).values(
+			rows.map(({ task, category, start_date, end_date, duration_ms }) => ({
+				task,
+				category,
+				start_date,
+				end_date,
+				duration_ms,
+			}))
+		);
+		return {
+			success: true,
+			message: `Imported ${rows.length} rows successfully`,
+		};
+	},
 };
