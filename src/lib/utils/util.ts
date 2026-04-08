@@ -62,6 +62,21 @@ export function formatDate(d: string | null | undefined) {
 	return t.toLocaleDateString();
 }
 
+/**
+ * Convert HH:MM:SS formatted date into mil;iseconds
+ * @param s Date string
+ */
+export function parseDurationHMS(s: string): number {
+	if (!s) {
+		return 0;
+	}
+	const parts = s.split(':').map(Number);
+	if (parts.length === 3) {
+		return ((parts[0] * 3600) + (parts[1] * 60) + parts[2]) * 1000;
+	}
+	return 0;
+}
+
 // for resizing toggle sliders
 export function dynamicToggleSlider(node: HTMLElement) {
 	const updateSlider = () => {
