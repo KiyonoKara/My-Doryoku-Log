@@ -18,6 +18,9 @@
 		iconPath={stopwatch}
 		href="/time"
 	/>
+	<div class="info-display-card">
+
+	</div>
 </section>
 
 <style>
