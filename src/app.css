@@ -994,6 +994,7 @@ textarea:focus {
             box-shadow var(--transition-base),
             border-color var(--transition-base),
             background var(--transition-base);
+    pointer-events: none;
 }
 
 .empty-state {
