@@ -164,6 +164,16 @@ textarea {
 	gap: 1.5rem;
 }
 
+.layout-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+}
+
+.layout-content {
+    flex: 1;
+}
+
 /* panel card */
 .panel {
 	border-radius: var(--radius-lg);
