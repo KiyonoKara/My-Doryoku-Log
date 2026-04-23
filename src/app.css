@@ -974,6 +974,7 @@ textarea:focus {
 	}
 }
 
+/* same css as action card but no pointer events */
 .info-display-card {
     display: block;
     width: 100%;
@@ -982,7 +983,7 @@ textarea:focus {
     max-height: 480px;
     margin: 0 auto;
     padding: 1.1rem 1.4rem;
-    background: var(--bg-raised);
+    background: var(--bg-deep);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     color: var(--text-primary);
@@ -995,6 +996,65 @@ textarea:focus {
             border-color var(--transition-base),
             background var(--transition-base);
     pointer-events: none;
+}
+
+.info-display-card__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    height: 100%;
+}
+
+.info-display-card__eyebrow {
+    margin: 0;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.info-display-card__title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 650;
+    color: var(--text-primary);
+}
+
+.info-display-card__text {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.info-display-card__section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-top: 0.2rem;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.info-display-card__section h3 {
+    margin-top: 0.3rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.info-display-card__section ul {
+    margin: 0;
+    padding-left: 1rem;
+    display: grid;
+    gap: 0.3rem;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.info-display-card__section li::marker {
+    color: var(--text-muted);
 }
 
 .empty-state {
