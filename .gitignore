@@ -28,5 +28,6 @@ vite.config.ts.timestamp-*
 # IDE
 /.idea
 
-# Ignore backend Python venv
+# Ignore legacy Python backend
 /backend/.venv
+/python-backend-legacy
