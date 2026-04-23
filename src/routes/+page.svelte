@@ -24,7 +24,8 @@
 			<p class="info-display-card__eyebrow">Finance page</p>
 			<h2 id="finance-info-title" class="info-display-card__title">Track transactions and money</h2>
 			<p class="info-display-card__text">
-				Use the finance page to save income and expense entries, review history, see a visual breakdown of your finances
+				Use the finance page to save income and expense entries, review history, see a visual
+				breakdown of your finances
 			</p>
 
 			<div class="info-display-card__section">
@@ -32,7 +33,10 @@
 				<ul>
 					<li>Log transactions with date, amount, category, type, details</li>
 					<li>Search, edit, or delete saved entries</li>
-					<li>Export CSV files, and import the app-generated CSV files to restore history or combine data</li>
+					<li>
+						Export CSV files, and import the app-generated CSV files to restore history or combine
+						data
+					</li>
 					<li>Review chart summaries and forecasting</li>
 				</ul>
 			</div>
@@ -44,7 +48,8 @@
 			<p class="info-display-card__eyebrow">Time page</p>
 			<h2 id="time-info-title" class="info-display-card__title">Track tasks by time spent</h2>
 			<p class="info-display-card__text">
-				Use the time page to start a task timer and stop it when done, keep a history of completed sessions with category and times
+				Use the time page to start a task timer and stop it when done, keep a history of completed
+				sessions with category and times
 			</p>
 
 			<div class="info-display-card__section">
@@ -53,7 +58,10 @@
 					<li>Name a task, choose a category, and start the timer</li>
 					<li>Pause, resume, or stop the active timer</li>
 					<li>Search, edit, or delete saved entries</li>
-					<li>Export CSV files and import the app-generated CSV files to restore history or combine data</li>
+					<li>
+						Export CSV files and import the app-generated CSV files to restore history or combine
+						data
+					</li>
 				</ul>
 			</div>
 		</div>
