@@ -1,6 +1,6 @@
 :root {
 	/* base colors */
-	--bg-base: #1c2127;
+	--bg-base: #0f1e30;
 	--bg-primary: #0d1520;
 	--bg-secondary: #0b385f;
 	--bg-surface: #3373b0;
@@ -1282,7 +1282,7 @@ textarea:focus {
 /* theme overrides */
 /* blueberry is default */
 [data-theme='blueberry'] {
-	--bg-base: #1c2127;
+	--bg-base: #0f1e30;
 	--bg-primary: #0d1520;
 	--bg-secondary: #0b385f;
 	--bg-surface: #3373b0;
