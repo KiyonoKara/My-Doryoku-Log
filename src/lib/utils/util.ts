@@ -92,7 +92,7 @@ export function parseDurationHMS(s: string): number {
 	}
 	const parts = s.split(':').map(Number);
 	// any negative number automatically makes the duration 0
-	if (parts.some(n => n < 0)) {
+	if (parts.some((n) => n < 0)) {
 		return 0;
 	}
 	if (parts.length === 3) {
