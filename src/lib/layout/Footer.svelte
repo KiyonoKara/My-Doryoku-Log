@@ -48,6 +48,7 @@
 		align-items: center;
 		gap: 0.5rem;
 		line-height: 1;
+		margin-left: auto;
 	}
 
 	.footer__github {
