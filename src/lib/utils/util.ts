@@ -1,13 +1,17 @@
 import { MONTH_NAMES } from '$lib/types/time';
 
 /**
- * Capitalizes first letter
+ * Capitalizes the first letter
  * @param str
  */
 export function capitalizeFirstLetter(str: string) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+/**
+ * Format duration in HH:MM:SS format
+ * @param ms
+ */
 export function formatDuration(ms: number): string {
 	if (!Number.isFinite(ms) || ms < 0) {
 		ms = 0;
@@ -24,6 +28,10 @@ export function formatDuration(ms: number): string {
 		.padStart(2, '0')}`;
 }
 
+/**
+ * Format date as YYYY-MM-DD
+ * @param d
+ */
 export function toYmd(d: Date) {
 	const yyyy = d.getFullYear();
 	const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -31,6 +39,10 @@ export function toYmd(d: Date) {
 	return `${yyyy}-${mm}-${dd}`;
 }
 
+/**
+ * Format date as month name, day, year
+ * @param ymd
+ */
 export function formatDateLabel(ymd: string) {
 	const [yyyy, mm, dd] = ymd.split('-').map(Number);
 	if (!yyyy || !mm || !dd) {
@@ -40,6 +52,10 @@ export function formatDateLabel(ymd: string) {
 	return `${month} ${dd}, ${yyyy}`;
 }
 
+/**
+ * Format date as HH:MM
+ * @param d
+ */
 export function formatTime(d: string | null | undefined) {
 	if (!d) {
 		return '';
@@ -51,6 +67,10 @@ export function formatTime(d: string | null | undefined) {
 	return t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+/**
+ * Format date as MM/DD/YYYY
+ * @param d
+ */
 export function formatDate(d: string | null | undefined) {
 	if (!d) {
 		return '';
@@ -63,7 +83,7 @@ export function formatDate(d: string | null | undefined) {
 }
 
 /**
- * Convert HH:MM:SS formatted date into mil;iseconds
+ * Convert HH:MM:SS formatted date into milliseconds
  * @param s Date string
  */
 export function parseDurationHMS(s: string): number {
@@ -71,13 +91,20 @@ export function parseDurationHMS(s: string): number {
 		return 0;
 	}
 	const parts = s.split(':').map(Number);
+	// any negative number automatically makes the duration 0
+	if (parts.some(n => n < 0)) {
+		return 0;
+	}
 	if (parts.length === 3) {
 		return (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
 	}
 	return 0;
 }
 
-// for resizing toggle sliders
+/**
+ * Dynamic toggle slider that resizes based on the active button
+ * @param node
+ */
 export function dynamicToggleSlider(node: HTMLElement) {
 	const updateSlider = () => {
 		const buttons = node.querySelectorAll('button');
@@ -104,7 +131,10 @@ export function dynamicToggleSlider(node: HTMLElement) {
 	node.addEventListener('click', handleTypeChange);
 }
 
-// restrict number input to numbers on input field
+/**
+ * Number input validator that only allows numbers and a single decimal point
+ * @param e
+ */
 export function numValidator(e: KeyboardEvent) {
 	const input = e.currentTarget as HTMLInputElement;
 	if (e.key.length > 1) {
@@ -120,7 +150,10 @@ export function numValidator(e: KeyboardEvent) {
 	}
 }
 
-// for parsing CSV lines
+/**
+ * Parse CSV line into an array of strings
+ * @param line
+ */
 export function parseCSVLine(line: string): string[] {
 	const result: string[] = [];
 	let cur = '';
