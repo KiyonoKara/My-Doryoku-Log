@@ -1,8 +1,12 @@
 <script lang="ts">
 	import github from '$lib/assets/github.svg';
+	import ThemeSwitch from '$lib/components/ThemeSwitch.svelte';
 </script>
 
 <footer class="footer">
+	<div class="footer__left">
+		<ThemeSwitch />
+	</div>
 	<div class="footer__right">
 		<a
 			href="https://github.com/KiyonoKara/My-Doryoku-Log"
@@ -23,10 +27,20 @@
 		margin-top: auto;
 		padding: 0.85rem 1.5rem;
 		display: flex;
-		justify-content: flex-end;
+		justify-content: space-between;
 		align-items: center;
 		background: transparent;
 		border-top: 1px solid var(--border-subtle);
+	}
+
+	.footer__left {
+		display: none;
+	}
+
+	@media (max-width: 600px) {
+		.footer__left {
+			display: block;
+		}
 	}
 
 	.footer__right {

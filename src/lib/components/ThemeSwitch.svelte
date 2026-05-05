@@ -176,6 +176,14 @@
 		transform-origin: top right;
 	}
 
+	:global(.footer__left) .ts-menu {
+		top: auto;
+		bottom: calc(100% + 0.5rem);
+		left: 0;
+		right: auto;
+		transform-origin: bottom left;
+	}
+
 	@keyframes ts-in {
 		from {
 			opacity: 0;
@@ -185,6 +193,21 @@
 			opacity: 1;
 			transform: scale(1) translateY(0);
 		}
+	}
+
+	@keyframes ts-in-footer {
+		from {
+			opacity: 0;
+			transform: scale(0.93) translateY(4px);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1) translateY(0);
+		}
+	}
+
+	:global(.footer__left) .ts-menu {
+		animation-name: ts-in-footer;
 	}
 
 	.ts-option {

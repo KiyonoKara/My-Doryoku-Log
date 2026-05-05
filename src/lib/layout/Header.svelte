@@ -68,4 +68,21 @@
 		align-items: center;
 		gap: 0.5rem;
 	}
+
+	@media (max-width: 600px) {
+		.header__controls {
+			display: none;
+		}
+		.header__label {
+			font-size: 1.1rem;
+		}
+		.header__icon-wrap {
+			width: 50px;
+			height: 50px;
+		}
+		.header__icon-wrap img {
+			width: 38px;
+			height: 38px;
+		}
+	}
 </style>
