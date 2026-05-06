@@ -8,6 +8,14 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+
+	interface Window {
+		electron: {
+			showSaveDialog: (options: never) => Promise<never>;
+			showOpenDialog: (options: never) => Promise<never>;
+			showMessageBox: (options: never) => Promise<never>;
+		};
+	}
 }
 
 export {};
