@@ -3,6 +3,7 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"main": "electron.ts",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -17,18 +18,47 @@
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
 		"test": "vitest run",
-		"test:watch": "vitest"
+		"test:watch": "vitest",
+		"electron:dev": "npm run build && tsc electron.ts preload.ts --outDir . --module esnext --target esnext --moduleResolution bundler && electron .",
+		"electron:pack": "npm run build && tsc electron.ts preload.ts --outDir . --module esnext --target esnext --moduleResolution bundler && electron-builder build"
+	},
+	"build": {
+		"appId": "org.kiyo.my-doryoku-log",
+		"productName": "My Doryoku Log",
+		"directories": {
+			"output": "dist"
+		},
+		"files": [
+			"build/**/*",
+			"drizzle/**/*",
+			"electron.ts",
+			"preload.ts",
+			"package.json",
+			"node_modules/**/*"
+		],
+		"mac": {
+			"category": "public.app-category.finance"
+		},
+		"win": {
+			"target": "nsis"
+		},
+		"linux": {
+			"target": "AppImage"
+		}
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
 		"@eslint/js": "^9.39.1",
 		"@sveltejs/adapter-auto": "^7.0.0",
+		"@sveltejs/adapter-node": "^5.5.4",
 		"@sveltejs/kit": "^2.53.4",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@types/better-sqlite3": "^7.6.13",
 		"@types/node": "^24",
 		"drizzle-kit": "^0.31.8",
 		"drizzle-orm": "^0.45.2",
+		"electron": "^41.5.0",
+		"electron-builder": "^26.8.1",
 		"eslint": "^9.39.1",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.13.1",
