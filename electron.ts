@@ -11,104 +11,103 @@ let serverProcess: ChildProcess | undefined;
 let mainWindow: BrowserWindow | null;
 
 interface Env {
-    isDev: boolean;
-    userDataPath: string;
-    dbPath: string;
-    DATABASE_URL: string;
-    PORT: number;
+	isDev: boolean;
+	userDataPath: string;
+	dbPath: string;
+	DATABASE_URL: string;
+	PORT: number;
 }
 
 function getEnv(): Env {
-    const isDev = !app.isPackaged;
-    const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, 'local.db');
-    
-    return {
-        isDev,
-        userDataPath,
-        dbPath,
-        DATABASE_URL: dbPath,
-        PORT: 5050,
-    };
+	const isDev = !app.isPackaged;
+	const userDataPath = app.getPath('userData');
+	const dbPath = path.join(userDataPath, 'local.db');
+
+	return {
+		isDev,
+		userDataPath,
+		dbPath,
+		DATABASE_URL: dbPath,
+		PORT: 5050
+	};
 }
 
 async function initializeDatabase(dbPath: string): Promise<void> {
-    console.log('Initializing database at:', dbPath);
+	console.log('Initializing database at:', dbPath);
 }
 
 function startServer(): void {
-    const env = getEnv();
-    const serverPath = path.join(__dirname, 'build', 'index.js');
+	const env = getEnv();
+	const serverPath = path.join(__dirname, 'build', 'index.js');
 
-    if (!fs.existsSync(serverPath)) {
-        console.error('Server build not found at:', serverPath);
-        return;
-    }
+	if (!fs.existsSync(serverPath)) {
+		console.error('Server build not found at:', serverPath);
+		return;
+	}
 
-    serverProcess = spawn('node', [serverPath], {
-        env: {
-            ...process.env,
-            DATABASE_URL: env.DATABASE_URL,
-            PORT: env.PORT.toString(),
-            NODE_ENV: 'production'
-        }
-    });
+	serverProcess = spawn('node', [serverPath], {
+		env: {
+			...process.env,
+			DATABASE_URL: env.DATABASE_URL,
+			PORT: env.PORT.toString(),
+			NODE_ENV: 'production'
+		}
+	});
 
-    serverProcess.stdout?.on('data', async (data: Buffer) => {
-        console.log(`Server: ${data}`);
-        if (data.toString().includes('Listening on')) {
-            if (mainWindow) {
-                await mainWindow.loadURL(`http://localhost:${env.PORT}`);
-            }
-        }
-    });
+	serverProcess.stdout?.on('data', async (data: Buffer) => {
+		console.log(`Server: ${data}`);
+		if (data.toString().includes('Listening on')) {
+			if (mainWindow) {
+				await mainWindow.loadURL(`http://localhost:${env.PORT}`);
+			}
+		}
+	});
 
-    serverProcess.stderr?.on('data', (data: Buffer) => {
-        console.error(`Server Error: ${data}`);
-    });
+	serverProcess.stderr?.on('data', (data: Buffer) => {
+		console.error(`Server Error: ${data}`);
+	});
 }
 
 function createWindow(): void {
-    mainWindow = new BrowserWindow({
-        width: 1600,
-        height: 1000,
-        // icon: path.join(__dirname, 'icon.svg'),
-        webPreferences: {
-            nodeIntegration: false,
-            contextIsolation: true,
-            preload: path.join(__dirname, 'preload.js')
-        }
-    });
+	mainWindow = new BrowserWindow({
+		width: 1600,
+		height: 1000,
+		webPreferences: {
+			nodeIntegration: false,
+			contextIsolation: true,
+			preload: path.join(__dirname, 'preload.js')
+		}
+	});
 
-    const env = getEnv();
-    mainWindow.loadURL(`http://localhost:${env.PORT}`).catch(() => {
-        console.log('Server is not ready yet...');
-    });
+	const env = getEnv();
+	mainWindow.loadURL(`http://localhost:${env.PORT}`).catch(() => {
+		console.log('Server is not ready yet...');
+	});
 
-    mainWindow.on('closed', () => {
-        mainWindow = null;
-    });
+	mainWindow.on('closed', () => {
+		mainWindow = null;
+	});
 }
 
 app.whenReady().then(async () => {
-    const env = getEnv();
-    await initializeDatabase(env.dbPath);
-    startServer();
-    createWindow();
+	const env = getEnv();
+	await initializeDatabase(env.dbPath);
+	startServer();
+	createWindow();
 
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) createWindow();
-    });
+	app.on('activate', () => {
+		if (BrowserWindow.getAllWindows().length === 0) createWindow();
+	});
 });
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+	if (process.platform !== 'darwin') {
+		app.quit();
+	}
 });
 
 app.on('quit', () => {
-    if (serverProcess) serverProcess.kill();
+	if (serverProcess) serverProcess.kill();
 });
 
 // IPC handlers for CSV operations
