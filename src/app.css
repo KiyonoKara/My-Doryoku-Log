@@ -1036,7 +1036,7 @@ textarea:focus {
 	font-size: 0.9rem;
 	line-height: 1.5;
 	color: var(--text-secondary);
-    padding-bottom: 0.4rem;
+	padding-bottom: 0.4rem;
 }
 
 .info-display-card__section {
@@ -1045,7 +1045,7 @@ textarea:focus {
 	gap: 0.4rem;
 	padding-top: 0.2rem;
 	border-top: 1px solid var(--border-subtle);
-    padding-bottom: 0.4rem;
+	padding-bottom: 0.4rem;
 }
 
 .info-display-card__section h3 {
@@ -1063,8 +1063,8 @@ textarea:focus {
 	color: var(--text-secondary);
 	font-size: 0.82rem;
 	line-height: 1.45;
-    padding-top: 0.3rem;
-    padding-bottom: 0.2rem;
+	padding-top: 0.3rem;
+	padding-bottom: 0.2rem;
 }
 
 .info-display-card__section li::marker {

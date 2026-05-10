@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { TxType } from '$lib/types/finance';
 	import { dynamicToggleSlider } from '$lib/utils/util';
+	import { currencyStore } from '$lib/stores/currency.svelte';
 
 	let { type, incomeTotals, expenseTotals } = $props<{
 		type: TxType;
@@ -120,7 +121,7 @@
 						dominant-baseline="central"
 						class="category-chart__value"
 					>
-						{value.toFixed(2)}
+						{currencyStore.symbol}{value.toFixed(2)}
 					</text>
 				{/each}
 			</g>

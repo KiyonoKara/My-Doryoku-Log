@@ -1,6 +1,7 @@
 <script>
 	import notebook from '$lib/assets/notebook.svg';
 	import ThemeSwitch from '$lib/components/ThemeSwitch.svelte';
+	import CurrencySwitch from '$lib/components/CurrencySwitch.svelte';
 
 	export let label;
 </script>
@@ -12,6 +13,7 @@
 	<h1 class="header__label">{label}</h1>
 
 	<div class="header__controls">
+		<CurrencySwitch />
 		<ThemeSwitch />
 	</div>
 </header>
@@ -69,7 +71,7 @@
 		gap: 0.5rem;
 	}
 
-	@media (max-width: 600px) {
+	@media (max-width: 840px) {
 		.header__controls {
 			display: none;
 		}

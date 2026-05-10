@@ -20,6 +20,7 @@
 	import fileReport from '$lib/assets/file-report.svg';
 	import FlashNotification from '$lib/other/FlashNotification.svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
+	import { currencyStore } from '$lib/stores/currency.svelte';
 
 	let { data, form } = $props();
 	let transactions = $derived<Transaction[]>(data.transactions ?? []);
@@ -321,7 +322,7 @@
 			<div class="field-row">
 				<label for="amount" class="field-label">Amount</label>
 				<div class="inline-amount-wrapper">
-					<span class="amount-prefix">$</span>
+					<span class="amount-prefix">{currencyStore.symbol}</span>
 					<input
 						id="amount"
 						name="amount"
@@ -514,7 +515,7 @@
 												<div class="edit-field-row">
 													<span class="edit-label">Amount</span>
 													<div class="inline-amount-wrapper">
-														<span class="amount-prefix">$</span>
+														<span class="amount-prefix">{currencyStore.symbol}</span>
 														<input
 															type="number"
 															step="0.01"
@@ -641,7 +642,7 @@
 														>{tx.type}</span
 													>
 													<span class="history-item__amount">
-														{tx.type === 'expense' ? '-' : '+'}${tx.amount}
+														{tx.type === 'expense' ? '-' : '+'}{currencyStore.symbol}{tx.amount}
 													</span>
 													<span class="history-item__date-label">{formatDateLabel(tx.date)}</span>
 												</div>

@@ -7,6 +7,7 @@
 	import BackButton from '$lib/buttons/BackButton.svelte';
 	import { page } from '$app/state';
 	import { themeStore } from '$lib/stores/theme.svelte';
+	import { currencyStore } from '$lib/stores/currency.svelte';
 
 	let { children } = $props();
 
@@ -16,6 +17,7 @@
 
 	onMount(() => {
 		themeStore.init();
+		currencyStore.init();
 	});
 </script>
 

@@ -6,6 +6,7 @@
 	import type { TxType, FinMLPredictionResponse } from '$lib/types/finance';
 	import { type Transaction } from '$lib/server/db/schema';
 	import { capitalizeFirstLetter, dynamicToggleSlider } from '$lib/utils/util';
+	import { currencyStore } from '$lib/stores/currency.svelte';
 
 	const FORECAST_EXP_API_URL = '/finance/forecast-expense';
 	const FORECAST_INC_API_URL = '/finance/forecast-income';
@@ -181,7 +182,7 @@
 										{expPrediction.pred.coarse_category || '—'}
 									</div>
 									<div class="forecast__amount">
-										-${expPrediction.pred.amount?.toFixed(2) || '0.00'}
+										-{currencyStore.symbol}{expPrediction.pred.amount?.toFixed(2) || '0.00'}
 									</div>
 								</div>
 								<div class="forecast__label">Next expense</div>
@@ -206,7 +207,7 @@
 									{incPrediction.pred.coarse_category || '—'}
 								</div>
 								<div class="forecast__amount">
-									+${incPrediction.pred.amount?.toFixed(2) || '0.00'}
+									+{currencyStore.symbol}{incPrediction.pred.amount?.toFixed(2) || '0.00'}
 								</div>
 							</div>
 							<div class="forecast__label">Next income</div>

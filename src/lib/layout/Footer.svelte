@@ -1,10 +1,12 @@
 <script lang="ts">
 	import github from '$lib/assets/github.svg';
 	import ThemeSwitch from '$lib/components/ThemeSwitch.svelte';
+	import CurrencySwitch from '$lib/components/CurrencySwitch.svelte';
 </script>
 
 <footer class="footer">
 	<div class="footer__left">
+		<CurrencySwitch />
 		<ThemeSwitch />
 	</div>
 	<div class="footer__right">
@@ -37,9 +39,10 @@
 		display: none;
 	}
 
-	@media (max-width: 600px) {
+	@media (max-width: 840px) {
 		.footer__left {
-			display: block;
+			display: flex;
+			gap: 0.5rem;
 		}
 	}
 
