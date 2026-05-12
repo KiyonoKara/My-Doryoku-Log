@@ -83,6 +83,29 @@ export function formatDate(d: string | null | undefined) {
 }
 
 /**
+ * Convert supplied ISO string to local datetime string (YYYY-MM-DDTHH:MM)
+ * @param iso
+ */
+export function toLocalDatetimeString(iso: string | null | undefined): string {
+	if (!iso) {
+		return '';
+	}
+
+	const d = new Date(iso);
+	if (Number.isNaN(d.getTime())) {
+		return '';
+	}
+
+	const yyyy = d.getFullYear();
+	const mm = String(d.getMonth() + 1).padStart(2, '0');
+	const dd = String(d.getDate()).padStart(2, '0');
+	const hh = String(d.getHours()).padStart(2, '0');
+	const min = String(d.getMinutes()).padStart(2, '0');
+
+	return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+}
+
+/**
  * Convert HH:MM:SS formatted date into milliseconds
  * @param s Date string
  */

@@ -1,32 +1,21 @@
-import { spawn, type ChildProcess } from 'child_process';
+import { spawn } from 'child_process';
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import net from 'net';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-let serverProcess: ChildProcess | undefined;
-let mainWindow: BrowserWindow | null;
-let currentPort: number;
-
-interface Env {
-	isDev: boolean;
-	userDataPath: string;
-	dbPath: string;
-	DATABASE_URL: string;
-}
-
+let serverProcess;
+let mainWindow;
+let currentPort;
 /**
  * Get environment variables
  */
-function getEnv(): Env {
+function getEnv() {
 	const isDev = !app.isPackaged;
 	const userDataPath = app.getPath('userData');
 	const dbPath = path.join(userDataPath, 'local.db');
-
 	return {
 		isDev,
 		userDataPath,
@@ -34,11 +23,10 @@ function getEnv(): Env {
 		DATABASE_URL: dbPath
 	};
 }
-
 /**
  * Find a free port on the local machine
  */
-async function getFreePort(): Promise<number> {
+async function getFreePort() {
 	return new Promise((resolve, reject) => {
 		const server = net.createServer();
 		server.unref();
@@ -56,20 +44,16 @@ async function getFreePort(): Promise<number> {
 		});
 	});
 }
-
-async function initializeDatabase(dbPath: string): Promise<void> {
+async function initializeDatabase(dbPath) {
 	console.log('Initializing database at:', dbPath);
 }
-
-function startServer(port: number): void {
+function startServer(port) {
 	const env = getEnv();
 	const serverPath = path.join(__dirname, 'build', 'index.js');
-
 	if (!fs.existsSync(serverPath)) {
 		console.error('Server build not found at:', serverPath);
 		return;
 	}
-
 	serverProcess = spawn('node', [serverPath], {
 		env: {
 			...process.env,
@@ -79,8 +63,7 @@ function startServer(port: number): void {
 			NODE_ENV: 'production'
 		}
 	});
-
-	serverProcess.stdout?.on('data', async (data: Buffer) => {
+	serverProcess.stdout?.on('data', async (data) => {
 		const output = data.toString();
 		console.log(`Server: ${output}`);
 		// Adapter-node listening message
@@ -90,13 +73,11 @@ function startServer(port: number): void {
 			}
 		}
 	});
-
-	serverProcess.stderr?.on('data', (data: Buffer) => {
+	serverProcess.stderr?.on('data', (data) => {
 		console.error(`Server Error: ${data}`);
 	});
 }
-
-function createWindow(port: number): void {
+function createWindow(port) {
 	mainWindow = new BrowserWindow({
 		width: 1600,
 		height: 1000,
@@ -107,51 +88,42 @@ function createWindow(port: number): void {
 			preload: path.join(__dirname, 'preload.js')
 		}
 	});
-
 	mainWindow.loadURL(`http://localhost:${port}`).catch(() => {
 		console.log('Server is not ready yet...');
 	});
-
 	mainWindow.on('closed', () => {
 		mainWindow = null;
 	});
 }
-
 app.whenReady().then(async () => {
 	const env = getEnv();
 	await initializeDatabase(env.dbPath);
 	currentPort = await getFreePort();
 	startServer(currentPort);
 	createWindow(currentPort);
-
 	app.on('activate', () => {
 		if (BrowserWindow.getAllWindows().length === 0) {
 			createWindow(currentPort);
 		}
 	});
 });
-
 app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') {
 		app.quit();
 	}
 });
-
 app.on('quit', () => {
 	if (serverProcess) {
 		serverProcess.kill();
 	}
 });
-
 // IPC handlers for CSV operations
 ipcMain.handle('show-save-dialog', async (_event, options) => {
-	return await dialog.showSaveDialog(mainWindow!, options);
+	return await dialog.showSaveDialog(mainWindow, options);
 });
-
 ipcMain.handle('show-open-dialog', async (_event, options) => {
-	return await dialog.showOpenDialog(mainWindow!, options);
+	return await dialog.showOpenDialog(mainWindow, options);
 });
-
 ipcMain.handle('show-message-box', async (_event, options) => {
-	return await dialog.showMessageBox(mainWindow!, options);
+	return await dialog.showMessageBox(mainWindow, options);
 });

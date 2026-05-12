@@ -12,7 +12,14 @@
 		type TimeCategory,
 		isStartData
 	} from '$lib/types/time';
-	import { formatDuration, toYmd, formatDateLabel, formatTime, formatDate } from '$lib/utils/util';
+	import {
+		formatDuration,
+		toYmd,
+		formatDateLabel,
+		formatTime,
+		formatDate,
+		toLocalDatetimeString
+	} from '$lib/utils/util';
 	import FlashNotification from '$lib/other/FlashNotification.svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
@@ -76,7 +83,7 @@
 			if (segmentStartMs != null) {
 				accumulatedMs += Math.max(0, Date.now() - segmentStartMs);
 			} else if (dbRunningEntry) {
-				//pause after a page refresh then get from DB
+				// pause after a page refresh, then get the start date from DB
 				accumulatedMs = Math.max(0, Date.now() - Date.parse(dbRunningEntry.start_date));
 			}
 			segmentStartMs = null;
@@ -305,7 +312,7 @@
 			isRunning = true;
 			nowMs = Date.now();
 
-			// refresh entries from load without reloading the entire page
+			// refresh entries from the load without reloading the entire page
 			await invalidateAll();
 		};
 	};
@@ -592,7 +599,7 @@
 													<input
 														type="datetime-local"
 														class="inline-input inline-input--date"
-														value={draft.start_date ? draft.start_date.slice(0, 16) : ''}
+														value={toLocalDatetimeString(draft.start_date)}
 														oninput={(e) => {
 															const d = drafts.get(entry.id);
 															if (!d) {
@@ -615,7 +622,7 @@
 													<input
 														type="datetime-local"
 														class="inline-input inline-input--date"
-														value={draft.end_date ? draft.end_date.slice(0, 16) : ''}
+														value={toLocalDatetimeString(draft.end_date)}
 														oninput={(e) => {
 															const d = drafts.get(entry.id);
 															if (!d) {
