@@ -1,3 +1,12 @@
+import {
+	type SaveDialogOptions,
+	type OpenDialogOptions,
+	type MessageBoxOptions,
+	type SaveDialogReturnValue,
+	type OpenDialogReturnValue,
+	type MessageBoxReturnValue
+} from 'electron';
+
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 declare global {
@@ -11,9 +20,9 @@ declare global {
 
 	interface Window {
 		electron: {
-			showSaveDialog: (options: never) => Promise<never>;
-			showOpenDialog: (options: never) => Promise<never>;
-			showMessageBox: (options: never) => Promise<never>;
+			showSaveDialog: (options: SaveDialogOptions) => Promise<SaveDialogReturnValue>;
+			showOpenDialog: (options: OpenDialogOptions) => Promise<OpenDialogReturnValue>;
+			showMessageBox: (options: MessageBoxOptions) => Promise<MessageBoxReturnValue>;
 		};
 	}
 }

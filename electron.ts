@@ -3,21 +3,25 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import net from 'net';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let serverProcess: ChildProcess | undefined;
 let mainWindow: BrowserWindow | null;
+let currentPort: number;
 
 interface Env {
 	isDev: boolean;
 	userDataPath: string;
 	dbPath: string;
 	DATABASE_URL: string;
-	PORT: number;
 }
 
+/**
+ * Get environment variables
+ */
 function getEnv(): Env {
 	const isDev = !app.isPackaged;
 	const userDataPath = app.getPath('userData');
@@ -27,16 +31,38 @@ function getEnv(): Env {
 		isDev,
 		userDataPath,
 		dbPath,
-		DATABASE_URL: dbPath,
-		PORT: 5050
+		DATABASE_URL: dbPath
 	};
+}
+
+/**
+ * Find a free port on the local machine
+ */
+async function getFreePort(): Promise<number> {
+	return new Promise((resolve, reject) => {
+		const server = net.createServer();
+		server.unref();
+		server.on('error', reject);
+		server.listen(0, () => {
+			const address = server.address();
+			const port = typeof address === 'string' ? 0 : address?.port;
+			server.close(() => {
+				if (port) {
+					resolve(port);
+				}
+				else {
+					reject(new Error('No port found'));
+				}
+			});
+		});
+	});
 }
 
 async function initializeDatabase(dbPath: string): Promise<void> {
 	console.log('Initializing database at:', dbPath);
 }
 
-function startServer(): void {
+function startServer(port: number): void {
 	const env = getEnv();
 	const serverPath = path.join(__dirname, 'build', 'index.js');
 
@@ -49,16 +75,19 @@ function startServer(): void {
 		env: {
 			...process.env,
 			DATABASE_URL: env.DATABASE_URL,
-			PORT: env.PORT.toString(),
+			PORT: port.toString(),
+			ORIGIN: `http://localhost:${port}`,
 			NODE_ENV: 'production'
 		}
 	});
 
 	serverProcess.stdout?.on('data', async (data: Buffer) => {
-		console.log(`Server: ${data}`);
-		if (data.toString().includes('Listening on')) {
+		const output = data.toString();
+		console.log(`Server: ${output}`);
+		// Adapter-node listening message
+		if (output.includes('Listening on') || output.includes('localhost:')) {
 			if (mainWindow) {
-				await mainWindow.loadURL(`http://localhost:${env.PORT}`);
+				await mainWindow.loadURL(`http://localhost:${port}`);
 			}
 		}
 	});
@@ -68,19 +97,19 @@ function startServer(): void {
 	});
 }
 
-function createWindow(): void {
+function createWindow(port: number): void {
 	mainWindow = new BrowserWindow({
 		width: 1600,
 		height: 1000,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
+			sandbox: true,
 			preload: path.join(__dirname, 'preload.js')
 		}
 	});
 
-	const env = getEnv();
-	mainWindow.loadURL(`http://localhost:${env.PORT}`).catch(() => {
+	mainWindow.loadURL(`http://localhost:${port}`).catch(() => {
 		console.log('Server is not ready yet...');
 	});
 
@@ -92,11 +121,14 @@ function createWindow(): void {
 app.whenReady().then(async () => {
 	const env = getEnv();
 	await initializeDatabase(env.dbPath);
-	startServer();
-	createWindow();
+	currentPort = await getFreePort();
+	startServer(currentPort);
+	createWindow(currentPort);
 
 	app.on('activate', () => {
-		if (BrowserWindow.getAllWindows().length === 0) createWindow();
+		if (BrowserWindow.getAllWindows().length === 0) {
+			createWindow(currentPort);
+		}
 	});
 });
 
@@ -107,7 +139,9 @@ app.on('window-all-closed', () => {
 });
 
 app.on('quit', () => {
-	if (serverProcess) serverProcess.kill();
+	if (serverProcess) {
+		serverProcess.kill();
+	}
 });
 
 // IPC handlers for CSV operations

@@ -15,10 +15,7 @@ const config = {
 			out: 'build',
 			precompress: false,
 			envPrefix: ''
-		}),
-		csrf: {
-			trustedOrigins: ['http://localhost:5050', 'http://127.0.0.1:5050']
-		}
+		})
 	}
 };
 
