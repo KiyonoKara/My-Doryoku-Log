@@ -1,12 +1,10 @@
 <script lang="ts">
 	import github from '$lib/assets/github.svg';
 	import ThemeSwitch from '$lib/components/ThemeSwitch.svelte';
-	import CurrencySwitch from '$lib/components/CurrencySwitch.svelte';
 </script>
 
 <footer class="footer">
 	<div class="footer__left">
-		<CurrencySwitch />
 		<ThemeSwitch />
 	</div>
 	<div class="footer__right">

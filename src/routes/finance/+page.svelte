@@ -21,6 +21,7 @@
 	import FlashNotification from '$lib/other/FlashNotification.svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import { currencyStore } from '$lib/stores/currency.svelte';
+	import CurrencySwitch from '$lib/components/CurrencySwitch.svelte';
 
 	let { data, form } = $props();
 	let transactions = $derived<Transaction[]>(data.transactions ?? []);
@@ -283,7 +284,11 @@
 	/>
 
 	<div class="panel panel--form">
-		<h2 class="panel-title">Log transaction</h2>
+		<div class="panel-header">
+			<h2 class="panel-title">Log transaction</h2>
+			<CurrencySwitch />
+		</div>
+
 		<form method="POST" action="?/submit" class="panel--entry-form" use:enhance>
 			<div class="field-row">
 				<div class="field-label">Type</div>

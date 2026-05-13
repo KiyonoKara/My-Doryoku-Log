@@ -186,6 +186,13 @@ textarea {
 	gap: 0.8rem;
 }
 
+.panel-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 0.5rem;
+}
+
 .panel-title {
 	margin: 0 0 0.1rem;
 	font-size: 1.1rem;
