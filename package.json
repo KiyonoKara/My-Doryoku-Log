@@ -19,8 +19,8 @@
 		"db:studio": "drizzle-kit studio",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"electron:dev": "npm run build && tsc electron.ts preload.ts --outDir . --module esnext --target esnext --moduleResolution bundler && electron .",
-		"electron:pack": "npm run build && tsc electron.ts preload.ts --outDir . --module esnext --target esnext --moduleResolution bundler && electron-builder build"
+        "electron:dev": "npm run build && tsc electron.ts preload.ts --outDir . --module esnext --target esnext --moduleResolution bundler && electron .",
+        "electron:pack": "npm run build && tsc electron.ts preload.ts --outDir . --module esnext --target esnext --moduleResolution bundler && electron-builder build"
 	},
 	"build": {
 		"appId": "org.kiyo.my-doryoku-log",
@@ -31,22 +31,27 @@
 		"files": [
 			"build/**/*",
 			"drizzle/**/*",
+			"icons/**/*",
 			"electron.ts",
 			"preload.ts",
 			"package.json",
 			"node_modules/**/*"
 		],
 		"mac": {
-			"category": "public.app-category.finance"
+			"category": "public.app-category.productivity",
+			"icon": "icons/MDL-Icon-Mac-Default@1x.icns"
 		},
 		"win": {
-			"target": "nsis"
+			"target": "nsis",
+			"icon": "icons/MDL-Icon-Default.png"
 		},
 		"linux": {
-			"target": "AppImage"
+			"target": "AppImage",
+			"icon": "icons/MDL-Icon-Default.png"
 		}
 	},
 	"devDependencies": {
+		"@electron/rebuild": "^4.0.4",
 		"@eslint/compat": "^1.4.0",
 		"@eslint/js": "^9.39.1",
 		"@sveltejs/adapter-auto": "^7.0.0",
