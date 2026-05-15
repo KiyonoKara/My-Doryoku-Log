@@ -45,9 +45,8 @@
 		"mac": {
 			"category": "public.app-category.productivity",
 			"icon": "icons/MDL-Icon-Mac-Default@1x.icns",
-			"target": [
-				{ "target": "zip", "arch": ["x64", "arm64"] }
-			]
+            "identity": null,
+			"target": "dmg"
 		},
 		"win": {
 			"target": "nsis",
