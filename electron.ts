@@ -31,7 +31,7 @@ function getEnv(): Env {
 		isDev,
 		userDataPath,
 		dbPath,
-		DATABASE_URL: dbPath
+		DATABASE_URL: isDev ? 'local.db' : dbPath
 	};
 }
 
@@ -58,7 +58,11 @@ async function getFreePort(): Promise<number> {
 }
 
 async function initializeDatabase(dbPath: string): Promise<void> {
-	console.log('Initializing database at:', dbPath);
+	const dbDir = path.dirname(dbPath);
+	if (!fs.existsSync(dbDir)) {
+		fs.mkdirSync(dbDir, { recursive: true });
+	}
+	console.log('Database path ensured at:', dbPath);
 }
 
 function startServer(port: number): void {
@@ -70,13 +74,16 @@ function startServer(port: number): void {
 		return;
 	}
 
-	serverProcess = spawn('node', [serverPath], {
+	serverProcess = spawn(process.execPath, [serverPath], {
 		env: {
 			...process.env,
 			DATABASE_URL: env.DATABASE_URL,
 			PORT: port.toString(),
 			ORIGIN: `http://localhost:${port}`,
-			NODE_ENV: 'production'
+			NODE_ENV: 'production',
+			PROTOCOL_HEADER: 'x-forwarded-proto',
+			HOST_HEADER: 'host',
+			BODY_SIZE_LIMIT: '0'
 		}
 	});
 
@@ -97,9 +104,16 @@ function startServer(port: number): void {
 }
 
 function createWindow(port: number): void {
+	const isMac = process.platform === 'darwin';
+	const iconPath = isMac
+		? path.join(__dirname, 'icons', 'MDL-Icon-Mac-Default@1x.icns')
+		: path.join(__dirname, 'icons', 'MDL-Icon-Default.png');
+
 	mainWindow = new BrowserWindow({
+		title: 'My Doryoku Log',
 		width: 1600,
 		height: 1000,
+		icon: iconPath,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,

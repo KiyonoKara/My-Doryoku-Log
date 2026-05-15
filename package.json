@@ -2,8 +2,9 @@
 	"name": "my-doryoku-log",
 	"private": true,
 	"version": "0.0.1",
+    "author": "KiyonoKara",
 	"type": "module",
-	"main": "electron.ts",
+	"main": "electron.js",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -32,14 +33,21 @@
 			"build/**/*",
 			"drizzle/**/*",
 			"icons/**/*",
-			"electron.ts",
-			"preload.ts",
+			"electron.js",
+			"preload.js",
 			"package.json",
 			"node_modules/**/*"
 		],
+		"asarUnpack": [
+			"drizzle/**/*",
+			"node_modules/better-sqlite3/**/*"
+		],
 		"mac": {
 			"category": "public.app-category.productivity",
-			"icon": "icons/MDL-Icon-Mac-Default@1x.icns"
+			"icon": "icons/MDL-Icon-Mac-Default@1x.icns",
+			"target": [
+				{ "target": "zip", "arch": ["x64", "arm64"] }
+			]
 		},
 		"win": {
 			"target": "nsis",
