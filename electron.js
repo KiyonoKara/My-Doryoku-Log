@@ -12,7 +12,6 @@ const __dirname = path.dirname(__filename);
 let serverProcess = null;
 let mainWindow = null;
 let currentPort = null;
-let isQuitting = false;
 let isBootstrapping = false;
 
 /**
@@ -64,7 +63,7 @@ function getEnv() {
 }
 
 /**
- * Check that data directory exists
+ * Check that the data directory exists
  */
 function checkDataDir() {
 	const { dataDir } = getPaths();
@@ -74,7 +73,7 @@ function checkDataDir() {
 }
 
 /**
- * Get path to server script
+ * Get the path to the server script
  * @returns {string}
  */
 function getServerPath() {
@@ -84,7 +83,7 @@ function getServerPath() {
 }
 
 /**
- * Get path to preload script
+ * Get the path to the preload script
  * @returns {string}
  */
 function getPreloadPath() {
@@ -324,9 +323,8 @@ if (!hasLock) {
 	});
 }
 
-// stop server when app is quitting
+// stop server when the app is quitting
 app.on('before-quit', () => {
-	isQuitting = true;
 	stopServer();
 });
 
