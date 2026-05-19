@@ -1,143 +1,351 @@
-import { spawn } from 'child_process';
+import { fork } from 'node:child_process';
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import net from 'net';
+import path from 'node:path';
+import fs from 'node:fs';
+import net from 'node:net';
+import http from 'node:http';
+import { fileURLToPath } from 'node:url';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-let serverProcess;
-let mainWindow;
-let currentPort;
+
+let serverProcess = null;
+let mainWindow = null;
+let currentPort = null;
+let isQuitting = false;
+let isBootstrapping = false;
+
+/**
+ * Log messages only in development mode
+ * @param args
+ */
+function safeLog(...args) {
+	if (!app.isPackaged){
+		console.log(...args);
+	}
+}
+
+/**
+ * Log errors only in development mode
+ * @param args
+ */
+function safeError(...args) {
+	if (!app.isPackaged) {
+		console.error(...args);
+	}
+}
+
+/**
+ * Get paths for app data
+ * @returns {{userData: string, dataDir: string, dbPath: string}}
+ */
+function getPaths() {
+	const userData = app.getPath('userData');
+	const dataDir = path.join(userData, 'app-data');
+	const dbPath = path.join(dataDir, 'local.db');
+
+	return {
+		userData,
+		dataDir,
+		dbPath
+	};
+}
+
 /**
  * Get environment variables
  */
 function getEnv() {
-    const isDev = !app.isPackaged;
-    const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, 'local.db');
-    return {
-        isDev,
-        userDataPath,
-        dbPath,
-        DATABASE_URL: isDev ? 'local.db' : dbPath
-    };
+	const { dbPath } = getPaths();
+
+	return {
+		DATABASE_URL: dbPath,
+		NODE_ENV: app.isPackaged ? 'production' : 'development'
+	};
 }
+
+/**
+ * Check that data directory exists
+ */
+function checkDataDir() {
+	const { dataDir } = getPaths();
+	if (!fs.existsSync(dataDir)) {
+		fs.mkdirSync(dataDir, { recursive: true });
+	}
+}
+
+/**
+ * Get path to server script
+ * @returns {string}
+ */
+function getServerPath() {
+	return app.isPackaged
+		? path.join(process.resourcesPath, 'server', 'index.js')
+		: path.join(__dirname, 'build', 'index.js');
+}
+
+/**
+ * Get path to preload script
+ * @returns {string}
+ */
+function getPreloadPath() {
+	return path.join(__dirname, 'preload.cjs');
+}
+
+/**
+ * Get icon path based on platform
+ * @returns {string}
+ */
+function getIconPath() {
+	if (process.platform === 'darwin') {
+		return path.join(__dirname, 'icons', 'MDL-Icon-Mac-Default@1x.icns');
+	}
+	if (process.platform === 'win32') {
+		return path.join(__dirname, 'icons', 'MDL-Icon-Default.png');
+	}
+	return path.join(__dirname, 'icons', 'MDL-Icon-Default.png');
+}
+
 /**
  * Find a free port on the local machine
+ * @returns {Promise<unknown>}
  */
-async function getFreePort() {
-    return new Promise((resolve, reject) => {
-        const server = net.createServer();
-        server.unref();
-        server.on('error', reject);
-        server.listen(0, () => {
-            const address = server.address();
-            const port = typeof address === 'string' ? 0 : address?.port;
-            server.close(() => {
-                if (port) {
-                    resolve(port);
-                }
-                else {
-                    reject(new Error('No port found'));
-                }
-            });
-        });
-    });
+function getFreePort() {
+	return new Promise((resolve, reject) => {
+		const server = net.createServer();
+		server.unref();
+		server.on('error', reject);
+		server.listen(0, '127.0.0.1', () => {
+			const address = server.address();
+			const port = typeof address === 'object' && address ? address.port : null;
+			server.close(() => {
+				if (port) resolve(port);
+				else reject(new Error('No free port found'));
+			});
+		});
+	});
 }
-async function initializeDatabase(dbPath) {
-    const dbDir = path.dirname(dbPath);
-    if (!fs.existsSync(dbDir)) {
-        fs.mkdirSync(dbDir, { recursive: true });
-    }
-    console.log('Database path ensured at:', dbPath);
+
+/**
+ * Wait for the local server to start
+ * @param url
+ * @param timeoutMs
+ * @returns {Promise<unknown>}
+ */
+function waitForServer(url, timeoutMs = 15000) {
+	const started = Date.now();
+
+	return new Promise((resolve, reject) => {
+		const tryRequest = () => {
+			const req = http.get(url, (res) => {
+				res.resume();
+				if (res.statusCode && res.statusCode < 500) {
+					resolve();
+					return;
+				}
+
+				if (Date.now() - started > timeoutMs) {
+					reject(new Error(`Server responded with ${res.statusCode}`));
+					return;
+				}
+
+				setTimeout(tryRequest, 250);
+			});
+
+			req.on('error', () => {
+				if (Date.now() - started > timeoutMs) {
+					reject(new Error('Timed out waiting for local server'));
+				} else {
+					setTimeout(tryRequest, 250);
+				}
+			});
+
+			req.setTimeout(2000, () => req.destroy());
+		};
+
+		tryRequest();
+	});
 }
-function startServer(port) {
-    const env = getEnv();
-    const serverPath = path.join(__dirname, 'build', 'index.js');
-    if (!fs.existsSync(serverPath)) {
-        console.error('Server build not found at:', serverPath);
-        return;
-    }
-    serverProcess = spawn(process.execPath, [serverPath], {
-        env: {
-            ...process.env,
-            DATABASE_URL: env.DATABASE_URL,
-            PORT: port.toString(),
-            ORIGIN: `http://localhost:${port}`,
-            NODE_ENV: 'production',
-            PROTOCOL_HEADER: 'x-forwarded-proto',
-            HOST_HEADER: 'host',
-            BODY_SIZE_LIMIT: '0'
-        }
-    });
-    serverProcess.stdout?.on('data', async (data) => {
-        const output = data.toString();
-        console.log(`Server: ${output}`);
-        // Adapter-node listening message
-        if (output.includes('Listening on') || output.includes('localhost:')) {
-            if (mainWindow) {
-                await mainWindow.loadURL(`http://localhost:${port}`);
-            }
-        }
-    });
-    serverProcess.stderr?.on('data', (data) => {
-        console.error(`Server Error: ${data}`);
-    });
+
+/**
+ * Stop the local server
+ */
+function stopServer() {
+	if (serverProcess && !serverProcess.killed) {
+		serverProcess.kill();
+	}
+	serverProcess = null;
 }
-function createWindow(port) {
-    const isMac = process.platform === 'darwin';
-    const iconPath = isMac
-        ? path.join(__dirname, 'icons', 'MDL-Icon-Mac-Default@1x.icns')
-        : path.join(__dirname, 'icons', 'MDL-Icon-Default.png');
-    mainWindow = new BrowserWindow({
-        title: 'My Doryoku Log',
-        width: 1600,
-        height: 1000,
-        icon: iconPath,
-        webPreferences: {
-            nodeIntegration: false,
-            contextIsolation: true,
-            sandbox: true,
-            preload: path.join(__dirname, 'preload.js')
-        }
-    });
-    mainWindow.loadURL(`http://localhost:${port}`).catch(() => {
-        console.log('Server is not ready yet...');
-    });
-    mainWindow.on('closed', () => {
-        mainWindow = null;
-    });
+
+/**
+ * Create the main window
+ * @returns {*|Electron.CrossProcessExports.BrowserWindow}
+ */
+function createWindow() {
+	if (mainWindow && !mainWindow.isDestroyed()) {
+		return mainWindow;
+	}
+
+	mainWindow = new BrowserWindow({
+		title: 'My Doryoku Log',
+		width: 1600,
+		height: 1000,
+		minWidth: 1100,
+		minHeight: 700,
+		show: false,
+		icon: getIconPath(),
+		webPreferences: {
+			nodeIntegration: false,
+			contextIsolation: true,
+			sandbox: true,
+			preload: getPreloadPath()
+		}
+	});
+
+	mainWindow.on('ready-to-show', () => {
+		mainWindow?.show();
+	});
+
+	mainWindow.on('closed', () => {
+		mainWindow = null;
+	});
+
+	return mainWindow;
 }
-app.whenReady().then(async () => {
-    const env = getEnv();
-    await initializeDatabase(env.dbPath);
-    currentPort = await getFreePort();
-    startServer(currentPort);
-    createWindow(currentPort);
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow(currentPort);
-        }
-    });
+
+async function startServer(port) {
+	const serverPath = getServerPath();
+
+	if (!fs.existsSync(serverPath)) {
+		throw new Error(`Server build not found at: ${serverPath}`);
+	}
+
+	const env = getEnv();
+	const baseUrl = `http://127.0.0.1:${port}`;
+
+	// start a local server
+	serverProcess = fork(serverPath, [], {
+		cwd: app.isPackaged ? process.resourcesPath : __dirname,
+		stdio: 'pipe',
+		env: {
+			...process.env,
+			...env,
+			HOST: '127.0.0.1',
+			PORT: String(port),
+			ORIGIN: baseUrl,
+			PROTOCOL_HEADER: 'x-forwarded-proto',
+			HOST_HEADER: 'host',
+			BODY_SIZE_LIMIT: '0'
+		}
+	});
+
+	serverProcess.stdout?.on('data', (data) => {
+		safeLog(`[server] ${data.toString()}`);
+	});
+
+	serverProcess.stderr?.on('data', (data) => {
+		safeError(`[server:error] ${data.toString()}`);
+	});
+
+	const exitedEarly = new Promise((_, reject) => {
+		serverProcess.once('exit', (code, signal) => {
+			serverProcess = null;
+			reject(new Error(`Server exited before listening. code=${code} signal=${signal}`));
+		});
+	});
+
+	await Promise.race([waitForServer(baseUrl), exitedEarly]);
+	return baseUrl;
+}
+
+function focusMainWindow() {
+	if (!mainWindow) {
+		return;
+	}
+	if (mainWindow.isMinimized()) {
+		mainWindow.restore();
+	}
+	mainWindow.focus();
+}
+
+async function bootstrap() {
+	if (isBootstrapping) {
+		return;
+	}
+	isBootstrapping = true;
+
+	try {
+		checkDataDir();
+		currentPort = await getFreePort();
+
+		const win = createWindow();
+		const url = await startServer(currentPort);
+		await win.loadURL(url);
+	} finally {
+		isBootstrapping = false;
+	}
+}
+
+const hasLock = app.requestSingleInstanceLock();
+
+if (!hasLock) {
+	app.quit();
+} else {
+	app.on('second-instance', () => {
+		focusMainWindow();
+	});
+
+	// avoid opening app multiple times
+	app.whenReady().then(async () => {
+		try {
+			await bootstrap();
+		} catch (error) {
+			await dialog.showErrorBox(
+				'Startup failed',
+				error instanceof Error ? error.message : String(error)
+			);
+			app.quit();
+		}
+
+		app.on('activate', async () => {
+			if (BrowserWindow.getAllWindows().length === 0) {
+				try {
+					await bootstrap();
+				} catch (error) {
+					await dialog.showErrorBox(
+						'Startup failed',
+						error instanceof Error ? error.message : String(error)
+					);
+					app.quit();
+				}
+			} else {
+				focusMainWindow();
+			}
+		});
+	});
+}
+
+// stop server when app is quitting
+app.on('before-quit', () => {
+	isQuitting = true;
+	stopServer();
 });
+
+// quit when all windows are closed
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+	if (process.platform !== 'darwin') {
+		app.quit();
+	}
 });
-app.on('quit', () => {
-    if (serverProcess) {
-        serverProcess.kill();
-    }
-});
+
 // IPC handlers for CSV operations
 ipcMain.handle('show-save-dialog', async (_event, options) => {
-    return await dialog.showSaveDialog(mainWindow, options);
+	return dialog.showSaveDialog(mainWindow ?? undefined, options);
 });
+
 ipcMain.handle('show-open-dialog', async (_event, options) => {
-    return await dialog.showOpenDialog(mainWindow, options);
+	return dialog.showOpenDialog(mainWindow ?? undefined, options);
 });
+
 ipcMain.handle('show-message-box', async (_event, options) => {
-    return await dialog.showMessageBox(mainWindow, options);
+	return dialog.showMessageBox(mainWindow ?? undefined, options);
 });
