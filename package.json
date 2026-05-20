@@ -24,9 +24,10 @@
 		"rebuild:electron": "electron-rebuild -f -w better-sqlite3",
 		"electron:dev": "pnpm run build && pnpm run rebuild:electron && electron .",
 		"pack": "pnpm run build && electron-builder build",
-		"pack:mac": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac",
-		"pack:win": "pnpm run build && electron-builder build --win",
-		"pack:linux": "pnpm run build && electron-builder build --linux"
+		"pack:mac:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --x64 --publish never",
+		"pack:mac:arm64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --arm64 --publish never",
+		"pack:win:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --win nsis --x64 --publish never",
+		"pack:linux:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --linux AppImage --x64 --publish never"
 	},
 	"build": {
 		"appId": "org.kiyo.my-doryoku-log",
@@ -79,6 +80,32 @@
 					]
 				}
 			]
+		},
+		"win": {
+			"icon": "icons/MDL-Icon-Default.png",
+			"target": [
+				{
+					"target": "nsis",
+					"arch": [
+						"x64"
+					]
+				}
+			]
+		},
+		"linux": {
+			"icon": "icons/MDL-Icon-Default.png",
+			"target": [
+				{
+					"target": "AppImage",
+					"arch": [
+						"x64"
+					]
+				}
+			]
+		},
+		"nsis": {
+			"oneClick": false,
+			"allowToChangeInstallationDirectory": true
 		}
 	},
 	"devDependencies": {
