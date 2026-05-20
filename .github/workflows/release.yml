@@ -19,18 +19,17 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.1.2
-          run_install: false
-          standalone: true
-          dest: ~/setup-pnpm
-
       - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
+
+      - name: Install pnpm
+        shell: bash
+        run: |
+          curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=11.1.2 SHELL="$(which bash)" bash -
+          echo "PNPM_HOME=$HOME/.local/share/pnpm" >> "$GITHUB_ENV"
+          echo "$HOME/.local/share/pnpm" >> "$GITHUB_PATH"
 
       - name: Verify tool versions
         shell: bash
@@ -66,18 +65,17 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.1.2
-          run_install: false
-          standalone: true
-          dest: ~/setup-pnpm
-
       - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
+
+      - name: Install pnpm
+        shell: bash
+        run: |
+          curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=11.1.2 SHELL="$(which bash)" bash -
+          echo "PNPM_HOME=$HOME/.local/share/pnpm" >> "$GITHUB_ENV"
+          echo "$HOME/.local/share/pnpm" >> "$GITHUB_PATH"
 
       - name: Verify tool versions
         shell: bash
@@ -113,21 +111,20 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.1.2
-          run_install: false
-          standalone: true
-          dest: ~/setup-pnpm
-
       - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
 
+      - name: Install pnpm
+        shell: powershell
+        run: |
+          Invoke-WebRequest https://get.pnpm.io/install.ps1 -UseBasicParsing | Invoke-Expression
+          echo "PNPM_HOME=$env:USERPROFILE\AppData\Local\pnpm" >> $env:GITHUB_ENV
+          echo "$env:USERPROFILE\AppData\Local\pnpm" >> $env:GITHUB_PATH
+
       - name: Verify tool versions
-        shell: bash
+        shell: powershell
         run: |
           node --version
           pnpm --version
@@ -160,19 +157,17 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.1.2
-          run_install: false
-          standalone: true
-          dest: ~/setup-pnpm
-
       - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
-          cache: 'pnpm'
+
+      - name: Install pnpm
+        shell: bash
+        run: |
+          curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=11.1.2 SHELL="$(which bash)" bash -
+          echo "PNPM_HOME=$HOME/.local/share/pnpm" >> "$GITHUB_ENV"
+          echo "$HOME/.local/share/pnpm" >> "$GITHUB_PATH"
 
       - name: Verify tool versions
         shell: bash
