@@ -6,7 +6,7 @@ on:
     tags:
       - 'v*.*.*'
   release:
-    types: [created]
+    types: [published]
 
 permissions:
   contents: write
@@ -19,20 +19,23 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+          run_install: false
+
       - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
           cache: 'pnpm'
 
-      - name: Install Corepack and pnpm
+      - name: Verify tool versions
         shell: bash
         run: |
-          npm install --global corepack@latest
-          corepack enable
-          corepack prepare pnpm@11.1.2 --activate
-          pnpm --version
           node --version
+          pnpm --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -62,20 +65,23 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+          run_install: false
+
       - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
           cache: 'pnpm'
 
-      - name: Install Corepack and pnpm
+      - name: Verify tool versions
         shell: bash
         run: |
-          npm install --global corepack@latest
-          corepack enable
-          corepack prepare pnpm@11.1.2 --activate
-          pnpm --version
           node --version
+          pnpm --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -105,20 +111,23 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+          run_install: false
+
       - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
           cache: 'pnpm'
 
-      - name: Install Corepack and pnpm
+      - name: Verify tool versions
         shell: bash
         run: |
-          npm install --global corepack@latest
-          corepack enable
-          corepack prepare pnpm@11.1.2 --activate
-          pnpm --version
           node --version
+          pnpm --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -148,20 +157,23 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+          run_install: false
+
       - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
           cache: 'pnpm'
 
-      - name: Install Corepack and pnpm
+      - name: Verify tool versions
         shell: bash
         run: |
-          npm install --global corepack@latest
-          corepack enable
-          corepack prepare pnpm@11.1.2 --activate
-          pnpm --version
           node --version
+          pnpm --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
