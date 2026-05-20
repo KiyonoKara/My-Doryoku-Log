@@ -5,6 +5,10 @@
 	"author": "KiyonoKara",
 	"type": "module",
 	"main": "electron.js",
+    "packageManager": "pnpm@11.1.2",
+    "engines": {
+      "node": ">=24.12.0 <25"
+    },
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
 		"dev": "vite dev",
