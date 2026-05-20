@@ -1,6 +1,7 @@
 name: Build desktop releases
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*.*.*'
