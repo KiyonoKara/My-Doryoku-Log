@@ -23,13 +23,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
-          cache: pnpm
+          cache: 'pnpm'
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Activate pnpm 11.1.2
-        run: corepack prepare pnpm@11.1.2 --activate
+      - name: Install Corepack and pnpm
+        shell: bash
+        run: |
+          npm install --global corepack@latest
+          corepack enable
+          corepack prepare pnpm@11.1.2 --activate
+          pnpm --version
+          node --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -63,13 +66,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
-          cache: pnpm
+          cache: 'pnpm'
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Activate pnpm 11.1.2
-        run: corepack prepare pnpm@11.1.2 --activate
+      - name: Install Corepack and pnpm
+        shell: bash
+        run: |
+          npm install --global corepack@latest
+          corepack enable
+          corepack prepare pnpm@11.1.2 --activate
+          pnpm --version
+          node --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -103,13 +109,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
-          cache: pnpm
+          cache: 'pnpm'
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Activate pnpm 11.1.2
-        run: corepack prepare pnpm@11.1.2 --activate
+      - name: Install Corepack and pnpm
+        shell: bash
+        run: |
+          npm install --global corepack@latest
+          corepack enable
+          corepack prepare pnpm@11.1.2 --activate
+          pnpm --version
+          node --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -143,13 +152,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.12.0
-          cache: pnpm
+          cache: 'pnpm'
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Activate pnpm 11.1.2
-        run: corepack prepare pnpm@11.1.2 --activate
+      - name: Install Corepack and pnpm
+        shell: bash
+        run: |
+          npm install --global corepack@latest
+          corepack enable
+          corepack prepare pnpm@11.1.2 --activate
+          pnpm --version
+          node --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -180,6 +192,7 @@ jobs:
       - build-mac-arm64
       - build-win-x64
       - build-linux-x64
+    if: github.event_name == 'release'
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
