@@ -2,71 +2,85 @@
 	"name": "my-doryoku-log",
 	"private": true,
 	"version": "0.0.1",
-    "author": "KiyonoKara",
+	"author": "KiyonoKara",
 	"type": "module",
 	"main": "electron.js",
-    "scripts": {
-      "preinstall": "npx only-allow pnpm",
-      "dev": "vite dev",
-      "build": "vite build",
-      "preview": "vite preview",
-      "prepare": "svelte-kit sync || echo ''",
-      "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-      "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-      "format": "prettier --write .",
-      "lint": "prettier --check . && eslint .",
-      "db:push": "drizzle-kit push",
-      "db:generate": "drizzle-kit generate",
-      "db:migrate": "drizzle-kit migrate",
-      "db:studio": "drizzle-kit studio",
-      "test": "vitest run",
-      "test:watch": "vitest",
-      "electron:dev": "pnpm run build && electron .",
-      "pack": "pnpm run build && electron-builder build",
-      "pack:mac": "pnpm run build && electron-builder build --mac",
-      "pack:win": "pnpm run build && electron-builder build --win",
-      "pack:linux": "pnpm run build && electron-builder build --linux"
-    },
-  "build": {
-    "appId": "org.kiyo.my-doryoku-log",
-    "productName": "My Doryoku Log",
-    "directories": {
-      "output": "dist-electron"
-    },
-    "files": [
-      "electron.js",
-      "preload.cjs",
-      "icons/**/*",
-      "package.json"
-    ],
-    "extraResources": [
-      {
-        "from": "build",
-        "to": "server",
-        "filter": ["**/*"]
-      }
-    ],
-    "asar": true,
-    "asarUnpack": [
-      "**/*.node",
-      "node_modules/better-sqlite3/**/*"
-    ],
-    "npmRebuild": true,
-    "nativeRebuilder": "sequential",
-    "buildDependenciesFromSource": false,
-    "nodeGypRebuild": false,
-    "mac": {
-      "category": "public.app-category.productivity",
-      "icon": "icons/MDL-Icon-Mac-Default@1x.icns",
-      "identity": null,
-      "target": [
-        {
-          "target": "zip",
-          "arch": ["x64"]
-        }
-      ]
-    }
-  },
+	"scripts": {
+		"preinstall": "npx only-allow pnpm",
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"format": "prettier --write .",
+		"lint": "prettier --check . && eslint .",
+		"db:push": "drizzle-kit push",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:studio": "drizzle-kit studio",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"rebuild:electron": "electron-rebuild -f -w better-sqlite3",
+		"electron:dev": "pnpm run build && pnpm run rebuild:electron && electron .",
+		"pack": "pnpm run build && electron-builder build",
+		"pack:mac": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac",
+		"pack:win": "pnpm run build && electron-builder build --win",
+		"pack:linux": "pnpm run build && electron-builder build --linux"
+	},
+	"build": {
+		"appId": "org.kiyo.my-doryoku-log",
+		"productName": "My Doryoku Log",
+		"directories": {
+			"output": "dist-electron"
+		},
+		"files": [
+			"electron.js",
+			"preload.cjs",
+			"db-init.js",
+			"icons/**/*",
+			"package.json"
+		],
+		"extraResources": [
+			{
+				"from": "build",
+				"to": "server",
+				"filter": [
+					"**/*"
+				]
+			},
+			{
+				"from": "drizzle",
+				"to": "drizzle",
+				"filter": [
+					"**/*"
+				]
+			}
+		],
+		"asar": true,
+		"asarUnpack": [
+			"**/*.node",
+			"node_modules/better-sqlite3/**/*"
+		],
+		"npmRebuild": true,
+		"nativeRebuilder": "sequential",
+		"buildDependenciesFromSource": false,
+		"nodeGypRebuild": false,
+		"mac": {
+			"category": "public.app-category.productivity",
+			"icon": "icons/MDL-Icon-Mac-Default@1x.icns",
+			"identity": null,
+			"target": [
+				{
+					"target": "zip",
+					"arch": [
+						"x64",
+						"arm64"
+					]
+				}
+			]
+		}
+	},
 	"devDependencies": {
 		"@electron/rebuild": "^4.0.4",
 		"@eslint/compat": "^1.4.0",

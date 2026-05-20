@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import net from 'node:net';
 import http from 'node:http';
 import { fileURLToPath } from 'node:url';
+import { checkDatabase } from './db-init.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,7 +20,7 @@ let isBootstrapping = false;
  * @param args
  */
 function safeLog(...args) {
-	if (!app.isPackaged){
+	if (!app.isPackaged) {
 		console.log(...args);
 	}
 }
@@ -91,7 +92,7 @@ function getPreloadPath() {
 }
 
 /**
- * Get icon path based on platform
+ * Get icon path based on the platform
  * @returns {string}
  */
 function getIconPath() {
@@ -117,11 +118,24 @@ function getFreePort() {
 			const address = server.address();
 			const port = typeof address === 'object' && address ? address.port : null;
 			server.close(() => {
-				if (port) resolve(port);
-				else reject(new Error('No free port found'));
+				if (port) {
+					resolve(port);
+				} else {
+					reject(new Error('No free port found'));
+				}
 			});
 		});
 	});
+}
+
+/**
+ * Get the path to the migrations directory
+ * @returns {string}
+ */
+function getMigrationsPath() {
+	return app.isPackaged
+		? path.join(process.resourcesPath, 'drizzle')
+		: path.join(__dirname, 'drizzle');
 }
 
 /**
@@ -233,7 +247,7 @@ async function startServer(port) {
 			ORIGIN: baseUrl,
 			PROTOCOL_HEADER: 'x-forwarded-proto',
 			HOST_HEADER: 'host',
-			BODY_SIZE_LIMIT: '0'
+			BODY_SIZE_LIMIT: 'Infinity'
 		}
 	});
 
@@ -276,6 +290,11 @@ async function bootstrap() {
 		checkDataDir();
 		currentPort = await getFreePort();
 
+		const { dbPath } = getPaths();
+		const migrationsPath = getMigrationsPath();
+
+		checkDatabase(dbPath, migrationsPath);
+
 		const win = createWindow();
 		const url = await startServer(currentPort);
 		await win.loadURL(url);
@@ -293,7 +312,7 @@ if (!hasLock) {
 		focusMainWindow();
 	});
 
-	// avoid opening app multiple times
+	// avoid opening the app multiple times
 	app.whenReady().then(async () => {
 		try {
 			await bootstrap();
