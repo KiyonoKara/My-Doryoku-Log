@@ -13,6 +13,8 @@ jobs:
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.runner }}
+    env:
+      DATABASE_URL: local.db
 
     strategy:
       fail-fast: false
@@ -72,6 +74,7 @@ jobs:
         run: pnpm run ${{ matrix.build_script }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DATABASE_URL: local.db
 
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
