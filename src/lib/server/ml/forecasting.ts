@@ -1,4 +1,4 @@
-import { db } from '$lib/server/db';
+import { getDb } from '$lib/server/db';
 import { transactions } from '$lib/server/db/schema';
 import type { Transaction } from '$lib/server/db/schema';
 import {
@@ -16,6 +16,7 @@ const MIN_REQ_TRANSACTIONS = 10;
 
 // load rows from db
 async function loadRows(): Promise<Transaction[]> {
+	const db = getDb();
 	return db.select().from(transactions).all();
 }
 
@@ -71,7 +72,7 @@ function getMedian(nums: number[]): number {
 
 function defaultFutureFeatures(trType: TxType, rows: Transaction[]) {
 	// feature vector for the next transaction of a given type
-	// uses current date and typical amount for that type
+	// uses the current date and typical amount for that type
 	const now = new Date();
 	const dow = now.getDay() === 0 ? 6 : now.getDay() - 1;
 	const dom = now.getDate();
@@ -99,7 +100,7 @@ function forecastNextForType(
 	models: ReturnType<typeof trainExpenseModels> & ReturnType<typeof trainIncomeModels>,
 	rows: Transaction[]
 ): Record<string, unknown> {
-	// forecast next coarse category and amount for a given type of expense or income
+	// forecast the next coarse category and amount for a given type of expense or income
 	const { dow, month, amount, isWeekend, isMonthStart, isMonthEnd } = defaultFutureFeatures(
 		trType,
 		rows
@@ -116,7 +117,7 @@ function forecastNextForType(
 	const coarseId = clf.predict([xClf])[0];
 	const coarseLabel = ID_TO_COARSE[coarseId];
 
-	// pick most frequent fine category for this type
+	// pick the most frequent fine category for this type
 	const fineCounts: Record<string, number> = {};
 	for (const r of rows) {
 		if (r.type !== trType || !ALL_CATEGORIES.includes(r.category)) {

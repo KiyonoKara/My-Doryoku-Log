@@ -1,6 +1,6 @@
 import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
+import { getDb } from '$lib/server/db';
 import { transactions, type Transaction } from '$lib/server/db/schema';
 import { desc, eq, inArray } from 'drizzle-orm';
 import { forecastNextExpense, forecastNextIncome } from '$lib/server/ml/forecasting';
@@ -9,11 +9,13 @@ import { parseCSVLine } from '$lib/utils/util';
 
 // load page with this
 export const load: PageServerLoad = async () => {
+	// get db instance
+	const db = getDb();
 	const rows: Transaction[] = await db
 		.select()
 		.from(transactions)
-		.orderBy(desc(transactions.date), desc(transactions.id))
-		.limit(50);
+		.orderBy(desc(transactions.date), desc(transactions.id));
+		//.limit(50);
 	const expenseForecast = await forecastNextExpense();
 	const incomeForecast = await forecastNextIncome();
 
@@ -27,6 +29,7 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
 	// for submitting transactions
 	submit: async ({ request }) => {
+		const db = getDb();
 		if (request.method !== 'POST') {
 			return fail(405, {
 				success: false,
@@ -91,6 +94,7 @@ export const actions: Actions = {
 	},
 	// for deleting transactions
 	delete: async ({ request }) => {
+		const db = getDb();
 		if (request.method !== 'POST') {
 			return fail(405, {
 				success: false,
@@ -119,6 +123,7 @@ export const actions: Actions = {
 
 	// for editing and updating transactions
 	update: async ({ request }) => {
+		const db = getDb();
 		if (request.method !== 'POST') {
 			return fail(405, { success: false, message: 'Method not allowed' });
 		}
@@ -183,6 +188,7 @@ export const actions: Actions = {
 
 	// for deleting multiple transactions
 	bulkDelete: async ({ request }) => {
+		const db = getDb();
 		if (request.method !== 'POST') {
 			return fail(405, {
 				success: false,
@@ -211,6 +217,7 @@ export const actions: Actions = {
 
 	// for importing CSV data
 	importCsv: async ({ request }) => {
+		const db = getDb();
 		if (request.method !== 'POST') {
 			return fail(405, {
 				success: false,

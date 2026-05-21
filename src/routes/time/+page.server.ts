@@ -1,17 +1,19 @@
 import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
+import { getDb } from '$lib/server/db';
 import { time_entries, type TimeEntry } from '$lib/server/db/schema';
 import { desc, eq, inArray } from 'drizzle-orm';
 import { MAX_TASK_LENGTH, TIME_CATEGORIES } from '$lib/types/time';
 import { parseCSVLine, parseDurationHMS } from '$lib/utils/util';
 
 export const load: PageServerLoad = async () => {
+	// get db instance
+	const db = getDb();
 	const rows: TimeEntry[] = await db
 		.select()
 		.from(time_entries)
-		.orderBy(desc(time_entries.start_date), desc(time_entries.id))
-		.limit(50);
+		.orderBy(desc(time_entries.start_date), desc(time_entries.id));
+		//.limit(50);
 
 	return {
 		entries: rows
@@ -20,6 +22,7 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
 	start: async ({ request }) => {
+		const db = getDb();
 		if (request.method !== 'POST') {
 			return fail(405, {
 				success: false,
@@ -80,6 +83,7 @@ export const actions: Actions = {
 	},
 
 	stop: async ({ request }) => {
+		const db = getDb();
 		if (request.method !== 'POST') {
 			return fail(405, {
 				success: false,
@@ -123,6 +127,7 @@ export const actions: Actions = {
 	},
 
 	update: async ({ request }) => {
+		const db = getDb();
 		if (request.method !== 'POST') {
 			return fail(405, {
 				success: false,
@@ -238,6 +243,7 @@ export const actions: Actions = {
 	},
 
 	delete: async ({ request }) => {
+		const db = getDb();
 		if (request.method !== 'POST') {
 			return fail(405, {
 				success: false,
@@ -286,6 +292,7 @@ export const actions: Actions = {
 	},
 
 	bulkDelete: async ({ request }) => {
+		const db = getDb();
 		if (request.method !== 'POST') {
 			return fail(405, {
 				success: false,
@@ -326,6 +333,7 @@ export const actions: Actions = {
 	},
 
 	importCsv: async ({ request }) => {
+		const db = getDb();
 		if (request.method !== 'POST') {
 			return fail(405, {
 				success: false,
