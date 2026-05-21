@@ -20,19 +20,19 @@ jobs:
         include:
           - name: macOS x64
             runner: macos-13
-            build_script: dist:mac:x64
+            build_script: pack:mac:x64
 
           - name: macOS arm64
             runner: macos-14
-            build_script: dist:mac:arm64
+            build_script: pack:mac:arm64
 
           - name: Windows x64
             runner: windows-2022
-            build_script: dist:win:x64
+            build_script: pack:win:x64
 
           - name: Linux x64
             runner: ubuntu-24.04
-            build_script: dist:linux:x64
+            build_script: pack:linux:x64
 
     steps:
       - name: Checkout
