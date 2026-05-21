@@ -64,7 +64,11 @@
 				"filter": [
 					"**/*"
 				]
-			}
+			},
+          {
+            "from": "local.db",
+            "to": "local.db"
+          }
 		],
 		"asar": true,
 		"asarUnpack": [
