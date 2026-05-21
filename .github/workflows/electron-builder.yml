@@ -64,6 +64,10 @@ jobs:
           pnpm check
           pnpm test
 
+      - name: Rebuild native modules
+        run: |
+          pnpm rebuild
+
       - name: Build package
         run: pnpm run ${{ matrix.build_script }}
         env:
