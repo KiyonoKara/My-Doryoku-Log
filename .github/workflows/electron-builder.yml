@@ -1,54 +1,77 @@
-name: Build desktop apps
+name: Build desktop packages
 
 on:
   workflow_dispatch:
   push:
     tags:
-      - 'v*.*.*'
-  release:
-    types: [published]
+      - "v*"
+
+permissions:
+  contents: write
 
 jobs:
   build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: macos-13
-            artifact: mac-x64
-            cmd: pnpm run pack:mac:x64
-          - os: macos-14
-            artifact: mac-arm64
-            cmd: pnpm run pack:mac:arm64
-          - os: windows-2022
-            artifact: win-x64
-            cmd: pnpm run pack:win:x64
-          - os: ubuntu-22.04
-            artifact: linux-x64
-            cmd: pnpm run pack:linux:x64
+          - name: macOS x64
+            runner: macos-13
+            build_script: dist:mac:x64
 
-    runs-on: ${{ matrix.os }}
+          - name: macOS arm64
+            runner: macos-14
+            build_script: dist:mac:arm64
+
+          - name: Windows x64
+            runner: windows-2022
+            build_script: dist:win:x64
+
+          - name: Linux x64
+            runner: ubuntu-24.04
+            build_script: dist:linux:x64
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v5
 
-      - uses: pnpm/action-setup@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
         with:
           version: 11.1.2
+          run_install: false
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v6
         with:
           node-version: 24.12.0
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install deps
+      - name: Show versions
+        run: |
+          node -v
+          pnpm -v
+
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build artifact
-        run: ${{ matrix.cmd }}
+      - name: Check app
+        run: |
+          pnpm check
+          pnpm test
 
-      - name: Upload artifact
+      - name: Build package
+        run: pnpm run ${{ matrix.build_script }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact }}
-          path: dist-electron/**
+          name: ${{ matrix.name }}
+          path: dist-electron/**/*
+          if-no-files-found: error
