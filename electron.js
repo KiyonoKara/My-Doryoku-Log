@@ -20,9 +20,9 @@ let isBootstrapping = false;
  * @param args
  */
 function safeLog(...args) {
-	if (!app.isPackaged) {
+	//if (!app.isPackaged) {
 		console.log(...args);
-	}
+	//}
 }
 
 /**
@@ -30,9 +30,9 @@ function safeLog(...args) {
  * @param args
  */
 function safeError(...args) {
-	if (!app.isPackaged) {
+	//if (!app.isPackaged) {
 		console.error(...args);
-	}
+	//}
 }
 
 /**
