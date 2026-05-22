@@ -61,8 +61,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify better-sqlite3
-        run: node -e "const Database=require('better-sqlite3'); new Database(':memory:').close(); console.log('better-sqlite3 OK')"
+      - name: Verify better-sqlite3 in Electron runtime
+        shell: bash
+        run: ELECTRON_RUN_AS_NODE=1 npx electron -e "const Database=require('better-sqlite3'); new Database(':memory:').close(); console.log('better-sqlite3 OK')"
 
       - name: Check app
         run: |
