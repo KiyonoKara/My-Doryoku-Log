@@ -1,5 +1,5 @@
 import { fork } from 'node:child_process';
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
 import net from 'node:net';
@@ -222,6 +222,19 @@ function createWindow() {
 		mainWindow = null;
 	});
 
+	mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+		if (validExternalUrl(url)) {
+			void shell.openExternal(url);
+		}
+	})
+
+	mainWindow.webContents.on('will-navigate', (event, url) => {
+		if (validExternalUrl(url)) {
+			event.preventDefault();
+			void shell.openExternal(url);
+		}
+	});
+
 	return mainWindow;
 }
 
@@ -280,6 +293,10 @@ function focusMainWindow() {
 	mainWindow.focus();
 }
 
+/**
+ * Bootstrap the app
+ * @returns {Promise<void>}
+ */
 async function bootstrap() {
 	if (isBootstrapping) {
 		return;
@@ -300,6 +317,20 @@ async function bootstrap() {
 		await win.loadURL(url);
 	} finally {
 		isBootstrapping = false;
+	}
+}
+
+/**
+ * Check if the URL is a valid external URL
+ * @param url
+ * @returns {boolean}
+ */
+function validExternalUrl(url) {
+	try {
+		const u = new URL(url);
+		return u.protocol === 'http' || u.protocol === 'https';
+	} catch {
+		return false;
 	}
 }
 
