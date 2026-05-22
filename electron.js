@@ -254,7 +254,8 @@ async function startServer(port) {
 		stdio: 'pipe',
 		env: {
 			...process.env,
-			...env,
+			DATABASE_URL: env.DATABASE_URL,
+			NODE_ENV: env.NODE_ENV,
 			HOST: '127.0.0.1',
 			PORT: String(port),
 			ORIGIN: baseUrl,
