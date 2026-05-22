@@ -62,7 +62,14 @@
 				"filter": [
 					"**/*"
 				]
-			}
+			},
+            {
+              "from": "node_modules",
+              "to": "server/node_modules",
+              "filter": [
+                "**/*"
+              ]
+            }
 		],
 		"asar": true,
 		"asarUnpack": [

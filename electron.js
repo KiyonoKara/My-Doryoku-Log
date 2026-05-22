@@ -265,6 +265,7 @@ function createWindow() {
 
 async function startServer(port) {
 	const serverPath = getServerPath();
+	const serverDir = path.dirname(serverPath);
 
 	if (!fs.existsSync(serverPath)) {
 		throw new Error(`Server build not found at: ${serverPath}`);
@@ -280,7 +281,7 @@ async function startServer(port) {
 
 	// start a local server
 	serverProcess = fork(serverPath, [], {
-		cwd: app.isPackaged ? process.resourcesPath : __dirname,
+		cwd: serverDir,
 		stdio: 'pipe',
 		env: {
 			...process.env,
