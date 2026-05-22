@@ -42,8 +42,6 @@
 		},
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
 		"files": [
-            "build/**/*",
-            "drizzle/**/*",
 			"electron.js",
 			"preload.cjs",
 			"db-init.js",
@@ -64,11 +62,7 @@
 				"filter": [
 					"**/*"
 				]
-			},
-          {
-            "from": "local.db",
-            "to": "local.db"
-          }
+			}
 		],
 		"asar": true,
 		"asarUnpack": [

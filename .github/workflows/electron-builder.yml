@@ -24,17 +24,17 @@ jobs:
             runner: macos-15-intel
             build_script: pack:mac:x64
 
-          - name: macOS arm64
-            runner: macos-14
-            build_script: pack:mac:arm64
-
-          - name: Windows x64
-            runner: windows-2022
-            build_script: pack:win:x64
-
-          - name: Linux x64
-            runner: ubuntu-24.04
-            build_script: pack:linux:x64
+#          - name: macOS arm64
+#            runner: macos-14
+#            build_script: pack:mac:arm64
+#
+#          - name: Windows x64
+#            runner: windows-2022
+#            build_script: pack:win:x64
+#
+#          - name: Linux x64
+#            runner: ubuntu-24.04
+#            build_script: pack:linux:x64
 
     steps:
       - name: Checkout

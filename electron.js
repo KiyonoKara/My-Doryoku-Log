@@ -15,24 +15,49 @@ let mainWindow = null;
 let currentPort = null;
 let isBootstrapping = false;
 
-/**
- * Log messages only in development mode
- * @param args
- */
-function safeLog(...args) {
-	//if (!app.isPackaged) {
-		console.log(...args);
-	//}
+// /**
+//  * Log messages only in development mode
+//  * @param args
+//  */
+// function safeLog(...args) {
+// 	if (!app.isPackaged) {
+// 		console.log(...args);
+// 	}
+// }
+//
+// /**
+//  * Log errors only in development mode
+//  * @param args
+//  */
+// function safeError(...args) {
+// 	if (!app.isPackaged) {
+// 		console.error(...args);
+// 	}
+// }
+
+function getLogFilePath() {
+	const userData = app.getPath('userData');
+	return path.join(userData, 'main.log');
 }
 
-/**
- * Log errors only in development mode
- * @param args
- */
-function safeError(...args) {
-	//if (!app.isPackaged) {
-		console.error(...args);
-	//}
+function appendLog(...args) {
+	const line = `[${new Date().toISOString()}] ${args.map((a) => String(a)).join(' ')}\n`;
+	try {
+		fs.appendFileSync(getLogFilePath(), line, 'utf8');
+	} catch (error) {
+		console.error('Failed to write log file:', error);
+	}
+	console.log(...args);
+}
+
+function appendError(...args) {
+	const line = `[${new Date().toISOString()}] ERROR ${args.map((a) => String(a)).join(' ')}\n`;
+	try {
+		fs.appendFileSync(getLogFilePath(), line, 'utf8');
+	} catch (error) {
+		console.error('Failed to write log file:', error);
+	}
+	console.error(...args);
 }
 
 /**
@@ -248,6 +273,11 @@ async function startServer(port) {
 	const env = getEnv();
 	const baseUrl = `http://127.0.0.1:${port}`;
 
+	appendLog('Server path:', serverPath);
+	appendLog('Resources path:', process.resourcesPath);
+	appendLog('Migrations path:', getMigrationsPath());
+	appendLog('Database path:', getPaths().dbPath);
+
 	// start a local server
 	serverProcess = fork(serverPath, [], {
 		cwd: app.isPackaged ? process.resourcesPath : __dirname,
@@ -266,11 +296,11 @@ async function startServer(port) {
 	});
 
 	serverProcess.stdout?.on('data', (data) => {
-		safeLog(`[server] ${data.toString()}`);
+		appendLog(`[server] ${data.toString()}`);
 	});
 
 	serverProcess.stderr?.on('data', (data) => {
-		safeError(`[server:error] ${data.toString()}`);
+		appendError(`[server:error] ${data.toString()}`);
 	});
 
 	const exitedEarly = new Promise((_, reject) => {
