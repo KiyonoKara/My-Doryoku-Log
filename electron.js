@@ -328,7 +328,7 @@ async function bootstrap() {
 function validExternalUrl(url) {
 	try {
 		const u = new URL(url);
-		return u.protocol === 'http' || u.protocol === 'https';
+		return u.protocol === 'http:' || u.protocol === 'https:';
 	} catch {
 		return false;
 	}
