@@ -8,12 +8,22 @@ import Database from 'better-sqlite3';
  * @returns {string[]}
  */
 function getMigrationFiles(migrationsDir) {
+	if (!fs.existsSync(migrationsDir)) {
+		throw new Error(`Migrations directory not found: ${migrationsDir}`);
+	}
+
 	const entries = fs.readdirSync(migrationsDir, { withFileTypes: true });
 
-	return entries
+	const entryFiles = entries
 		.filter((entry) => entry.isFile() && entry.name.endsWith('.sql'))
 		.map((entry) => path.join(migrationsDir, entry.name))
 		.sort();
+
+	if (entryFiles.length === 0) {
+		throw new Error(`No migration SQL files found in: ${migrationsDir}`);
+	}
+
+	return entryFiles;
 }
 
 /**
@@ -23,6 +33,11 @@ function getMigrationFiles(migrationsDir) {
  */
 export function checkDatabase(dbPath, migrationsDir) {
 	const dbDir = path.dirname(dbPath);
+
+	console.log('[db-init] dbPath =', dbPath);
+	console.log('[db-init] migrationsDir =', migrationsDir);
+	console.log('[db-init] dbDir exists =', fs.existsSync(dbDir));
+	console.log('[db-init] migrationsDir exists =', fs.existsSync(migrationsDir));
 
 	if (!fs.existsSync(dbDir)) {
 		fs.mkdirSync(dbDir, { recursive: true });
@@ -46,14 +61,17 @@ export function checkDatabase(dbPath, migrationsDir) {
 	);
 
 	const files = getMigrationFiles(migrationsDir);
+	console.log('[db-init] migration files =', files);
 
 	for (const file of files) {
 		const name = path.basename(file);
 
 		if (applied.has(name)) {
+			console.log('[db-init] already applied:', name);
 			continue;
 		}
 
+		console.log('[db-init] applying:', name);
 		const sql = fs.readFileSync(file, 'utf8');
 
 		const tx = db.transaction(() => {
@@ -63,6 +81,11 @@ export function checkDatabase(dbPath, migrationsDir) {
 
 		tx();
 	}
+
+	const tables = db
+		.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+		.all();
+	console.log('[db-init] tables after migration =', tables);
 
 	db.close();
 }

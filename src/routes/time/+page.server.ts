@@ -7,17 +7,21 @@ import { MAX_TASK_LENGTH, TIME_CATEGORIES } from '$lib/types/time';
 import { parseCSVLine, parseDurationHMS } from '$lib/utils/util';
 
 export const load: PageServerLoad = async () => {
-	// get db instance
-	const db = getDb();
-	const rows: TimeEntry[] = await db
-		.select()
-		.from(time_entries)
-		.orderBy(desc(time_entries.start_date), desc(time_entries.id));
-		//.limit(50);
+	try {
+		// get db instance
+		const db = getDb();
+		const rows: TimeEntry[] = await db
+			.select()
+			.from(time_entries)
+			.orderBy(desc(time_entries.start_date), desc(time_entries.id));
+			//.limit(50);
 
-	return {
-		entries: rows
-	};
+		return {
+			entries: rows
+		};
+	} catch (error) {
+		console.error('[time load] failed:', error);
+	}
 };
 
 export const actions: Actions = {

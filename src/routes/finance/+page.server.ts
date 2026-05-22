@@ -9,21 +9,37 @@ import { parseCSVLine } from '$lib/utils/util';
 
 // load page with this
 export const load: PageServerLoad = async () => {
-	// get db instance
-	const db = getDb();
-	const rows: Transaction[] = await db
-		.select()
-		.from(transactions)
-		.orderBy(desc(transactions.date), desc(transactions.id));
-		//.limit(50);
-	const expenseForecast = await forecastNextExpense();
-	const incomeForecast = await forecastNextIncome();
+	try {
+		// get db instance
+		const db = getDb();
+		const rows: Transaction[] = await db
+			.select()
+			.from(transactions)
+			.orderBy(desc(transactions.date), desc(transactions.id));
+			//.limit(50);
+		let expenseForecast = null;
+		let incomeForecast = null;
 
-	return {
-		transactions: rows as Transaction[],
-		expenseForecast,
-		incomeForecast
-	};
+		try {
+			expenseForecast = await forecastNextExpense();
+		} catch (error) {
+			console.error('forecastNextExpense failed:', error);
+		}
+
+		try {
+			incomeForecast = await forecastNextIncome();
+		} catch (error) {
+			console.error('forecastNextIncome failed:', error);
+		}
+
+		return {
+			transactions: rows as Transaction[],
+			expenseForecast,
+			incomeForecast
+		};
+	} catch (error) {
+		console.error('[finance load] failed:', error);
+	}
 };
 
 export const actions: Actions = {
