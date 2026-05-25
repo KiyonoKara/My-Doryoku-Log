@@ -16,7 +16,7 @@ export const load: PageServerLoad = async () => {
 			.select()
 			.from(transactions)
 			.orderBy(desc(transactions.date), desc(transactions.id));
-			//.limit(50);
+		//.limit(50);
 		let expenseForecast = null;
 		let incomeForecast = null;
 

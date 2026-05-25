@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 permissions:
   contents: write
@@ -70,9 +70,9 @@ jobs:
           pnpm check
           pnpm test
 
-#      - name: Rebuild native modules
-#        run: |
-#          pnpm rebuild
+      #      - name: Rebuild native modules
+      #        run: |
+      #          pnpm rebuild
 
       - name: Build package
         run: pnpm run ${{ matrix.build_script }}

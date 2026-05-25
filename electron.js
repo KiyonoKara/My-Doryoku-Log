@@ -251,7 +251,7 @@ function createWindow() {
 		if (validExternalUrl(url)) {
 			void shell.openExternal(url);
 		}
-	})
+	});
 
 	mainWindow.webContents.on('will-navigate', (event, url) => {
 		if (validExternalUrl(url)) {

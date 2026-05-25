@@ -14,7 +14,7 @@ export const load: PageServerLoad = async () => {
 			.select()
 			.from(time_entries)
 			.orderBy(desc(time_entries.start_date), desc(time_entries.id));
-			//.limit(50);
+		//.limit(50);
 
 		return {
 			entries: rows

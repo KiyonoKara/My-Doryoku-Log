@@ -41,6 +41,10 @@
 			"output": "dist-electron"
 		},
 		"artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+		"compression": "normal",
+		"electronLanguages": [
+			"en"
+		],
 		"files": [
 			"electron.js",
 			"preload.cjs",
@@ -64,8 +68,22 @@
 				]
 			},
 			{
-				"from": "node_modules",
-				"to": "server/node_modules",
+				"from": "node_modules/better-sqlite3",
+				"to": "server/node_modules/better-sqlite3",
+				"filter": [
+					"**/*"
+				]
+			},
+			{
+				"from": "node_modules/bindings",
+				"to": "server/node_modules/bindings",
+				"filter": [
+					"**/*"
+				]
+			},
+			{
+				"from": "node_modules/file-uri-to-path",
+				"to": "server/node_modules/file-uri-to-path",
 				"filter": [
 					"**/*"
 				]
@@ -74,8 +92,7 @@
 		"asar": true,
 		"asarUnpack": [
 			"**/*.node",
-			"node_modules/better-sqlite3/**/*",
-			"node_modules/.pnpm/**/*"
+			"node_modules/better-sqlite3/**/*"
 		],
 		"npmRebuild": true,
 		"nativeRebuilder": "sequential",
