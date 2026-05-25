@@ -1,0 +1,134 @@
+name: Attach build artifacts to a release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to publish, e.g. v0.0.1"
+        required: true
+        type: string
+      run_id:
+        description: "Workflow run ID from the desktop packaging workflow"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  attach:
+    name: Attach artifacts to release
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Validate inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TAG="${{ inputs.tag }}"
+          RUN_ID="${{ inputs.run_id }}"
+
+          if [[ ! "$TAG" =~ ^v ]]; then
+            echo "Tag must start with v, for example v0.0.1"
+            exit 1
+          fi
+
+          if [[ ! "$RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo "run_id must be numeric"
+            exit 1
+          fi
+
+      - name: Show selected values
+        shell: bash
+        run: |
+          echo "Tag: ${{ inputs.tag }}"
+          echo "Run ID: ${{ inputs.run_id }}"
+          echo "Create release if missing: ${{ inputs.create_release_if_missing }}"
+          echo "Artifact name filter: ${{ inputs.artifact_name }}"
+
+      - name: Download all artifacts from selected run
+        if: ${{ inputs.artifact_name == '' }}
+        uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.run_id }}
+          path: release-artifacts
+
+      - name: Download selected artifact from chosen run
+        if: ${{ inputs.artifact_name != '' }}
+        uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.run_id }}
+          name: ${{ inputs.artifact_name }}
+          path: release-artifacts
+
+      - name: List downloaded files
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Downloaded files:"
+          find release-artifacts -type f | sort
+
+      - name: Check that files exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! find release-artifacts -type f | grep -q .; then
+            echo "No files were downloaded from the selected workflow run."
+            exit 1
+          fi
+
+      - name: Check whether release exists
+        id: release_check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set +e
+          gh release view "${{ inputs.tag }}" >/dev/null 2>&1
+          STATUS=$?
+          set -e
+          if [ "$STATUS" -eq 0 ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create release if missing
+        if: ${{ steps.release_check.outputs.exists == 'false' && inputs.create_release_if_missing }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "${{ inputs.tag }}" \
+            --title "${{ inputs.tag }}" \
+            --notes "Release assets uploaded from workflow run ${{ inputs.run_id }}."
+
+      - name: Fail if release is missing and creation is disabled
+        if: ${{ steps.release_check.outputs.exists == 'false' && !inputs.create_release_if_missing }}
+        shell: bash
+        run: |
+          echo "Release ${{ inputs.tag }} does not exist and create_release_if_missing is false."
+          exit 1
+
+      - name: Upload files to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            echo "Uploading $file"
+            gh release upload "${{ inputs.tag }}" "$file" --clobber
+          done < <(find release-artifacts -type f -print0)
+
+      - name: Show release URL
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          gh release view "${{ inputs.tag }}" --json url --jq '.url'
