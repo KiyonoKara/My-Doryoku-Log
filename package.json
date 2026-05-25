@@ -5,13 +5,13 @@
 	"author": "KiyonoKara",
 	"type": "module",
 	"main": "electron.js",
-    "packageManager": "pnpm@11.1.2",
-    "engines": {
-      "node": ">=24.12.0 <25"
-    },
+	"packageManager": "pnpm@11.1.2",
+	"engines": {
+		"node": ">=24.12.0 <25"
+	},
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
-        "postinstall": "electron-builder install-app-deps",
+		"postinstall": "electron-builder install-app-deps",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -29,10 +29,10 @@
 		"rebuild:electron": "electron-rebuild -f -w better-sqlite3",
 		"electron:dev": "pnpm run build && pnpm run rebuild:electron && electron .",
 		"pack": "pnpm run build && electron-builder build",
-        "pack:mac:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --x64 --publish never",
-        "pack:mac:arm64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --arm64 --publish never",
-        "pack:win:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --win nsis --x64 --publish never",
-        "pack:linux:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --linux AppImage --x64 --publish never"
+		"pack:mac:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --x64 --publish never",
+		"pack:mac:arm64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --arm64 --publish never",
+		"pack:win:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --win nsis --x64 --publish never",
+		"pack:linux:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --linux AppImage --x64 --publish never"
 	},
 	"build": {
 		"appId": "org.kiyo.my-doryoku-log",
@@ -40,7 +40,7 @@
 		"directories": {
 			"output": "dist-electron"
 		},
-        "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+		"artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
 		"files": [
 			"electron.js",
 			"preload.cjs",
@@ -63,19 +63,19 @@
 					"**/*"
 				]
 			},
-            {
-              "from": "node_modules",
-              "to": "server/node_modules",
-              "filter": [
-                "**/*"
-              ]
-            }
+			{
+				"from": "node_modules",
+				"to": "server/node_modules",
+				"filter": [
+					"**/*"
+				]
+			}
 		],
 		"asar": true,
 		"asarUnpack": [
 			"**/*.node",
-            "node_modules/better-sqlite3/**/*",
-            "node_modules/.pnpm/**/*"
+			"node_modules/better-sqlite3/**/*",
+			"node_modules/.pnpm/**/*"
 		],
 		"npmRebuild": true,
 		"nativeRebuilder": "sequential",
@@ -151,6 +151,8 @@
 		"vitest": "^4.1.5"
 	},
 	"dependencies": {
-		"better-sqlite3": "^12.5.0"
+		"better-sqlite3": "^12.5.0",
+		"bindings": "^1.5.0",
+		"file-uri-to-path": "^2.0.0"
 	}
 }
