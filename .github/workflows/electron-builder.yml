@@ -61,15 +61,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Check better-sqlite for Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: $env:ELECTRON_RUN_AS_NODE=1; npx electron -e "const Database=require('better-sqlite3'); const db=new Database(':memory:'); db.prepare('select 1').get(); db.close(); console.log('OK')"
-
       - name: Check app
         run: |
           pnpm check
           pnpm test
+
+      - name: Verify better-sqlite3 in Electron runtime
+        if: runner.os != 'Windows'
+        shell: bash
+        run: ELECTRON_RUN_AS_NODE=1 npx electron -e "const Database=require('better-sqlite3'); const db=new Database(':memory:'); db.prepare('select 1').get(); db.close(); console.log('OK')"
 
       - name: Build package
         run: pnpm run ${{ matrix.build_script }}
