@@ -42,9 +42,6 @@
 		},
 		"artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
 		"compression": "normal",
-		"electronLanguages": [
-			"en"
-		],
 		"files": [
 			"electron.js",
 			"preload.cjs",
