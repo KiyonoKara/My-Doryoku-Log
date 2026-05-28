@@ -15,25 +15,7 @@ let mainWindow = null;
 let currentPort = null;
 let isBootstrapping = false;
 
-// /**
-//  * Log messages only in development mode
-//  * @param args
-//  */
-// function safeLog(...args) {
-// 	if (!app.isPackaged) {
-// 		console.log(...args);
-// 	}
-// }
-//
-// /**
-//  * Log errors only in development mode
-//  * @param args
-//  */
-// function safeError(...args) {
-// 	if (!app.isPackaged) {
-// 		console.error(...args);
-// 	}
-// }
+app.setName('MyDoryokuLog');
 
 function getLogFilePath() {
 	const userData = app.getPath('userData');
