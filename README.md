@@ -31,7 +31,7 @@ App made for logging finances and timed tasks. My Doryoku Log also means close t
 
 ### Running the project in Dev Mode
 
-Install dependencies with `npm install` (or `pnpm install` or `yarn`), then start a development server:
+Install dependencies with `npm install` (or `pnpm install` or `yarn`), then start a development server. Using `pnpm` is highly recommended.
 
 ```sh
 npm run dev
