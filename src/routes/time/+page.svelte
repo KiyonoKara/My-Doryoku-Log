@@ -623,14 +623,28 @@
 														type="datetime-local"
 														class="inline-input inline-input--date"
 														value={toLocalDatetimeString(draft.end_date)}
+														min={toLocalDatetimeString(draft.start_date)}
 														oninput={(e) => {
 															const d = drafts.get(entry.id);
 															if (!d) {
 																return;
 															}
-															const iso = e.currentTarget.value
-																? new Date(e.currentTarget.value).toISOString()
-																: null;
+															if (!e.currentTarget.value) {
+																drafts.set(entry.id, { ...d, end_date: null });
+																return;
+															}
+															// prevent the end date from being before the start date
+															const endMs = new Date(e.currentTarget.value).getTime();
+															const startMs = new Date(d.start_date).getTime();
+															if (endMs < startMs) {
+																e.currentTarget.setCustomValidity(
+																	'End time cannot be before start time.'
+																);
+																e.currentTarget.reportValidity();
+																return;
+															}
+															e.currentTarget.setCustomValidity('');
+															const iso = new Date(e.currentTarget.value).toISOString();
 															drafts.set(entry.id, { ...d, end_date: iso });
 														}}
 													/>

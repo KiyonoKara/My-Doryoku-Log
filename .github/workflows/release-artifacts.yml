@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag to publish, e.g. v0.0.1"
+        description: 'Tag to publish, e.g. v0.0.1'
         required: true
         type: string
       run_id:
-        description: "Workflow run ID from the desktop packaging workflow"
+        description: 'Workflow run ID from the desktop packaging workflow'
         required: true
         type: string
 
