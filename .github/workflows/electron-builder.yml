@@ -22,11 +22,11 @@ jobs:
         include:
           - name: macOS x64
             runner: macos-15-intel
-            build_script: pack:mac:x64
+            build_script: pack:mac:x64:dmg
 
           - name: macOS arm64
             runner: macos-14
-            build_script: pack:mac:arm64
+            build_script: pack:mac:arm64:dmg
 
           - name: Windows x64
             runner: windows-2022
