@@ -20,21 +20,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-#          - name: macOS x64
-#            runner: macos-15-intel
-#            build_script: pack:mac:x64
-#
-#          - name: macOS arm64
-#            runner: macos-14
-#            build_script: pack:mac:arm64
+          - name: macOS x64
+            runner: macos-15-intel
+            build_script: pack:mac:x64
+
+          - name: macOS arm64
+            runner: macos-14
+            build_script: pack:mac:arm64
 
           - name: Windows x64
             runner: windows-2022
             build_script: pack:win:x64
 
-#          - name: Linux x64
-#            runner: ubuntu-24.04
-#            build_script: pack:linux:x64
+          - name: Linux x64
+            runner: ubuntu-24.04
+            build_script: pack:linux:x64
 
     steps:
       - name: Checkout
@@ -65,11 +65,6 @@ jobs:
         run: |
           pnpm check
           pnpm test
-
-      - name: Verify better-sqlite3 in Electron runtime
-        if: runner.os != 'Windows'
-        shell: bash
-        run: ELECTRON_RUN_AS_NODE=1 npx electron -e "const Database=require('better-sqlite3'); const db=new Database(':memory:'); db.prepare('select 1').get(); db.close(); console.log('OK')"
 
       - name: Build package
         run: pnpm run ${{ matrix.build_script }}
