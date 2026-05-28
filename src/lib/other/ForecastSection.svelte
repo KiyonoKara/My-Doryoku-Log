@@ -42,8 +42,8 @@
 	let lastExpenseHash = $state('');
 	let lastIncomeHash = $state('');
 
-	let needsExpenseRefresh = $derived(expenseHash !== lastExpenseHash);
-	let needsIncomeRefresh = $derived(incomeHash !== lastIncomeHash);
+	let needsExpenseRefresh = $derived(expenseHash !== lastExpenseHash && expenseCount >= 10);
+	let needsIncomeRefresh = $derived(incomeHash !== lastIncomeHash && incomeCount >= 10);
 
 	let needsRefresh = $derived(needsExpenseRefresh || needsIncomeRefresh);
 

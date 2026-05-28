@@ -184,7 +184,7 @@
 		await invalidateAll();
 	}
 
-	// check if any part of the form is modified to determine whether user needs to save again
+	// check if any part of the form is modified to determine whether the user needs to save again
 	function isModified(tx: Transaction, draft: Transaction): boolean {
 		return (
 			draft.type !== tx.type ||
@@ -214,7 +214,7 @@
 	// group by date
 	let groupedByDate = $derived(
 		filtered.reduce<Record<string, Transaction[]>>((acc, tx) => {
-			// if no date then it's empty
+			// if no date, then it's empty
 			acc[tx.date] ??= [];
 			acc[tx.date].push(tx);
 			return acc;
@@ -237,7 +237,7 @@
 
 		const escape = (value: unknown) => {
 			const str = String(value ?? '');
-			// if value has comma, quote or newline, wrap in quotes and escape them
+			// if the value has comma, quote or newline, wrap in quotes and escape them
 			return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
 		};
 
@@ -333,7 +333,7 @@
 						name="amount"
 						type="number"
 						step="0.01"
-						min="0"
+						min="0.01"
 						onkeydown={numValidator}
 						required
 					/>
