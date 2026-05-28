@@ -29,8 +29,10 @@
 		"rebuild:electron": "electron-rebuild -f -w better-sqlite3",
 		"electron:dev": "pnpm run build && pnpm run rebuild:electron && electron .",
 		"pack": "pnpm run build && electron-builder build",
-		"pack:mac:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --x64 --publish never",
-		"pack:mac:arm64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --arm64 --publish never",
+		"pack:mac:x64:zip": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --x64 --publish never",
+		"pack:mac:arm64:zip": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --arm64 --publish never",
+		"pack:mac:x64:dmg": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac dmg --x64 --publish never",
+		"pack:mac:arm64:dmg": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac dmg --arm64 --publish never",
 		"pack:win:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --win nsis --x64 --publish never",
 		"pack:linux:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --linux AppImage --x64 --publish never"
 	},
@@ -106,6 +108,13 @@
 						"x64",
 						"arm64"
 					]
+				},
+				{
+					"target": "dmg",
+					"arch": [
+						"x64",
+						"arm64"
+					]
 				}
 			]
 		},
@@ -121,13 +130,34 @@
 			]
 		},
 		"linux": {
-			"icon": "icons/MDL-Icon-Default.png",
+			"icon": "icons/MDL-Icon-Default-256x256.png",
 			"target": [
 				{
 					"target": "AppImage",
 					"arch": [
 						"x64"
 					]
+				}
+			]
+		},
+		"dmg": {
+			"backgroundColor": "#0f1e30",
+			"iconSize": 100,
+			"window": {
+				"width": 540,
+				"height": 380
+			},
+			"contents": [
+				{
+					"x": 150,
+					"y": 190,
+					"type": "file"
+				},
+				{
+					"x": 390,
+					"y": 190,
+					"type": "link",
+					"path": "/Applications"
 				}
 			]
 		},
