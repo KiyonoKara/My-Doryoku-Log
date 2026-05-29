@@ -393,6 +393,7 @@
 							maxlength={MAX_TASK_LENGTH}
 							disabled={isRunning || !!dbRunningEntry}
 							required
+							onmousedown={() => window.focus()}
 						/>
 						<div class="char-counter" class:visible={taskName.length > MAX_TASK_LENGTH - 10}>
 							{taskName.length}/{MAX_TASK_LENGTH} characters
