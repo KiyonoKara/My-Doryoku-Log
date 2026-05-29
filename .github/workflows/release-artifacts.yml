@@ -89,10 +89,14 @@ jobs:
             gh release upload "${{ inputs.tag }}" "$file" \
               --repo "${{ github.repository }}" \
               --clobber
-          done < <(find release-artifacts -type f -print0)
+          done < <(
+            find release-artifacts -type f \
+              \( -name '*.zip' -o -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) \
+              -print0
+          )
 
           if [ "$found" -eq 0 ]; then
-            echo "No files found to upload."
+            echo "No release assets found."
             exit 1
           fi
 
