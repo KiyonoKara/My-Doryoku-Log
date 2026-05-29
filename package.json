@@ -126,7 +126,7 @@
 			]
 		},
 		"win": {
-			"icon": "icons/MDL-Icon-Default.png",
+			"icon": "icons/MDL-Icon-Default.ico",
 			"target": [
 				{
 					"target": "nsis",
@@ -137,7 +137,7 @@
 			]
 		},
 		"linux": {
-			"icon": "icons/MDL-Icon-Default-256x256.png",
+			"icon": "icons/",
 			"target": [
 				{
 					"target": "AppImage",
