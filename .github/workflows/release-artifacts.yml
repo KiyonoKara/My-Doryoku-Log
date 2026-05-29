@@ -83,12 +83,25 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          found=0
           while IFS= read -r -d '' file; do
-            gh release upload "${{ inputs.tag }}" "$file" --clobber
+            found=1
+            gh release upload "${{ inputs.tag }}" "$file" \
+              --repo "${{ github.repository }}" \
+              --clobber
           done < <(find release-artifacts -type f -print0)
+
+          if [ "$found" -eq 0 ]; then
+            echo "No files found to upload."
+            exit 1
+          fi
 
       - name: Show release URL
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
-        run: gh release view "${{ inputs.tag }}" --json url --jq '.url'
+        run: |
+          gh release view "${{ inputs.tag }}" \
+            --repo "${{ github.repository }}" \
+            --json url \
+            --jq '.url'
