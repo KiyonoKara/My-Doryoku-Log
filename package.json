@@ -106,7 +106,7 @@
 		"nodeGypRebuild": false,
 		"mac": {
 			"category": "public.app-category.productivity",
-			"icon": "icons/MDL-Icon-Mac-Default@1x.icns",
+			"icon": "icons/MDL-Icon-Mac-Default.icns",
 			"identity": null,
 			"target": [
 				{
