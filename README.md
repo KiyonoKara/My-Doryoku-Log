@@ -59,6 +59,13 @@ The packaging scripts are defined in the `package.json` file:
 - `pack:win:x64` for Windows x64
 - `pack:linux:x64` for Linux x64
 
+## Granting Permissions
+macOS requires the app to be signed. However, this app doesn't come signed. The code is open-source, so you can take a look at it to verify the integrity of the app. To let the app run on macOS, you must run this command:
+
+```sh
+xattr -c '/Applications/My Doryoku Log.app'
+```
+
 ## Resources Used and Acknowledgements
 
 - Vector Icons: https://tablericons.com/
