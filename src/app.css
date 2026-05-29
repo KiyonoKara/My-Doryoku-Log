@@ -316,6 +316,16 @@ textarea:focus {
 	gap: 0.25rem;
 	min-height: 3.5rem;
 	max-height: 3.5rem;
+	appearance: none;
+	-webkit-appearance: none;
+}
+
+.textarea-wrapper::-webkit-inner-spin-button,
+.textarea-wrapper::-webkit-outer-spin-button {
+	display: none;
+	-webkit-appearance: none;
+	appearance: none;
+	margin: 0;
 }
 
 /* dates */
