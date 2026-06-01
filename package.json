@@ -138,6 +138,20 @@
 		},
 		"linux": {
 			"icon": "icons/",
+			"category": "Office",
+			"synopsis": "Finance and time tracking app",
+			"description": "Local persona finance and time tracking desktop app.",
+			"desktop": {
+				"entry": {
+					"Name": "My Doryoku Log",
+					"StartupWMClass": "My Doryoku Log",
+					"Categories": "Office;Productivity;Utility;",
+					"Comment": "Finance and time tracking desktop app",
+					"Terminal": "false",
+					"Type": "Application",
+					"Keywords": "finance;time tracking;productivity;office;"
+				}
+			},
 			"target": [
 				{
 					"target": "AppImage",
@@ -171,7 +185,7 @@
 		"nsis": {
 			"oneClick": false,
 			"allowToChangeInstallationDirectory": true,
-            "deleteAppDataOnUninstall": true
+			"deleteAppDataOnUninstall": true
 		}
 	},
 	"devDependencies": {
