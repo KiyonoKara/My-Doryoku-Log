@@ -26,6 +26,7 @@
 		"db:studio": "drizzle-kit studio",
 		"test": "vitest run",
 		"test:watch": "vitest",
+        "dev:rebuild": "pnpm rebuild && pnpm run dev",
 		"rebuild:electron": "electron-rebuild -f -w better-sqlite3",
 		"electron:dev": "pnpm run build && pnpm run rebuild:electron && electron .",
 		"pack": "pnpm run build && electron-builder build",
