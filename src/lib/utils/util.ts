@@ -32,11 +32,14 @@ export function formatDuration(ms: number): string {
  * Format date as YYYY-MM-DD
  * @param d
  */
-export function toYmd(d: Date) {
-	const yyyy = d.getFullYear();
-	const mm = String(d.getMonth() + 1).padStart(2, '0');
-	const dd = String(d.getDate()).padStart(2, '0');
-	return `${yyyy}-${mm}-${dd}`;
+export function toYmd(d: Date): string {
+	const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+	return new Intl.DateTimeFormat('en-CA', {
+		timeZone: timeZone,
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit'
+	}).format(d);
 }
 
 /**
@@ -64,7 +67,8 @@ export function formatTime(d: string | null | undefined) {
 	if (Number.isNaN(t.getTime())) {
 		return '';
 	}
-	return t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+	return t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: tz });
 }
 
 /**
@@ -79,7 +83,8 @@ export function formatDate(d: string | null | undefined) {
 	if (Number.isNaN(t.getTime())) {
 		return '';
 	}
-	return t.toLocaleDateString();
+	const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+	return t.toLocaleDateString([], { timeZone: tz });
 }
 
 /**
