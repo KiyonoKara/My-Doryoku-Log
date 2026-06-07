@@ -425,8 +425,9 @@
 							{isPaused ? 'Resume' : 'Pause'}
 						</button>
 						<!-- stop -->
-						<form method="POST" action="?/stop" use:enhance={enhanceStop}>
+ 					<form method="POST" action="?/stop" use:enhance={enhanceStop}>
 							<input type="hidden" name="id" value={runningId ?? dbRunningEntry?.id ?? ''} />
+							<input type="hidden" name="duration_ms" value={elapsedMs} />
 							<button type="submit" class="timer-btn timer-stop" disabled={stopBusy}>
 								{stopBusy ? 'Stopping…' : 'Stop'}
 							</button>
