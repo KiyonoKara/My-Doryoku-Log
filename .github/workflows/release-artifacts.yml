@@ -83,8 +83,8 @@ jobs:
         run: |
           set -euo pipefail
       
-          VERSION=$(awk -F'"' '/"version": ".+"/ { print $4; exit }' package.json)
-          APP_NAME=$(awk -F'"' '/"productName": ".+"/ { print $4; exit }' package.json)
+          VERSION=$(awk -F'"' '/"version": ".+"/ { print $4; exit }' ./package.json)
+          APP_NAME=$(awk -F'"' '/"productName": ".+"/ { print $4; exit }' ./package.json)
           APP_FILE_NAME=${PRODUCT_NAME// /.}
       
           {
