@@ -105,21 +105,15 @@ jobs:
         run: |
           set -euo pipefail
           found=0
-          prefix="${APP_FILE_NAME}-${VERSION}-"
           
           while IFS= read -r -d '' file; do
-            base="$(basename "$file")"
-
-            case "$base" in
-              "${prefix}"*)
-                found=1
-                gh release upload "${{ inputs.tag }}" "$file" \
-                  --repo "${{ github.repository }}" \
-                  --clobber
-                ;;
-            esac
+            found=1
+            gh release upload "${{ inputs.tag }}" "$file" \
+              --repo "${{ github.repository }}" \
+              --clobber
           done < <(
             find release-artifacts -type f \
+              -name "${APP_FILE_NAME}-${VERSION}-*" \
               \( -name '*.zip' -o -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) \
               -print0
           )
