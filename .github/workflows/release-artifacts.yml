@@ -92,7 +92,6 @@ jobs:
           {
             echo "version=$VERSION"
             echo "app_name=$APP_NAME"
-            echo "app_file_name=$APP_FILE_NAME"
           } >> "$GITHUB_OUTPUT"
 
       - name: Upload files to release
