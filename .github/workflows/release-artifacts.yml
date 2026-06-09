@@ -107,16 +107,25 @@ jobs:
           found=0
           prefix="${APP_FILE_NAME}-${VERSION}-"
           
+          # while IFS= read -r -d '' file; do
+          #   found=1
+          #   gh release upload "${{ inputs.tag }}" "$file" \
+          #     --repo "${{ github.repository }}" \
+          #     --clobber
           while IFS= read -r -d '' file; do
-            found=1
-            gh release upload "${{ inputs.tag }}" "$file" \
-              --repo "${{ github.repository }}" \
-              --clobber
+            base="$(basename "$file")"
+            case "$base" in
+              "${prefix}"*)
+                found=1
+                gh release upload "${{ inputs.tag }}" "$file" \
+                  --repo "${{ github.repository }}" \
+                  --clobber
+                ;;
+            esac    
           done < <(
-            # find release-artifacts -type f \
-            #   \( -name '*.zip' -o -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) \
-            #   -print0
-            find release-artifacts -type f -name "${prefix}*" -print0
+            find release-artifacts -type f \
+              \( -name '*.zip' -o -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) \
+              -print0
           )
 
           if [ "$found" -eq 0 ]; then
