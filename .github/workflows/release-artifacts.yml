@@ -88,7 +88,6 @@ jobs:
       
           VERSION=$(awk -F'"' '/"version": ".+"/ { print $4; exit }' "$GITHUB_WORKSPACE/package.json")
           APP_NAME=$(awk -F'"' '/"productName": ".+"/ { print $4; exit }' "$GITHUB_WORKSPACE/package.json")
-          APP_FILE_NAME=${APP_NAME// /.}
       
           {
             echo "version=$VERSION"
@@ -100,25 +99,25 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.app_meta.outputs.version }}
-          APP_FILE_NAME: ${{ steps.app_meta.outputs.app_file_name }}
+          APP_NAME: ${{ steps.app_meta.outputs.app_name }}
         shell: bash
         run: |
           set -euo pipefail
           found=0
-          prefix="${APP_FILE_NAME}-${VERSION}-"
-      
-          find release-artifacts -type f -print0 | while IFS= read -r -d '' file; do
-            base="$(basename "$file")"
-            case "$base" in
-              "${prefix}"*)
-                found=1
-                gh release upload "${{ inputs.tag }}" "$file" \
-                  --repo "${{ github.repository }}" \
-                  --clobber
-                ;;
-            esac
-          done
-      
+          prefix="${APP_NAME}-${VERSION}-"
+          
+          while IFS= read -r -d '' file; do
+            found=1
+            gh release upload "${{ inputs.tag }}" "$file" \
+              --repo "${{ github.repository }}" \
+              --clobber
+          done < <(
+            find release-artifacts -type f \
+              -name "${prefix}*" \
+              \( -name '*.zip' -o -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) \
+              -print0
+          )
+
           if [ "$found" -eq 0 ]; then
             echo "No release assets found."
             exit 1
