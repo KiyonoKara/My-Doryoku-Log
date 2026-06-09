@@ -106,13 +106,8 @@ jobs:
           set -euo pipefail
           found=0
           prefix="${APP_FILE_NAME}-${VERSION}-"
-          
-          # while IFS= read -r -d '' file; do
-          #   found=1
-          #   gh release upload "${{ inputs.tag }}" "$file" \
-          #     --repo "${{ github.repository }}" \
-          #     --clobber
-          while IFS= read -r -d '' file; do
+      
+          find release-artifacts -type f -print0 | while IFS= read -r -d '' file; do
             base="$(basename "$file")"
             case "$base" in
               "${prefix}"*)
@@ -121,13 +116,9 @@ jobs:
                   --repo "${{ github.repository }}" \
                   --clobber
                 ;;
-            esac    
-          done < <(
-            find release-artifacts -type f \
-              \( -name '*.zip' -o -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' \) \
-              -print0
-          )
-
+            esac
+          done
+      
           if [ "$found" -eq 0 ]; then
             echo "No release assets found."
             exit 1
