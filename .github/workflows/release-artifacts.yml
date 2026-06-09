@@ -76,27 +76,28 @@ jobs:
             --repo "${{ github.repository }}" \
             --title "${{ inputs.tag }}" \
             --notes "Release assets uploaded from workflow run ${{ inputs.run_id }}."
-
+    
       - name: Get app metadata
         id: app_meta
-        working-directory: .
         shell: bash
         run: |
           set -euo pipefail
       
           VERSION=$(awk -F'"' '/"version": ".+"/ { print $4; exit }' package.json)
           APP_NAME=$(awk -F'"' '/"productName": ".+"/ { print $4; exit }' package.json)
-          APP_FILE_NAME=${PRODUCT_NAME// /.}
+          APP_FILE_NAME=${APP_NAME// /.}
       
           {
             echo "version=$VERSION"
-            echo "product_name=$APP_NAME"
-            echo "product_file_name=$APP_FILE_NAME"
+            echo "app_name=$APP_NAME"
+            echo "app_file_name=$APP_FILE_NAME"
           } >> "$GITHUB_OUTPUT"
 
       - name: Upload files to release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.app_meta.outputs.version }}
+          APP_FILE_NAME: ${{ steps.app_meta.outputs.app_file_name }}
         shell: bash
         run: |
           set -euo pipefail
