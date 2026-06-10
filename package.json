@@ -164,6 +164,7 @@
 		},
 		"dmg": {
 			"backgroundColor": "#bed4e9",
+            "icon": "icons/MDL-DMG-Icon-Default.icns",
 			"iconSize": 100,
 			"window": {
 				"width": 540,
