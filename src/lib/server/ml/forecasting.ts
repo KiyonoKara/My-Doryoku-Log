@@ -9,10 +9,7 @@ import {
 	ID_TO_COARSE,
 	ALL_CATEGORIES
 } from './random_forest';
-import type { TxType } from '$lib/types/finance';
-
-// minimum required rows to train models
-const MIN_REQ_TRANSACTIONS = 10;
+import { MIN_REQ_TRANSACTIONS, type TxType } from '$lib/types/finance';
 
 // load rows from db
 async function loadRows(): Promise<Transaction[]> {

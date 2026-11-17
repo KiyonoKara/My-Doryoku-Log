@@ -110,18 +110,14 @@ export function checkDatabase(dbPath, migrationsDir) {
 
 	if (applied.size === 0 && hasAppTables) {
 		console.log('[db-init] existing schema found, recording 0000_wide_hex.sql as applied');
-		db.prepare('INSERT OR IGNORE INTO __app_migrations (name) VALUES (?)').run(
-			'0000_wide_hex.sql'
-		);
+		db.prepare('INSERT OR IGNORE INTO __app_migrations (name) VALUES (?)').run('0000_wide_hex.sql');
 		applied.add('0000_wide_hex.sql');
 	}
 
 	const files = getMigrationFiles(migrationsDir);
 	console.log('[db-init] migration files =', files);
 
-	const pending = files
-		.map((file) => path.basename(file))
-		.filter((name) => !applied.has(name));
+	const pending = files.map((file) => path.basename(file)).filter((name) => !applied.has(name));
 
 	if (pending.length === 0) {
 		console.log('[db-init] no pending migrations');
@@ -147,9 +143,7 @@ export function checkDatabase(dbPath, migrationsDir) {
 	const violations = db.pragma('foreign_key_check');
 	if (violations.length > 0) {
 		db.close();
-		throw new Error(
-			`Foreign key violations found after migration: ${JSON.stringify(violations)}`
-		);
+		throw new Error(`Foreign key violations found after migration: ${JSON.stringify(violations)}`);
 	}
 
 	const tables = db

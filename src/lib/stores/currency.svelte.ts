@@ -1,6 +1,11 @@
+import { CURRENCY_FORMATS } from '$lib/types/finance';
+import { formatCurrency } from '$lib/utils/util';
+
 const STORAGE_KEY = 'doryoku-currency';
 const DEFAULT: Currency = 'USD';
+const SUPPORTED = Object.keys(CURRENCY_FORMATS) as Currency[];
 
+// this store only controls how amounts are displayed, it does not convert them
 function createCurrencyStore() {
 	let current = $state<Currency>(DEFAULT);
 
@@ -9,8 +14,7 @@ function createCurrencyStore() {
 			return;
 		}
 		const saved = localStorage.getItem(STORAGE_KEY) as Currency | null;
-		// only supporting $ and ¥, sorry
-		if (saved && ['USD', 'JPY'].includes(saved)) {
+		if (saved && SUPPORTED.includes(saved)) {
 			current = saved;
 		}
 	}
@@ -25,7 +29,13 @@ function createCurrencyStore() {
 			return current;
 		},
 		get symbol() {
-			return current === DEFAULT ? '$' : '¥';
+			return CURRENCY_FORMATS[current].symbol;
+		},
+		get decimals() {
+			return CURRENCY_FORMATS[current].decimals;
+		},
+		format(amount: number) {
+			return formatCurrency(amount, current);
 		},
 		init,
 		set
