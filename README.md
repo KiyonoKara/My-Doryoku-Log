@@ -16,7 +16,7 @@ App made for logging finances and timed tasks. My Doryoku Log also means close t
 - View and search history of all income and expense transactions
 - View a bar chart of income and expense categories
 - Get predictions of future income and expense amounts if there are at least 10 transactions with refresh
-- Change currency indicator
+- Change the currency display format (only changes the symbol and decimal places, saved data isn't converted)
 - Import/export transactions to a CSV file
 
 ### Time Page Features
