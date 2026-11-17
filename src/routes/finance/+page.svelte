@@ -647,7 +647,7 @@
 														>{tx.type}</span
 													>
 													<span class="history-item__amount">
-														{tx.type === 'expense' ? '-' : '+'}{currencyStore.symbol}{tx.amount}
+														{tx.type === 'expense' ? '-' : '+'}{currencyStore.format(tx.amount)}
 													</span>
 													<span class="history-item__date-label">{formatDateLabel(tx.date)}</span>
 												</div>

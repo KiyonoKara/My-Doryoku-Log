@@ -7,6 +7,7 @@ import {
 	formatDateLabel,
 	formatTime,
 	formatDate,
+	formatCurrency,
 	parseCSVLine
 } from './util';
 
@@ -123,6 +124,31 @@ describe('util.ts', () => {
 			const result = formatDate('2024-06-15T00:00:00');
 			expect(result).toBeTruthy();
 			expect(typeof result).toBe('string');
+		});
+	});
+
+	describe('formatCurrency', () => {
+		it('should format USD with two decimals', () => {
+			expect(formatCurrency(12.5, 'USD')).toBe('$12.50');
+			expect(formatCurrency(0, 'USD')).toBe('$0.00');
+			expect(formatCurrency(1234.567, 'USD')).toBe('$1234.57');
+		});
+
+		it('should format JPY without decimals because yen has no minor unit', () => {
+			expect(formatCurrency(1234.56, 'JPY')).toBe('¥1235');
+			expect(formatCurrency(0, 'JPY')).toBe('¥0');
+			expect(formatCurrency(100, 'JPY')).toBe('¥100');
+		});
+
+		it('should place the sign before the symbol', () => {
+			expect(formatCurrency(-4.5, 'USD')).toBe('-$4.50');
+			expect(formatCurrency(-1000, 'JPY')).toBe('-¥1000');
+		});
+
+		it('should fall back to zero for non-finite amounts', () => {
+			expect(formatCurrency(NaN, 'USD')).toBe('$0.00');
+			expect(formatCurrency(Infinity, 'USD')).toBe('$0.00');
+			expect(formatCurrency(-Infinity, 'JPY')).toBe('¥0');
 		});
 	});
 

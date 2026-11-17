@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-    
+
       - name: Validate inputs
         shell: bash
         run: |
@@ -79,16 +79,16 @@ jobs:
             --repo "${{ github.repository }}" \
             --title "${{ inputs.tag }}" \
             --notes "Release assets uploaded from workflow run ${{ inputs.run_id }}."
-    
+
       - name: Get app metadata
         id: app_meta
         shell: bash
         run: |
           set -euo pipefail
-      
+
           VERSION=$(awk -F'"' '/"version": ".+"/ { print $4; exit }' "$GITHUB_WORKSPACE/package.json")
           APP_NAME=$(awk -F'"' '/"productName": ".+"/ { print $4; exit }' "$GITHUB_WORKSPACE/package.json")
-      
+
           {
             echo "version=$VERSION"
             echo "app_name=$APP_NAME"
@@ -104,7 +104,7 @@ jobs:
           set -euo pipefail
           found=0
           prefix="${APP_NAME}-${VERSION}-"
-          
+
           while IFS= read -r -d '' file; do
             found=1
             gh release upload "${{ inputs.tag }}" "$file" \
