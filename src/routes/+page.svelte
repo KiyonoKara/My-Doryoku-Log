@@ -6,13 +6,13 @@
 	import StatCard from '$lib/other/StatCard.svelte';
 	import type { Transaction, TimeEntry } from '$lib/server/db/schema';
 	import { MONTH_NAMES } from '$lib/types/time';
-	import { MIN_REQ_TRANSACTIONS } from '$lib/types/finance';
 	import { currencyStore } from '$lib/stores/currency.svelte';
-	import { formatDateLabel, formatDuration, formatTime, toYmd } from '$lib/utils/util';
+	import { daysBetween, formatDateLabel, formatDuration, formatTime, toYmd } from '$lib/utils/util';
 	import {
 		currentStreak,
 		entryDay,
 		monthKey,
+		projectMonth,
 		recentActivity,
 		runningEntry,
 		summarizeDay,
@@ -20,6 +20,7 @@
 		trackedDays,
 		type ActivityItem
 	} from '$lib/utils/summary';
+	import { detectRecurring, recurringDueBetween } from '$lib/utils/recurring';
 
 	let { data } = $props();
 
@@ -43,25 +44,43 @@
 
 	let isEmpty = $derived(transactions.length === 0 && entries.length === 0);
 
-	// the models train per type, so track progress toward each threshold separately
-	let expenseCount = $derived(transactions.filter((tx) => tx.type === 'expense').length);
-	let incomeCount = $derived(transactions.filter((tx) => tx.type === 'income').length);
-	let forecastingReady = $derived(
-		expenseCount >= MIN_REQ_TRANSACTIONS && incomeCount >= MIN_REQ_TRANSACTIONS
+	// where the month lands if the spending so far keeps up
+	let projection = $derived(projectMonth(transactions, today));
+	let monthEnd = $derived(`${month}-${String(projection.daysInMonth).padStart(2, '0')}`);
+	let dueThisMonth = $derived(
+		recurringDueBetween(
+			detectRecurring(transactions, today).filter((item) => item.type === 'expense'),
+			today,
+			monthEnd
+		)
 	);
-	// count down to the nearest side that is still locked
-	// taking the max across both would let an unlocked side mask a locked one and report "0 more" while a model
-	// is still untrained
-	let forecastingValue = $derived.by(() => {
-		if (forecastingReady) {
-			return 'Unlocked';
+	let dueTotal = $derived(dueThisMonth.reduce((sum, due) => sum + due.item.amount, 0));
+
+	// a projection with nothing spent yet or too early in the month won't get a card
+	let showPace = $derived(projection.projected !== null && projection.spent > 0);
+	let showDue = $derived(dueThisMonth.length > 0);
+
+	// the pace counts spend to date while the month row totals the whole month
+	// naming the basis keeps the two numbers from reading as a contradiction
+	let paceDetail = $derived.by(() => {
+		const soFar = `${currencyStore.format(projection.spent)} so far`;
+
+		// comparing against a month with nothing in it says nothing
+		return projection.byThisPointLastMonth > 0
+			? `${soFar} · vs ${currencyStore.format(projection.byThisPointLastMonth)} by this point last month`
+			: soFar;
+	});
+
+	// the soonest charge still to come, named so the number has something behind it
+	let nextDueDetail = $derived.by(() => {
+		const next = dueThisMonth[0];
+		if (!next) {
+			return '';
 		}
 
-		const gaps = [MIN_REQ_TRANSACTIONS - expenseCount, MIN_REQ_TRANSACTIONS - incomeCount].filter(
-			(gap) => gap > 0
-		);
-
-		return `${Math.min(...gaps)} more to go`;
+		const days = daysBetween(today, next.date);
+		const when = days <= 0 ? 'today' : days === 1 ? 'tomorrow' : `in ${days} days`;
+		return `${next.item.category} · ${when}`;
 	});
 
 	$effect(() => {
@@ -76,9 +95,8 @@
 		return () => clearInterval(interval);
 	});
 
-	// wall clock time since the started session intentionally isn't shown as the recorded duration
-	// since pause state is only in the time page
-	// a paused session still reads as running from this
+	// wall clock time since the started session, which isn't the recorded duration since the pause state
+	// is in the time page and a paused session still reads as running from here
 	let elapsedMs = $derived.by(() => {
 		if (!active) {
 			return 0;
@@ -104,7 +122,8 @@
 			<h2 class="panel-title">Start your log</h2>
 			<p class="dashboard__start-text">
 				Nothing recorded yet. Save a transaction to begin tracking money, or run the timer while you
-				work on a task. Predictions switch on once one side reaches {MIN_REQ_TRANSACTIONS} entries.
+				work on a task. A month-end pace and any repeating charges show up here once there is
+				something to read.
 			</p>
 		</article>
 	{:else}
@@ -179,18 +198,31 @@
 			</div>
 		</div>
 
-		<div class="dashboard__section">
-			<h2 class="dashboard__section-title">Predictions</h2>
+		{#if showPace || showDue}
+			<div class="dashboard__section">
+				<h2 class="dashboard__section-title">Predictions</h2>
 
-			<div class="stat-row stat-row--predictions">
-				<StatCard
-					eyebrow="All time"
-					value={forecastingValue}
-					label="Forecasting"
-					detail={`Expenses ${expenseCount}/${MIN_REQ_TRANSACTIONS} · Income ${incomeCount}/${MIN_REQ_TRANSACTIONS}`}
-				/>
+				<div class="stat-row">
+					{#if showPace}
+						<StatCard
+							eyebrow="Pace"
+							value={currencyStore.format(projection.projected ?? 0)}
+							label="On pace to spend"
+							detail={paceDetail}
+						/>
+					{/if}
+
+					{#if showDue}
+						<StatCard
+							eyebrow="Recurring"
+							value={currencyStore.format(dueTotal)}
+							label="Still due this month"
+							detail={nextDueDetail}
+						/>
+					{/if}
+				</div>
 			</div>
-		</div>
+		{/if}
 	{/if}
 
 	<div class="dashboard__section">
@@ -319,11 +351,6 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 		gap: 0.8rem;
-	}
-
-	/* single card, so cap it instead of letting it span the full row */
-	.stat-row--predictions {
-		grid-template-columns: minmax(180px, 300px);
 	}
 
 	.quick-start {
