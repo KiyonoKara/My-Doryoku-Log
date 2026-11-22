@@ -44,6 +44,24 @@ export function toYmd(d: Date): string {
 }
 
 /**
+ * Get days from two dates
+ * Returns negative int if the second date is before the first
+ * Rounded because daylight savings change makes the millisecond gap an hour short
+ * @param firstDate
+ * @param secondDate
+ */
+export function daysBetween(firstDate: string, secondDate: string): number {
+	const [ay, am, ad] = firstDate.split('-').map(Number);
+	const [by, bm, bd] = secondDate.split('-').map(Number);
+	if (!ay || !am || !ad || !by || !bm || !bd) {
+		return 0;
+	}
+	const from = new Date(ay, am - 1, ad);
+	const to = new Date(by, bm - 1, bd);
+	return Math.round((to.getTime() - from.getTime()) / 86400000);
+}
+
+/**
  * Format date as month name, day, year
  * @param ymd
  */

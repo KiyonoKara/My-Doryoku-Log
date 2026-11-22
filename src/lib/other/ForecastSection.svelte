@@ -193,7 +193,7 @@
 										-{currencyStore.format(expPrediction.pred.amount ?? 0)}
 									</div>
 								</div>
-								<div class="forecast__label">Next expense</div>
+								<div class="forecast__label">Likely expense</div>
 							</div>
 						</div>
 					{:else}
@@ -218,7 +218,7 @@
 									+{currencyStore.format(incPrediction.pred.amount ?? 0)}
 								</div>
 							</div>
-							<div class="forecast__label">Next income</div>
+							<div class="forecast__label">Likely income</div>
 						</div>
 					</div>
 				{:else}

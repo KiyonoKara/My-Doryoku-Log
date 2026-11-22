@@ -9,7 +9,8 @@ import {
 	trackedDays,
 	currentStreak,
 	runningEntry,
-	recentActivity
+	recentActivity,
+	projectMonth
 } from './summary';
 
 function tx(overrides: Partial<Transaction> = {}): Transaction {
@@ -349,6 +350,130 @@ describe('summary.ts', () => {
 
 		it('should return an empty list when there is nothing', () => {
 			expect(recentActivity([], [], 5)).toEqual([]);
+		});
+	});
+
+	describe('projectMonth', () => {
+		it('should project the month total from the pace so far', () => {
+			const transactions = [
+				tx({ id: 1, date: '2026-11-05', amount: 100 }),
+				tx({ id: 2, date: '2026-11-10', amount: 50 })
+			];
+
+			const result = projectMonth(transactions, '2026-11-15');
+
+			expect(result.elapsedDays).toBe(15);
+			expect(result.daysInMonth).toBe(30);
+			expect(result.spent).toBe(150);
+			// 150 over 15 days is 10 a day, over 30 days is 300
+			expect(result.projected).toBe(300);
+		});
+
+		it('should withhold the projection before MIN_DAYS_TO_PROJECT days in', () => {
+			const transactions = [tx({ id: 1, date: '2026-11-01', amount: 100 })];
+
+			const result = projectMonth(transactions, '2026-11-02');
+
+			expect(result.projected).toBeNull();
+			// the running total is still reported so the caller can show something else
+			expect(result.spent).toBe(100);
+		});
+
+		it('should project on the first day that meets the threshold', () => {
+			const transactions = [tx({ id: 1, date: '2026-11-01', amount: 30 })];
+
+			const result = projectMonth(transactions, '2026-11-03');
+
+			expect(result.projected).toBe(300);
+		});
+
+		it('should compare against the previous month only up to the same day', () => {
+			const transactions = [
+				tx({ id: 1, date: '2026-10-05', amount: 100 }),
+				tx({ id: 2, date: '2026-10-25', amount: 200 }),
+				tx({ id: 3, date: '2026-11-05', amount: 40 })
+			];
+
+			const result = projectMonth(transactions, '2026-11-15');
+
+			// the 25th of October has not happened yet by the 15th of November
+			expect(result.byThisPointLastMonth).toBe(100);
+			expect(result.spent).toBe(40);
+		});
+
+		it('should step the comparison back across a year boundary', () => {
+			const transactions = [
+				tx({ id: 1, date: '2025-12-04', amount: 80 }),
+				tx({ id: 2, date: '2026-01-04', amount: 20 })
+			];
+
+			const result = projectMonth(transactions, '2026-01-10');
+
+			expect(result.daysInMonth).toBe(31);
+			expect(result.byThisPointLastMonth).toBe(80);
+		});
+
+		it('should take all of a shorter previous month when the day has no counterpart', () => {
+			const transactions = [
+				tx({ id: 1, date: '2026-02-10', amount: 60 }),
+				tx({ id: 2, date: '2026-02-27', amount: 40 })
+			];
+
+			// March 31st has no February "equivalent", so all of February is compared
+			const result = projectMonth(transactions, '2026-03-31');
+
+			expect(result.byThisPointLastMonth).toBe(100);
+		});
+
+		it('should use the real length of February in a leap year', () => {
+			expect(projectMonth([], '2028-02-10').daysInMonth).toBe(29);
+			expect(projectMonth([], '2026-02-10').daysInMonth).toBe(28);
+		});
+
+		it('should leave a charge dated later in the month out of the running total', () => {
+			const transactions = [
+				tx({ id: 1, date: '2026-11-10', amount: 40 }),
+				// logged ahead of time, so it is not spent yet and must not inflate the pace
+				tx({ id: 2, date: '2026-11-22', amount: 300 })
+			];
+
+			const result = projectMonth(transactions, '2026-11-15');
+
+			expect(result.spent).toBe(40);
+			expect(result.projected).toBe(80);
+		});
+
+		it('should count expenses only and ignore income', () => {
+			const transactions = [
+				tx({ id: 1, date: '2026-11-05', amount: 90, type: 'expense' }),
+				tx({ id: 2, date: '2026-11-05', amount: 5000, type: 'income' }),
+				tx({ id: 3, date: '2026-10-05', amount: 7000, type: 'income' })
+			];
+
+			const result = projectMonth(transactions, '2026-11-15');
+
+			expect(result.spent).toBe(90);
+			expect(result.byThisPointLastMonth).toBe(0);
+		});
+
+		it('should report zero when the month has no expenses yet', () => {
+			const transactions = [tx({ id: 1, date: '2026-10-05', amount: 90 })];
+
+			const result = projectMonth(transactions, '2026-11-15');
+
+			expect(result.spent).toBe(0);
+			expect(result.projected).toBe(0);
+			expect(result.byThisPointLastMonth).toBe(90);
+		});
+
+		it('should fall back to empty values when today is malformed', () => {
+			expect(projectMonth([], 'nonsense')).toEqual({
+				elapsedDays: 0,
+				daysInMonth: 0,
+				spent: 0,
+				projected: null,
+				byThisPointLastMonth: 0
+			});
 		});
 	});
 });
