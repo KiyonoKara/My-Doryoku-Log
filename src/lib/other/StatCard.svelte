@@ -29,8 +29,12 @@
 	.stat-card {
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--border);
-		background: var(--card-grad-bottom);
-		box-shadow: var(--shadow-3);
+		background: radial-gradient(
+			100% 75% at 50% 125%,
+			var(--bg-subtle-grad1),
+			var(--bg-subtle-grad2)
+		);
+		box-shadow: var(--card-shadow);
 		padding: 0.9rem 1rem;
 		display: flex;
 		flex-direction: column;
