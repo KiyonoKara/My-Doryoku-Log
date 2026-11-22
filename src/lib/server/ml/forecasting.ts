@@ -5,9 +5,7 @@ import {
 	buildDatasets,
 	RandomForestClassifier,
 	RandomForestRegressor,
-	CATEGORY_TO_ID,
-	ID_TO_COARSE,
-	ALL_CATEGORIES
+	ID_TO_COARSE
 } from './random_forest';
 import { MIN_REQ_TRANSACTIONS, type TxType } from '$lib/types/finance';
 
@@ -57,81 +55,45 @@ function trainIncomeModels(rows: Transaction[]) {
 	};
 }
 
-// gets median (for finding the typical amounts)
-function getMedian(nums: number[]): number {
-	if (!nums.length) {
-		return 0;
-	}
-	const sorted = [...nums].sort((a, b) => a - b);
-	const mid = Math.floor(sorted.length / 2);
-	return sorted.length % 2 === 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-}
-
-function defaultFutureFeatures(trType: TxType, rows: Transaction[]) {
-	// feature vector for the next transaction of a given type
-	// uses the current date and typical amount for that type
-	const now = new Date();
+// date features
+export function futureDateFeatures(now: Date) {
 	const dow = now.getDay() === 0 ? 6 : now.getDay() - 1;
 	const dom = now.getDate();
 	const month = now.getMonth() + 1;
-	const isWeekend = dow >= 5 ? 1 : 0;
-	const isMonthStart = dom <= 3 ? 1 : 0;
-	const isMonthEnd = dom >= 28 ? 1 : 0;
 
-	// calculate median amount per type from history
-	const amounts = rows.filter((r) => r.type === trType).map((r) => r.amount);
-	const typicalAmount = getMedian(amounts);
 	return {
 		dow,
-		dom,
 		month,
-		isWeekend,
-		isMonthStart,
-		isMonthEnd,
-		amount: typicalAmount
+		isWeekend: dow >= 5 ? 1 : 0,
+		isMonthStart: dom <= 3 ? 1 : 0,
+		isMonthEnd: dom >= 28 ? 1 : 0
 	};
 }
 
+// forecast the coarse category and amount for a given type, null when that type never had enough rows
 function forecastNextForType(
 	trType: TxType,
-	models: ReturnType<typeof trainExpenseModels> & ReturnType<typeof trainIncomeModels>,
-	rows: Transaction[]
-): Record<string, unknown> {
-	// forecast the next coarse category and amount for a given type of expense or income
-	const { dow, month, amount, isWeekend, isMonthStart, isMonthEnd } = defaultFutureFeatures(
-		trType,
-		rows
-	);
-
+	models: ReturnType<typeof trainExpenseModels> & ReturnType<typeof trainIncomeModels>
+): Record<string, unknown> | null {
 	const clf = trType === 'expense' ? models.exp_clf : models.inc_clf;
 	const reg = trType === 'expense' ? models.exp_reg : models.inc_reg;
 
 	if (!clf || !reg) {
-		return {};
+		return null;
 	}
 
-	const xClf = [dow, month, amount, isWeekend, isMonthStart, isMonthEnd];
+	const { dow, month, isWeekend, isMonthStart, isMonthEnd } = futureDateFeatures(new Date());
+
+	// both vectors match what buildDatasets produces so no feature is ever unseen
+	const xClf = [dow, month, isWeekend, isMonthStart, isMonthEnd];
 	const coarseId = clf.predict([xClf])[0];
-	const coarseLabel = ID_TO_COARSE[coarseId];
+	const amountPred = reg.predict([[dow, month, isWeekend, isMonthStart, coarseId]])[0];
 
-	// pick the most frequent fine category for this type
-	const fineCounts: Record<string, number> = {};
-	for (const r of rows) {
-		if (r.type !== trType || !ALL_CATEGORIES.includes(r.category)) {
-			continue;
-		}
-		// find coarse to match build_datasets
-		fineCounts[r.category] = (fineCounts[r.category] ?? 0) + 1;
-	}
-
-	const mainFine = Object.entries(fineCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
-	// use 0 if nothing
-	const fineId = mainFine != null ? (CATEGORY_TO_ID[mainFine] ?? 0) : 0;
-
-	const xReg = [dow, month, isWeekend, isMonthStart, fineId];
-	const amountPred = reg.predict([xReg])[0];
-
-	return { type: trType, coarse_category: coarseLabel, amount: amountPred };
+	return {
+		type: trType,
+		coarse_category: ID_TO_COARSE[coarseId],
+		amount: amountPred
+	};
 }
 
 // forecast result typing
@@ -141,41 +103,30 @@ export type ForecastResult = {
 	pred: Record<string, unknown>;
 };
 
-// both functions load db, train models, get forecasts
-export async function forecastNextExpense(): Promise<ForecastResult> {
-	const rows = await loadRows();
-	const { expense } = rowByType(rows);
-	if (rows.length < MIN_REQ_TRANSACTIONS) {
-		return {
-			success: false,
-			n_transactions: expense.length,
-			pred: {}
-		};
+// rows keep the models testable without opening the database, falling back to the whole table
+export async function forecastNextExpense(rows?: Transaction[]): Promise<ForecastResult> {
+	const all = rows ?? (await loadRows());
+	const { expense } = rowByType(all);
+	const models = { ...trainExpenseModels(all), inc_clf: null, inc_reg: null };
+	// success is defined by whether the model was trained instead of getting the row count
+	const pred = forecastNextForType('expense', models);
+
+	if (!pred) {
+		return { success: false, n_transactions: expense.length, pred: {} };
 	}
-	const models = { ...trainExpenseModels(rows), inc_clf: null, inc_reg: null };
-	const pred = forecastNextForType('expense', models, rows);
-	return {
-		success: true,
-		n_transactions: expense.length,
-		pred
-	};
+
+	return { success: true, n_transactions: expense.length, pred };
 }
 
-export async function forecastNextIncome(): Promise<ForecastResult> {
-	const rows = await loadRows();
-	const { income } = rowByType(rows);
-	if (rows.length < MIN_REQ_TRANSACTIONS) {
-		return {
-			success: false,
-			n_transactions: income.length,
-			pred: {}
-		};
+export async function forecastNextIncome(rows?: Transaction[]): Promise<ForecastResult> {
+	const all = rows ?? (await loadRows());
+	const { income } = rowByType(all);
+	const models = { exp_clf: null, exp_reg: null, ...trainIncomeModels(all) };
+	const pred = forecastNextForType('income', models);
+
+	if (!pred) {
+		return { success: false, n_transactions: income.length, pred: {} };
 	}
-	const models = { exp_clf: null, exp_reg: null, ...trainIncomeModels(rows) };
-	const pred = forecastNextForType('income', models, rows);
-	return {
-		success: true,
-		n_transactions: income.length,
-		pred
-	};
+
+	return { success: true, n_transactions: income.length, pred };
 }
