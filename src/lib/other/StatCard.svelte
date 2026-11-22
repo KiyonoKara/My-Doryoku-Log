@@ -30,7 +30,7 @@
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--border);
 		background: radial-gradient(
-			100% 75% at 50% 125%,
+			100% 75% at 50% 155%,
 			var(--bg-subtle-grad1),
 			var(--bg-subtle-grad2)
 		);
