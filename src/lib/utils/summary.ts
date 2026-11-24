@@ -1,5 +1,4 @@
 import type { Transaction, TimeEntry } from '$lib/server/db/schema';
-import { MIN_DAYS_TO_PROJECT } from '$lib/types/finance';
 import { toYmd } from './util';
 
 /**
@@ -70,64 +69,20 @@ export function summarizeMonth(transactions: Transaction[], month: string): Mont
 	return { income, expense, net: income - expense, count };
 }
 
-export type MonthProjection = {
-	elapsedDays: number;
-	daysInMonth: number;
-	spent: number;
-	projected: number | null;
-	byThisPointLastMonth: number;
-};
-
 /**
- * Month-to-date expense total and where it is if the current pace holds
- * Projected stays are null until MIN_DAYS_TO_PROJECT days in
- * the comparison month is cut at the same day so a partial month isn't compared to a full one
+ * The most recent YYYY-MM-DD a transaction was recorded, empty when there are none
  * @param transactions
- * @param today YYYY-MM-DD
  */
-export function projectMonth(transactions: Transaction[], today: string): MonthProjection {
-	const [yyyy, mm, dd] = today.split('-').map(Number);
-	if (!yyyy || !mm || !dd) {
-		return { elapsedDays: 0, daysInMonth: 0, spent: 0, projected: null, byThisPointLastMonth: 0 };
-	}
-
-	const month = monthKey(today);
-	// day 0 of the following month is the last day of this one
-	const daysInMonth = new Date(yyyy, mm, 0).getDate();
-
-	const prevYyyy = mm === 1 ? yyyy - 1 : yyyy;
-	const prevMm = mm === 1 ? 12 : mm - 1;
-	const prevMonth = `${prevYyyy}-${String(prevMm).padStart(2, '0')}`;
-	const prevDaysInMonth = new Date(prevYyyy, prevMm, 0).getDate();
-	// the 31st has no counterpart in a 30-day month, so that day compares against all of it
-	const compareDay = Math.min(dd, prevDaysInMonth);
-
-	let spent = 0;
-	let byThisPointLastMonth = 0;
+export function lastTransactionDate(transactions: Transaction[]): string {
+	let latest = '';
 
 	for (const tx of transactions) {
-		if (tx.type !== 'expense') {
-			continue;
-		}
-
-		const txMonth = monthKey(tx.date);
-		if (txMonth === month) {
-			// a charge dated later in the month has not been spent yet, counting it inflates the pace
-			if (tx.date <= today) {
-				spent += tx.amount;
-			}
-		} else if (txMonth === prevMonth && Number(tx.date.slice(8, 10)) <= compareDay) {
-			byThisPointLastMonth += tx.amount;
+		if (tx.date > latest) {
+			latest = tx.date;
 		}
 	}
 
-	return {
-		elapsedDays: dd,
-		daysInMonth,
-		spent,
-		projected: dd >= MIN_DAYS_TO_PROJECT ? (spent / dd) * daysInMonth : null,
-		byThisPointLastMonth
-	};
+	return latest;
 }
 
 export type DaySummary = {
@@ -175,6 +130,23 @@ export function trackedDays(entries: TimeEntry[]): Set<string> {
 	}
 
 	return days;
+}
+
+/**
+ * The most recent YYYY-MM-DD with a completed session, empty when there are none
+ * takes the set trackedDays returns so the duration rule isn't duplicated
+ * @param days
+ */
+export function lastTrackedDay(days: Set<string>): string {
+	let latest = '';
+
+	for (const day of days) {
+		if (day > latest) {
+			latest = day;
+		}
+	}
+
+	return latest;
 }
 
 /**

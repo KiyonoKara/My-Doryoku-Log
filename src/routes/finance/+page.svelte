@@ -680,7 +680,7 @@
 			{#if transactionsCsv}
 				<CsvExportButton
 					label="Export CSV"
-					description="Download all transactions as CSV"
+					description="Download filtered transactions as CSV"
 					csvContent={transactionsCsv}
 					iconPath={fileReport}
 					filename={`transactions-${new Date().toISOString().slice(0, 10)}.csv`}

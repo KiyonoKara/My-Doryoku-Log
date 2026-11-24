@@ -36,9 +36,6 @@ export type TransactionCategory = (typeof EXPENSE_CATEGORIES | typeof INCOME_CAT
 // minimum rows per type before the random forest models can be trained
 export const MIN_REQ_TRANSACTIONS = 10;
 
-// minimum days into the current month before the random forest models can predict income/expenses
-export const MIN_DAYS_TO_PROJECT = 3;
-
 export interface FinMLPrediction {
 	type: string;
 	coarse_category: string;
