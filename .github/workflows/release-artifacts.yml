@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Validate inputs
         shell: bash
@@ -42,7 +42,7 @@ jobs:
           fi
 
       - name: Download all artifacts from build run
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
