@@ -6,7 +6,8 @@
 	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
 	import CsvImportButton from '$lib/buttons/CsvImportButton.svelte';
 	import CategoryBarChart from '$lib/other/CategoryBarChart.svelte';
-	import ForecastSection from '$lib/other/ForecastSection.svelte';
+	// ml forecasting is archived
+	// import ForecastSection from '$lib/other/ForecastSection.svelte';
 	import { capitalizeFirstLetter, dynamicToggleSlider, numValidator } from '$lib/utils/util';
 	import {
 		type TxType,
@@ -698,7 +699,7 @@
 	/>
 
 	<!-- ML predictions section, can be toggled on or off	-->
-	<ForecastSection {transactions} />
+	<!-- <ForecastSection {transactions} /> -->
 </section>
 
 <style>
