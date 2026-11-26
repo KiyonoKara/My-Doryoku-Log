@@ -34,7 +34,7 @@
 			var(--bg-subtle-grad1),
 			var(--bg-subtle-grad2)
 		);
-		box-shadow: var(--card-shadow);
+		box-shadow: var(--card-bottom-shadow);
 		padding: 0.9rem 1rem;
 		display: flex;
 		flex-direction: column;

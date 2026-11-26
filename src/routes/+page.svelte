@@ -11,8 +11,9 @@
 	import {
 		currentStreak,
 		entryDay,
+		lastTrackedDay,
+		lastTransactionDate,
 		monthKey,
-		projectMonth,
 		recentActivity,
 		runningEntry,
 		summarizeDay,
@@ -20,7 +21,6 @@
 		trackedDays,
 		type ActivityItem
 	} from '$lib/utils/summary';
-	import { detectRecurring, recurringDueBetween } from '$lib/utils/recurring';
 
 	let { data } = $props();
 
@@ -38,50 +38,57 @@
 
 	let monthSummary = $derived(summarizeMonth(transactions, month));
 	let daySummary = $derived(summarizeDay(entries, today));
-	let streak = $derived(currentStreak(trackedDays(entries), today));
+	let tracked = $derived(trackedDays(entries));
+	let streak = $derived(currentStreak(tracked, today));
 	let active = $derived(runningEntry(entries));
-	let activity = $derived(recentActivity(transactions, entries, 5));
 
 	let isEmpty = $derived(transactions.length === 0 && entries.length === 0);
 
-	// where the month lands if the spending so far keeps up
-	let projection = $derived(projectMonth(transactions, today));
-	let monthEnd = $derived(`${month}-${String(projection.daysInMonth).padStart(2, '0')}`);
-	let dueThisMonth = $derived(
-		recurringDueBetween(
-			detectRecurring(transactions, today).filter((item) => item.type === 'expense'),
-			today,
-			monthEnd
-		)
-	);
-	let dueTotal = $derived(dueThisMonth.reduce((sum, due) => sum + due.item.amount, 0));
+	// money and time are two separate records, so the panels never share a list
+	// an empty array on the other side reuses the same tested merge for one domain only
+	let recentTransactions = $derived(recentActivity(transactions, [], 4));
+	let recentSessions = $derived(recentActivity([], entries, 4));
 
-	// a projection with nothing spent yet or too early in the month won't get a card
-	let showPace = $derived(projection.projected !== null && projection.spent > 0);
-	let showDue = $derived(dueThisMonth.length > 0);
+	let lastTx = $derived(lastTransactionDate(transactions));
+	let lastSession = $derived(lastTrackedDay(tracked));
 
-	// the pace counts spend to date while the month row totals the whole month
-	// naming the basis keeps the two numbers from reading as a contradiction
-	let paceDetail = $derived.by(() => {
-		const soFar = `${currencyStore.format(projection.spent)} so far`;
-
-		// comparing against a month with nothing in it says nothing
-		return projection.byThisPointLastMonth > 0
-			? `${soFar} · vs ${currencyStore.format(projection.byThisPointLastMonth)} by this point last month`
-			: soFar;
-	});
-
-	// the soonest charge still to come, named so the number has something behind it
-	let nextDueDetail = $derived.by(() => {
-		const next = dueThisMonth[0];
-		if (!next) {
+	// how long the record has been quiet, phrased as information rather than a scold
+	function ago(day: string, from: string): string {
+		if (!day) {
 			return '';
 		}
 
-		const days = daysBetween(today, next.date);
-		const when = days <= 0 ? 'today' : days === 1 ? 'tomorrow' : `in ${days} days`;
-		return `${next.item.category} · ${when}`;
-	});
+		const days = daysBetween(day, from);
+		if (days <= 0) {
+			return 'today';
+		}
+
+		return days === 1 ? 'yesterday' : `${days} days ago`;
+	}
+
+	// a zero in a detail line reads as a gap, so each panel names the absence instead
+	let todayDetail = $derived(
+		daySummary.sessions === 0
+			? 'Nothing yet today'
+			: daySummary.sessions === 1
+				? '1 session'
+				: `${daySummary.sessions} sessions`
+	);
+
+	// the stat row answers for this month, the meta line answers for the whole record
+	let financeMeta = $derived(
+		transactions.length === 0
+			? 'No transactions yet'
+			: `${transactions.length} recorded · last entry ${ago(lastTx, today)}`
+	);
+
+	let timeMeta = $derived(
+		entries.length === 0
+			? 'No sessions yet'
+			: entries.length === 1
+				? '1 session recorded'
+				: `${entries.length} sessions recorded`
+	);
 
 	$effect(() => {
 		if (!active) {
@@ -95,8 +102,8 @@
 		return () => clearInterval(interval);
 	});
 
-	// wall clock time since the started session, which isn't the recorded duration since the pause state
-	// is in the time page and a paused session still reads as running from here
+	// wall clock time since the started session, which isn't the recorded duration since the pause
+	// state is in the time page and a paused session still reads as running from here
 	let elapsedMs = $derived.by(() => {
 		if (!active) {
 			return 0;
@@ -121,193 +128,193 @@
 		<article class="panel dashboard__start">
 			<h2 class="panel-title">Start your log</h2>
 			<p class="dashboard__start-text">
-				Nothing recorded yet. Save a transaction to begin tracking money, or run the timer while you
-				work on a task. A month-end pace and any repeating charges show up here once there is
-				something to read.
+				Nothing yet...
 			</p>
 		</article>
 	{:else}
-		<div class="dashboard__section">
-			<h2 class="dashboard__section-title">Today</h2>
-
-			<div class="stat-row">
-				<StatCard
-					eyebrow="Time"
-					value={formatDuration(daySummary.totalMs)}
-					label="Tracked today"
-					detail={daySummary.sessions === 1 ? '1 session' : `${daySummary.sessions} sessions`}
-				/>
-
-				<StatCard
-					eyebrow="Streak"
-					value={streak === 1 ? '1 day' : `${streak} days`}
-					label="Current streak"
-					detail={streak > 0
-						? 'Consecutive days with tracked time'
-						: 'Log a session to start a streak'}
-				/>
-			</div>
-
-			{#if active}
-				<article class="running-card">
-					<div class="running-card__main">
-						<p class="running-card__eyebrow">Running now</p>
-						<p class="running-card__task">{active.task}</p>
-						<p class="running-card__meta">
-							{active.category} · started {formatTime(active.start_date)}
-						</p>
-					</div>
-
-					<div class="running-card__elapsed">
-						<p class="running-card__timer">{formatDuration(elapsedMs)}</p>
-						<p class="running-card__timer-label">elapsed since start</p>
-					</div>
-
-					<a class="running-card__link" href={resolve('/time')}>Pause or stop</a>
-				</article>
-			{/if}
-		</div>
-
-		<div class="dashboard__section">
-			<h2 class="dashboard__section-title">{monthLabel}</h2>
-
-			<div class="stat-row">
-				<StatCard
-					eyebrow="Money in"
-					value={currencyStore.format(monthSummary.income)}
-					label="Income"
-					tone="positive"
-				/>
-
-				<StatCard
-					eyebrow="Money out"
-					value={currencyStore.format(monthSummary.expense)}
-					label="Expenses"
-					tone="negative"
-				/>
-
-				<StatCard
-					eyebrow="Balance"
-					value={currencyStore.format(monthSummary.net)}
-					label="Net this month"
-					tone={netTone}
-					detail={monthSummary.count === 1
-						? '1 entry this month'
-						: `${monthSummary.count} entries this month`}
-				/>
-			</div>
-		</div>
-
-		{#if showPace || showDue}
-			<div class="dashboard__section">
-				<h2 class="dashboard__section-title">Predictions</h2>
+		<div class="dashboard__grid">
+			<!-- money -->
+			<article class="panel dashboard__panel">
+				<header class="dashboard__panel-header">
+					<h2 class="panel-title">{monthLabel}</h2>
+					<span class="dashboard__panel-chip">Finance</span>
+				</header>
 
 				<div class="stat-row">
-					{#if showPace}
-						<StatCard
-							eyebrow="Pace"
-							value={currencyStore.format(projection.projected ?? 0)}
-							label="On pace to spend"
-							detail={paceDetail}
-						/>
-					{/if}
+					<StatCard
+						eyebrow="Money in"
+						value={currencyStore.format(monthSummary.income)}
+						label="Income"
+						tone="positive"
+					/>
 
-					{#if showDue}
+					<StatCard
+						eyebrow="Money out"
+						value={currencyStore.format(monthSummary.expense)}
+						label="Expenses"
+						tone="negative"
+					/>
+
+					<StatCard
+						eyebrow="Balance"
+						value={currencyStore.format(monthSummary.net)}
+						label="Net this month"
+						tone={netTone}
+						detail={monthSummary.count === 1
+							? '1 entry this month'
+							: `${monthSummary.count} entries this month`}
+					/>
+				</div>
+
+				<p class="dashboard__meta">{financeMeta}</p>
+
+				<SectionButton
+					label="Log a transaction"
+					description="Record money in or out"
+					iconPath={fileReport}
+					href="/finance"
+				/>
+
+				<div class="history-scroll">
+					{#if recentTransactions.length === 0}
+						<p class="empty-state">No transactions yet</p>
+					{:else}
+						<ul class="history-list">
+							{#each recentTransactions as item (activityKey(item))}
+								{#if item.kind === 'transaction'}
+									<li class="history-item">
+										<div class="history-item__row">
+											<div class="history-item__main">
+												<div class="history-item__main-top">
+													<span
+														class="history-item__type history-item__type--{item.transaction.type}"
+													>
+														{item.transaction.type}
+													</span>
+													<span class="history-item__category">
+														{item.transaction.category}
+													</span>
+												</div>
+
+												{#if item.transaction.description}
+													<span class="history-item__description">
+														{item.transaction.description}
+													</span>
+												{/if}
+											</div>
+
+											<div class="history-item__meta">
+												<span class="history-item__amount">
+													{item.transaction.type === 'expense' ? '-' : '+'}{currencyStore.format(
+														item.transaction.amount
+													)}
+												</span>
+												<span class="history-item__date-label">
+													{formatDateLabel(item.transaction.date)}
+												</span>
+											</div>
+										</div>
+									</li>
+								{/if}
+							{/each}
+						</ul>
+					{/if}
+				</div>
+			</article>
+
+			<!-- time -->
+			<article class="panel dashboard__panel">
+				<header class="dashboard__panel-header">
+					<h2 class="panel-title">Today</h2>
+					<span class="dashboard__panel-chip">Time</span>
+				</header>
+
+				{#if active}
+					<article class="running-card">
+						<div class="running-card__main">
+							<p class="running-card__eyebrow">Running now</p>
+							<p class="running-card__task">{active.task}</p>
+							<p class="running-card__meta">
+								{active.category} · started {formatTime(active.start_date)}
+							</p>
+						</div>
+
+						<div class="running-card__elapsed">
+							<p class="running-card__timer">{formatDuration(elapsedMs)}</p>
+							<p class="running-card__timer-label">elapsed since start</p>
+						</div>
+
+						<a class="running-card__link" href={resolve('/time')}>Pause or stop</a>
+					</article>
+				{/if}
+
+				<div class="stat-row">
+					<StatCard
+						eyebrow="Time"
+						value={formatDuration(daySummary.totalMs)}
+						label="Tracked today"
+						detail={todayDetail}
+					/>
+
+					{#if streak > 0}
 						<StatCard
-							eyebrow="Recurring"
-							value={currencyStore.format(dueTotal)}
-							label="Still due this month"
-							detail={nextDueDetail}
+							eyebrow="Streak"
+							value={streak === 1 ? '1 day' : `${streak} days`}
+							label="Current streak"
+							detail="Consecutive days with tracked time"
+						/>
+					{:else}
+						<!-- a zero streak is a judgement, the gap since the last session is information -->
+						<StatCard
+							eyebrow="Last tracked"
+							value={lastSession ? ago(lastSession, today) : '—'}
+							label="Since your last session"
+							detail={lastSession ? formatDateLabel(lastSession) : 'No sessions yet'}
 						/>
 					{/if}
 				</div>
-			</div>
-		{/if}
-	{/if}
 
-	<div class="dashboard__section">
-		<h2 class="dashboard__section-title">Quick start</h2>
+				<p class="dashboard__meta">{timeMeta}</p>
 
-		<div class="quick-start">
-			<SectionButton
-				label="Finance logging"
-				description="Log transactions and see reports"
-				iconPath={fileReport}
-				href="/finance"
-			/>
+				<SectionButton
+					label="Start tracking"
+					description="Run the timer on a task"
+					iconPath={stopwatch}
+					href="/time"
+				/>
 
-			<SectionButton
-				label="Time tracking"
-				description="Track how long tasks take"
-				iconPath={stopwatch}
-				href="/time"
-			/>
-		</div>
-	</div>
+				<div class="history-scroll">
+					{#if recentSessions.length === 0}
+						<p class="empty-state">No finished sessions yet</p>
+					{:else}
+						<ul class="history-list">
+							{#each recentSessions as item (activityKey(item))}
+								{#if item.kind === 'time'}
+									<li class="history-item">
+										<div class="history-item__row">
+											<div class="history-item__main">
+												<div class="history-item__main-top">
+													<span class="history-item__type">{item.entry.category}</span>
+													<span class="history-item__category">{item.entry.task}</span>
+												</div>
+											</div>
 
-	{#if !isEmpty}
-		<div class="dashboard__section">
-			<h2 class="dashboard__section-title">Recent activity</h2>
-
-			<div class="history-scroll">
-				{#if activity.length === 0}
-					<p class="empty-state">No finished entries yet</p>
-				{:else}
-					<ul class="history-list">
-						{#each activity as item (activityKey(item))}
-							<li class="history-item">
-								<div class="history-item__row">
-									<div class="history-item__main">
-										<div class="history-item__main-top">
-											{#if item.kind === 'transaction'}
-												<span
-													class="history-item__type history-item__type--{item.transaction.type}"
-												>
-													{item.transaction.type}
+											<div class="history-item__meta">
+												<span class="history-item__duration">
+													{formatDuration(item.entry.duration_ms)}
 												</span>
-												<span class="history-item__category">
-													{item.transaction.category}
+												<span class="history-item__date-label">
+													{formatDateLabel(entryDay(item.entry))}
 												</span>
-											{:else}
-												<span class="history-item__type">
-													{item.entry.category}
-												</span>
-												<span class="history-item__category">{item.entry.task}</span>
-											{/if}
+											</div>
 										</div>
-
-										{#if item.kind === 'transaction' && item.transaction.description}
-											<span class="history-item__description">
-												{item.transaction.description}
-											</span>
-										{/if}
-									</div>
-
-									<div class="history-item__meta">
-										{#if item.kind === 'transaction'}
-											<span class="history-item__amount">
-												{item.transaction.type === 'expense' ? '-' : '+'}{currencyStore.format(
-													item.transaction.amount
-												)}
-											</span>
-											<span class="history-item__date-label">
-												{formatDateLabel(item.transaction.date)}
-											</span>
-										{:else}
-											<span class="history-item__duration">
-												{formatDuration(item.entry.duration_ms)}
-											</span>
-											<span class="history-item__date-label">
-												{formatDateLabel(entryDay(item.entry))}
-											</span>
-										{/if}
-									</div>
-								</div>
-							</li>
-						{/each}
-					</ul>
-				{/if}
-			</div>
+									</li>
+								{/if}
+							{/each}
+						</ul>
+					{/if}
+				</div>
+			</article>
 		</div>
 	{/if}
 </section>
@@ -322,18 +329,36 @@
 		gap: 1.5rem;
 	}
 
-	.dashboard__section {
-		display: flex;
-		flex-direction: column;
-		gap: 0.6rem;
+	/* two records, two columns, the same split the other pages use */
+	.dashboard__grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+		gap: 1.5rem;
 	}
 
-	.dashboard__section-title {
-		margin: 0;
-		font-size: 0.95rem;
+	.dashboard__panel {
+		min-width: 0;
+	}
+
+	.dashboard__panel-header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
+
+	.dashboard__panel-chip {
+		font-size: 0.68rem;
 		font-weight: 600;
-		letter-spacing: 0.01em;
-		color: var(--text-secondary);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+	}
+
+	.dashboard__meta {
+		margin: 0;
+		font-size: 0.78rem;
+		color: var(--text-muted);
 	}
 
 	.dashboard__start {
@@ -353,18 +378,6 @@
 		gap: 0.8rem;
 	}
 
-	.quick-start {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		gap: 1rem;
-	}
-
-	@media (min-width: 720px) {
-		.quick-start {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-	}
-
 	.running-card {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) auto;
@@ -373,7 +386,7 @@
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-resume-border);
 		background: var(--card-grad-bottom);
-		box-shadow: var(--shadow-3);
+		box-shadow: var(--card-bottom-shadow);
 		padding: 0.9rem 1rem;
 	}
 
@@ -456,6 +469,10 @@
 	@media (max-width: 840px) {
 		.dashboard {
 			padding: 0 1rem 2rem;
+		}
+
+		.dashboard__grid {
+			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 </style>
