@@ -121,7 +121,7 @@
 						dominant-baseline="central"
 						class="category-chart__value"
 					>
-						{currencyStore.symbol}{value.toFixed(2)}
+						{currencyStore.format(value)}
 					</text>
 				{/each}
 			</g>

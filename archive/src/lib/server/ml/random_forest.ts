@@ -280,24 +280,22 @@ export function buildDatasets(rows: Transaction[]) {
 				? (COARSE_EXPENSE_MAP[category] ?? 'Other')
 				: (COARSE_INCOME_MAP[category] ?? 'Other Income');
 		const coarseId = COARSE_TO_ID[coarseCat];
-		// fine id
-		const fineId = CATEGORY_TO_ID[category];
 
 		if (type === 'expense') {
 			// expense
 			// for classifier
-			XExpClf.push([dow, month, amount, isWeekend, isMonthStart, isMonthEnd]);
+			XExpClf.push([dow, month, isWeekend, isMonthStart, isMonthEnd]);
 			yExpClf.push(coarseId);
 			// for regression
-			XExpReg.push([dow, month, isWeekend, isMonthStart, fineId]);
+			XExpReg.push([dow, month, isWeekend, isMonthStart, coarseId]);
 			yExpReg.push(amount);
 		} else {
 			// income
 			// for classifier
-			XIncClf.push([dow, month, amount, isWeekend, isMonthStart, isMonthEnd]);
+			XIncClf.push([dow, month, isWeekend, isMonthStart, isMonthEnd]);
 			yIncClf.push(coarseId);
 			// for regression
-			XIncReg.push([dow, month, isWeekend, isMonthStart, fineId]);
+			XIncReg.push([dow, month, isWeekend, isMonthStart, coarseId]);
 			yIncReg.push(amount);
 		}
 	}

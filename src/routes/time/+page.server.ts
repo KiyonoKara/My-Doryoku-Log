@@ -121,9 +121,12 @@ export const actions: Actions = {
 
 		// use the difference between start and end dates if there's no recorded duration
 		const submittedMs = Number(formData.get('duration_ms'));
-		const duration_ms = Number.isFinite(submittedMs) && submittedMs > 0
-			? submittedMs
-			: Number.isFinite(startMs) && Number.isFinite(endMs) ? Math.max(0, endMs - startMs) : 0;
+		const duration_ms =
+			Number.isFinite(submittedMs) && submittedMs > 0
+				? submittedMs
+				: Number.isFinite(startMs) && Number.isFinite(endMs)
+					? Math.max(0, endMs - startMs)
+					: 0;
 
 		await db.update(time_entries).set({ end_date, duration_ms }).where(eq(time_entries.id, id));
 

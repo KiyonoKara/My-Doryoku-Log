@@ -1,22 +1,16 @@
 <script lang="ts">
 	import { currencyStore } from '$lib/stores/currency.svelte';
+	import { CURRENCY_FORMATS } from '$lib/types/finance';
 
 	const currencies: {
 		id: Currency;
 		label: string;
 		symbol: string;
-	}[] = [
-		{
-			id: 'USD',
-			label: 'USD',
-			symbol: '$'
-		},
-		{
-			id: 'JPY',
-			label: 'JPY',
-			symbol: '¥'
-		}
-	];
+	}[] = (Object.keys(CURRENCY_FORMATS) as Currency[]).map((id) => ({
+		id,
+		label: id,
+		symbol: CURRENCY_FORMATS[id].symbol
+	}));
 
 	let open = $state(false);
 
@@ -46,10 +40,10 @@
 	<button
 		class="ts-trigger"
 		onclick={toggle}
-		aria-label="Change currency"
+		aria-label="Change currency display format"
 		aria-expanded={open}
 		aria-haspopup="listbox"
-		title="Change currency"
+		title="Change currency display format"
 	>
 		<span class="currency-symbol" aria-hidden="true">
 			{currencyStore.symbol}
@@ -92,6 +86,7 @@
 					{/if}
 				</button>
 			{/each}
+			<p class="ts-menu__note">Display only. Saved amounts are not converted.</p>
 		</div>
 	{/if}
 </div>
@@ -242,6 +237,15 @@
 	.ts-option__check {
 		font-size: 0.9rem;
 		color: var(--color-positive-text);
+	}
+
+	.ts-menu__note {
+		margin: 0.15rem 0 0;
+		padding: 0.4rem 0.6rem 0.15rem;
+		border-top: 1px solid var(--border-subtle);
+		font-size: 0.7rem;
+		line-height: 1.3;
+		color: var(--text-muted);
 	}
 
 	.currency-symbol {

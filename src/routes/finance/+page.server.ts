@@ -3,7 +3,8 @@ import { fail } from '@sveltejs/kit';
 import { getDb } from '$lib/server/db';
 import { transactions, type Transaction } from '$lib/server/db/schema';
 import { desc, eq, inArray } from 'drizzle-orm';
-import { forecastNextExpense, forecastNextIncome } from '$lib/server/ml/forecasting';
+// ml forecasting is archived
+// import { forecastNextExpense, forecastNextIncome } from '$lib/server/ml/forecasting';
 import { MAX_DESCRIPTION_LENGTH } from '$lib/types/finance';
 import { parseCSVLine } from '$lib/utils/util';
 
@@ -17,25 +18,26 @@ export const load: PageServerLoad = async () => {
 			.from(transactions)
 			.orderBy(desc(transactions.date), desc(transactions.id));
 		//.limit(50);
-		let expenseForecast = null;
-		let incomeForecast = null;
 
-		try {
-			expenseForecast = await forecastNextExpense();
-		} catch (error) {
-			console.error('forecastNextExpense failed:', error);
-		}
-
-		try {
-			incomeForecast = await forecastNextIncome();
-		} catch (error) {
-			console.error('forecastNextIncome failed:', error);
-		}
+		// let expenseForecast = null;
+		// let incomeForecast = null;
+		//
+		// try {
+		// 	expenseForecast = await forecastNextExpense();
+		// } catch (error) {
+		// 	console.error('forecastNextExpense failed:', error);
+		// }
+		//
+		// try {
+		// 	incomeForecast = await forecastNextIncome();
+		// } catch (error) {
+		// 	console.error('forecastNextIncome failed:', error);
+		// }
 
 		return {
-			transactions: rows as Transaction[],
-			expenseForecast,
-			incomeForecast
+			transactions: rows as Transaction[]
+			// expenseForecast,
+			// incomeForecast
 		};
 	} catch (error) {
 		console.error('[finance load] failed:', error);

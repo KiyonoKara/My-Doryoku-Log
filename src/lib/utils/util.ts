@@ -1,4 +1,5 @@
 import { MONTH_NAMES } from '$lib/types/time';
+import { CURRENCY_FORMATS } from '$lib/types/finance';
 
 /**
  * Capitalizes the first letter
@@ -40,6 +41,24 @@ export function toYmd(d: Date): string {
 		month: '2-digit',
 		day: '2-digit'
 	}).format(d);
+}
+
+/**
+ * Get days from two dates
+ * Returns negative int if the second date is before the first
+ * Rounded because daylight savings change makes the millisecond gap an hour short
+ * @param firstDate
+ * @param secondDate
+ */
+export function daysBetween(firstDate: string, secondDate: string): number {
+	const [ay, am, ad] = firstDate.split('-').map(Number);
+	const [by, bm, bd] = secondDate.split('-').map(Number);
+	if (!ay || !am || !ad || !by || !bm || !bd) {
+		return 0;
+	}
+	const from = new Date(ay, am - 1, ad);
+	const to = new Date(by, bm - 1, bd);
+	return Math.round((to.getTime() - from.getTime()) / 86400000);
 }
 
 /**
@@ -85,6 +104,20 @@ export function formatDate(d: string | null | undefined) {
 	}
 	const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 	return t.toLocaleDateString([], { timeZone: tz });
+}
+
+/**
+ * Format a currency amount to display the currency symbol
+ * Cosmetic only and data doesn't change
+ * The sign is placed before the symbol. E.g. -$9.99 instead of $-9.99
+ * @param amount
+ * @param currency
+ */
+export function formatCurrency(amount: number, currency: Currency): string {
+	const { symbol, decimals } = CURRENCY_FORMATS[currency];
+	const value = Number.isFinite(amount) ? amount : 0;
+	const sign = value < 0 ? '-' : '';
+	return `${sign}${symbol}${Math.abs(value).toFixed(decimals)}`;
 }
 
 /**

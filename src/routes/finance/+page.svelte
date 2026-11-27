@@ -6,7 +6,8 @@
 	import CsvExportButton from '$lib/buttons/CsvExportButton.svelte';
 	import CsvImportButton from '$lib/buttons/CsvImportButton.svelte';
 	import CategoryBarChart from '$lib/other/CategoryBarChart.svelte';
-	import ForecastSection from '$lib/other/ForecastSection.svelte';
+	// ml forecasting is archived
+	// import ForecastSection from '$lib/other/ForecastSection.svelte';
 	import { capitalizeFirstLetter, dynamicToggleSlider, numValidator } from '$lib/utils/util';
 	import {
 		type TxType,
@@ -647,7 +648,7 @@
 														>{tx.type}</span
 													>
 													<span class="history-item__amount">
-														{tx.type === 'expense' ? '-' : '+'}{currencyStore.symbol}{tx.amount}
+														{tx.type === 'expense' ? '-' : '+'}{currencyStore.format(tx.amount)}
 													</span>
 													<span class="history-item__date-label">{formatDateLabel(tx.date)}</span>
 												</div>
@@ -680,7 +681,7 @@
 			{#if transactionsCsv}
 				<CsvExportButton
 					label="Export CSV"
-					description="Download all transactions as CSV"
+					description="Download filtered transactions as CSV"
 					csvContent={transactionsCsv}
 					iconPath={fileReport}
 					filename={`transactions-${new Date().toISOString().slice(0, 10)}.csv`}
@@ -698,7 +699,7 @@
 	/>
 
 	<!-- ML predictions section, can be toggled on or off	-->
-	<ForecastSection {transactions} />
+	<!-- <ForecastSection {transactions} /> -->
 </section>
 
 <style>

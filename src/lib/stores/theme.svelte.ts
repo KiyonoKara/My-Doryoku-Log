@@ -31,7 +31,6 @@ function createThemeStore() {
 
 	function applyTheme(theme: Theme) {
 		const resolved = theme === 'system' ? getSystemTheme() : theme;
-		console.log(resolved);
 		document.documentElement.setAttribute('data-theme', resolved);
 	}
 

@@ -3,7 +3,11 @@
 	import { slide } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import leftArrow from '$lib/assets/left-arrow.svg';
-	import type { TxType, FinMLPredictionResponse } from '$lib/types/finance';
+	import {
+		MIN_REQ_TRANSACTIONS,
+		type TxType,
+		type FinMLPredictionResponse
+	} from '$lib/types/finance';
 	import { type Transaction } from '$lib/server/db/schema';
 	import { capitalizeFirstLetter, dynamicToggleSlider } from '$lib/utils/util';
 	import { currencyStore } from '$lib/stores/currency.svelte';
@@ -42,8 +46,12 @@
 	let lastExpenseHash = $state('');
 	let lastIncomeHash = $state('');
 
-	let needsExpenseRefresh = $derived(expenseHash !== lastExpenseHash && expenseCount >= 10);
-	let needsIncomeRefresh = $derived(incomeHash !== lastIncomeHash && incomeCount >= 10);
+	let needsExpenseRefresh = $derived(
+		expenseHash !== lastExpenseHash && expenseCount >= MIN_REQ_TRANSACTIONS
+	);
+	let needsIncomeRefresh = $derived(
+		incomeHash !== lastIncomeHash && incomeCount >= MIN_REQ_TRANSACTIONS
+	);
 
 	let needsRefresh = $derived(needsExpenseRefresh || needsIncomeRefresh);
 
@@ -172,7 +180,7 @@
 					Loading predictions...
 				</div>
 			{:else if type === 'expense'}
-				{#if expenseCount >= 10}
+				{#if expenseCount >= MIN_REQ_TRANSACTIONS}
 					<!-- show predicted expense if there are at least 10 expense transactions -->
 					{#if expPrediction.success && expPrediction.pred}
 						<div class="forecast__grid">
@@ -182,10 +190,10 @@
 										{expPrediction.pred.coarse_category || '—'}
 									</div>
 									<div class="forecast__amount">
-										-{currencyStore.symbol}{expPrediction.pred.amount?.toFixed(2) || '0.00'}
+										-{currencyStore.format(expPrediction.pred.amount ?? 0)}
 									</div>
 								</div>
-								<div class="forecast__label">Next expense</div>
+								<div class="forecast__label">Likely expense</div>
 							</div>
 						</div>
 					{:else}
@@ -194,10 +202,10 @@
 				{:else}
 					<!-- show status if insufficient -->
 					<div class="forecast__status forecast__status--not-ready">
-						Enter {10 - expenseCount} more expenses for predictions
+						Enter {MIN_REQ_TRANSACTIONS - expenseCount} more expenses for predictions
 					</div>
 				{/if}
-			{:else if incomeCount >= 10}
+			{:else if incomeCount >= MIN_REQ_TRANSACTIONS}
 				{#if incPrediction.success && incPrediction.pred}
 					<!-- show predicted income if there are at least 10 income transactions -->
 					<div class="forecast__grid">
@@ -207,10 +215,10 @@
 									{incPrediction.pred.coarse_category || '—'}
 								</div>
 								<div class="forecast__amount">
-									+{currencyStore.symbol}{incPrediction.pred.amount?.toFixed(2) || '0.00'}
+									+{currencyStore.format(incPrediction.pred.amount ?? 0)}
 								</div>
 							</div>
-							<div class="forecast__label">Next income</div>
+							<div class="forecast__label">Likely income</div>
 						</div>
 					</div>
 				{:else}
@@ -219,7 +227,7 @@
 			{:else}
 				<!-- show status if insufficient -->
 				<div class="forecast__status forecast__status--not-ready">
-					Enter {10 - incomeCount} more income transactions for predictions
+					Enter {MIN_REQ_TRANSACTIONS - incomeCount} more income transactions for predictions
 				</div>
 			{/if}
 		</div>
