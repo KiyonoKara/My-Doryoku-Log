@@ -1,0 +1,84 @@
+name: Build packages check
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
+    env:
+      DATABASE_URL: local.db
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS x64
+            runner: macos-latest
+            build_script: pack:mac:x64:dmg
+
+          - name: macOS arm64
+            runner: macos-latest
+            build_script: pack:mac:arm64:dmg
+
+          - name: Windows x64
+            runner: windows-2025
+            build_script: pack:win:x64
+
+          - name: Linux x64
+            runner: ubuntu-latest
+            build_script: pack:linux:x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.1.2
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Show versions
+        run: |
+          node -v
+          pnpm -v
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check app
+        run: |
+          pnpm check
+          pnpm test
+
+      - name: Build package
+        run: pnpm run ${{ matrix.build_script }}
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.name }}-${{ github.event.pull_request.head.sha || github.sha }}
+          path: dist-electron/**/*
+          if-no-files-found: error
+          retention-days: 7

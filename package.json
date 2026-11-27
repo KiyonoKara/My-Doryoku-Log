@@ -32,8 +32,8 @@
 		"pack": "pnpm run build && electron-builder build",
 		"pack:mac:x64:zip": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --x64 --publish never",
 		"pack:mac:arm64:zip": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac zip --arm64 --publish never",
-		"pack:mac:x64:dmg": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac dmg --x64 --publish never",
-		"pack:mac:arm64:dmg": "pnpm run build && pnpm run rebuild:electron && electron-builder build --mac dmg --arm64 --publish never",
+		"pack:mac:x64:dmg": "pnpm run build && pnpm run rebuild:electron --arch x64 && electron-builder build --mac dmg --x64 --publish never",
+		"pack:mac:arm64:dmg": "pnpm run build && pnpm run rebuild:electron --arch arm64 && electron-builder build --mac dmg --arm64 --publish never",
 		"pack:win:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --win nsis --x64 --publish never",
 		"pack:linux:x64": "pnpm run build && pnpm run rebuild:electron && electron-builder build --linux AppImage --x64 --publish never"
 	},

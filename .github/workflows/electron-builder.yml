@@ -22,24 +22,24 @@ jobs:
       matrix:
         include:
           - name: macOS x64
-            runner: macos-15-intel
+            runner: macos-latest
             build_script: pack:mac:x64:dmg
 
           - name: macOS arm64
-            runner: macos-14
+            runner: macos-latest
             build_script: pack:mac:arm64:dmg
 
           - name: Windows x64
-            runner: windows-2022
+            runner: windows-2025
             build_script: pack:win:x64
 
           - name: Linux x64
-            runner: ubuntu-24.04
+            runner: ubuntu-latest
             build_script: pack:linux:x64
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -48,9 +48,10 @@ jobs:
           run_install: false
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: 24
+          # node-version: 24
+          node-version-file: .nvmrc
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
@@ -74,7 +75,7 @@ jobs:
           DATABASE_URL: local.db
 
       - name: Upload workflow artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.name }}
           path: dist-electron/**/*
